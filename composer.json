@@ -8,7 +8,6 @@
           "email": "berthott@web.de"
       }
   ],
-  "minimum-stability": "dev",
   "autoload" : {
       "psr-4" : {
           "berthott\\SX\\": "src"
@@ -31,5 +30,7 @@
     "phpunit/phpunit": "^9.5"
   },
   "require": {
+    "caseyamcl/guzzle_retry_middleware": "^2.6",
+    "guzzlehttp/guzzle": "^7.3"
   }
 }

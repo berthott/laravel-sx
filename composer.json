@@ -1,0 +1,35 @@
+{
+  "name": "berthott/laravel-sx",
+  "description": "A SurveyXAct API Integration for Laravel",
+  "license": "MIT",
+  "authors": [
+      {
+          "name": "Jan Bladt",
+          "email": "berthott@web.de"
+      }
+  ],
+  "minimum-stability": "dev",
+  "autoload" : {
+      "psr-4" : {
+          "berthott\\SX\\": "src"
+      }
+  },
+  "autoload-dev": {
+      "psr-4": {
+          "berthott\\SX\\Tests\\": "tests"
+      }
+  },
+  "extra" : {
+      "laravel" : {
+          "providers" : [
+              "berthott\\SX\\SxServiceProvider"
+          ]
+      }
+  },
+  "require-dev": {
+    "orchestra/testbench": "^6.0",
+    "phpunit/phpunit": "^9.5"
+  },
+  "require": {
+  }
+}

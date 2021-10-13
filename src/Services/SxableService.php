@@ -3,7 +3,9 @@
 namespace berthott\SX\Services;
 
 use HaydenPierce\ClassFinder\ClassFinder;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class SxableService
@@ -19,6 +21,7 @@ class SxableService
     public function __construct()
     {
         $this->initSxableClasses();
+        $this->initTables();
     }
 
     /**
@@ -61,5 +64,43 @@ class SxableService
         return $this->sxables->first(function ($sxable) use ($model) {
             return Str::contains($sxable, $model);
         });
+    }
+
+    /**
+     * Initialize the sxable tables.
+     */
+    private function initTables(): void
+    {
+        if (!$this->sxables) {
+            return;
+        }
+
+        foreach ($this->sxables as $sxable) {
+            $single = Str::lower(class_basename($sxable));
+            $baseTable = Str::plural($single);
+            $valuesTable = $single.'_values';
+            $variablesTable = $single.'_variables';
+
+            if (!Schema::hasTable($baseTable)) {
+                Schema::create($baseTable, function (Blueprint $table) {
+                    $table->bigIncrements('id');
+                    $table->timestamps();
+                });
+            }
+
+            if (!Schema::hasTable($valuesTable)) {
+                Schema::create($valuesTable, function (Blueprint $table) {
+                    $table->bigIncrements('id');
+                    $table->timestamps();
+                });
+            }
+
+            if (!Schema::hasTable($variablesTable)) {
+                Schema::create($variablesTable, function (Blueprint $table) {
+                    $table->bigIncrements('id');
+                    $table->timestamps();
+                });
+            }
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Models\Traits;
 
-use berthott\SX\Models\SxTableFormat;
+use berthott\SX\Models\SxMode;
 
 trait Sxable
 {
@@ -19,6 +19,6 @@ trait Sxable
      */
     public static function format(): string
     {
-        return SxTableFormat::long;
+        return SxMode::Entity;
     }
 }

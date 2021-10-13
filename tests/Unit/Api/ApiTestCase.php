@@ -1,6 +1,6 @@
 <?php
 
-namespace berthott\SX\Tests\Unit;
+namespace berthott\SX\Tests\Unit\Api;
 
 use berthott\SX\SxServiceProvider;
 use Illuminate\Support\Facades\Config;

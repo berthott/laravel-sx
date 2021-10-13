@@ -31,6 +31,7 @@
   },
   "require": {
     "caseyamcl/guzzle_retry_middleware": "^2.6",
-    "guzzlehttp/guzzle": "^7.3"
+    "guzzlehttp/guzzle": "^7.3",
+    "haydenpierce/class-finder": "^0.4.3"
   }
 }

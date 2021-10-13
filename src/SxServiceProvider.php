@@ -2,6 +2,8 @@
 
 namespace berthott\SX;
 
+use berthott\SX\Models\Contracts\Targetable;
+use berthott\SX\Services\SxableService;
 use berthott\SX\Services\SxEntityService;
 use Illuminate\Support\ServiceProvider;
 
@@ -16,12 +18,20 @@ class SxServiceProvider extends ServiceProvider
         $this->app->singleton('SxController', function () {
             return new SxEntityService();
         });
+        $this->app->singleton('Sxable', function () {
+            return new SxableService();
+        });
 
         // bind exception singleton
         //$this->app->singleton(ExceptionHandler::class, Handler::class);
 
         // add config
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'sx');
+
+        // init targetables
+        $this->app->afterResolving(Targetable::class, function (Targetable $targetable) {
+            $targetable->initTarget();
+        });
     }
 
     /**
@@ -40,5 +50,13 @@ class SxServiceProvider extends ServiceProvider
             'path' => storage_path('logs/surveyxact.log'),
             'level' => 'debug',
         ]);
+    }
+
+    protected function routeConfiguration(): array
+    {
+        return [
+            'middleware' => config('sx.middleware'),
+            'prefix' => config('sx.prefix'),
+        ];
     }
 }

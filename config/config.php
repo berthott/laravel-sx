@@ -4,14 +4,65 @@ $baseUrl = env('SX_BASE_URL', 'https://www.survey-xact.dk').'/rest';
 
 return [
 
+    /*
+    |--------------------------------------------------------------------------
+    | Route Middleware Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configurations for the route.
+    |
+    */
+
+    'middleware' => [],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Model Namespace Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Defines one or multiple model namespaces.
+    |
+    */
+
+    'namespace' => 'App\Models',
+
+    /*
+    |--------------------------------------------------------------------------
+    | API Prefix
+    |--------------------------------------------------------------------------
+    |
+    | Defines the api prefix.
+    |
+    */
+
+    'prefix' => 'api',
+
+    /*
+    |--------------------------------------------------------------------------
+    | SX Basic Auth
+    |--------------------------------------------------------------------------
+    |
+    | Defines the SX Basic Auth.
+    |
+    */
+
     'auth' => [
         env('SX_USERNAME'),
         env('SX_PASSWORD'),
     ],
 
-    // https://documenter.getpostman.com/view/1760772/S1a33ni6
+    /*
+    |--------------------------------------------------------------------------
+    | API definitions
+    |--------------------------------------------------------------------------
+    |
+    | Defines the SX API. See
+    | https://documenter.getpostman.com/view/1760772/S1a33ni6
+    |
+    */
+    
     'api' => [
-        'survey' => [
+        'surveys' => [
             'all' => [
                 'api' => "{$baseUrl}/organizations/{organization}/surveys",
                 'method' => 'get'

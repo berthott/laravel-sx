@@ -2,7 +2,6 @@
 
 namespace berthott\SX\Services;
 
-use berthott\SX\Facades\Sx;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
@@ -83,7 +82,7 @@ class SxableService
             $questionsTable = $single.'_questions';
 
             if (!Schema::hasTable($baseTable)) {
-                $sx = Sx::forSurvey($sxable::surveyId());
+                $sx = new SxService($sxable::surveyId());
                 Schema::create($baseTable, function (Blueprint $table) use ($sx) {
                     $table->bigIncrements('id');
                     foreach ($sx->getBaseStructure() as $column) {

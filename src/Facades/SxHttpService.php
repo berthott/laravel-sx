@@ -4,10 +4,10 @@ namespace berthott\SX\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class Sx extends Facade
+class SxHttpService extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return 'Sx';
+        return 'SxHttpService';
     }
 }

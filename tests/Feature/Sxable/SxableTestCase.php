@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Tests\Feature\Sxable;
 
-use berthott\SX\Facades\Sx;
+use berthott\SX\Facades\SxApiService;
 use berthott\SX\SxServiceProvider;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Config;
@@ -14,13 +14,13 @@ abstract class SxableTestCase extends BaseTestCase
     public function setUp(): void
     {
         parent::setUp();
-        Sx::shouldReceive('getStructureFromApi')
+        SxApiService::shouldReceive('exportStructure')
             ->andReturn(new Response(
                 $status = 200,
                 $headers = [],
                 File::get(__DIR__.'/structure.csv'),
             ));
-        Sx::makePartial();
+        SxApiService::makePartial();
     }
 
     protected function getPackageProviders($app)

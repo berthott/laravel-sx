@@ -1,6 +1,6 @@
 <?php
 
-namespace berthott\SX\Services;
+namespace berthott\SX\Services\Http;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
@@ -16,9 +16,10 @@ class SxApiService
     */
     protected string $api;
 
-    public function __construct(string $api)
+    public function api(string $api): self
     {
         $this->api = $api;
+        return $this;
     }
 
     public function __call(string $name, array $arguments): mixed

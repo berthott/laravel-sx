@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Services;
 
-use berthott\SX\Facades\SxController;
+use berthott\SX\Facades\SxHttpService;
 use GuzzleHttp\Psr7\Response;
 use League\Csv\Reader;
 use GuzzleHttp\Psr7\StreamWrapper;
@@ -21,12 +21,11 @@ class SxService
     private string $survey_id;
 
     /**
-     * Set the survey id.
+     * The Constructor.
      */
-    public function forSurvey(string $survey_id): self
+    public function __construct(string $survey_id)
     {
         $this->survey_id = $survey_id;
-        return $this;
     }
 
     /**
@@ -44,7 +43,7 @@ class SxService
      */
     public function getStructureFromApi(): Response
     {
-        return SxController::surveys()->exportStructure([
+        return SxHttpService::surveys()->exportStructure([
             'survey' => $this->survey_id,
             'query' => [
                 'format' => 'EU',

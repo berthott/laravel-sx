@@ -6,6 +6,7 @@ use berthott\SX\Models\SxMode;
 use berthott\SX\Services\SxControllerService;
 use Closure;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -146,11 +147,17 @@ trait Sxable
      */
     public static function initQuestionsTable(bool $force = false): void
     {
-        self::initTable(self::questionsTableName(), function (Blueprint $table) {
+        $table = self::questionsTableName();
+        self::initTable($table, function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('questionName');
             $table->string('questionText');
             $table->timestamps();
         }, $force);
+
+        if (DB::table($table)->get()->isEmpty()) {
+            $data = self::controller()->getQuestions()->all();
+            DB::table($table)->insert(self::controller()->getQuestions()->all());
+        }
     }
 }

@@ -52,6 +52,7 @@ class SxControllerService
         $csv = Reader::createFromStream(StreamWrapper::getResource($response->getBody()));
         $csv->setHeaderOffset(0);
         $csv->setDelimiter(';');
+        $csv->addStreamFilter('convert.iconv.ISO-8859-15/UTF-8');
         foreach ($csv as $record) {
             $collection->push(($record));
         }

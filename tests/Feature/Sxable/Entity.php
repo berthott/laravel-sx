@@ -1,6 +1,6 @@
 <?php
 
-namespace berthott\SX\Tests\Unit\Sxable;
+namespace berthott\SX\Tests\Feature\Sxable;
 
 use berthott\SX\Models\Traits\Sxable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -25,10 +25,5 @@ class Entity extends Model
     public static function surveyId(): string
     {
         return '1325978';
-    }
-
-    protected static function newFactory()
-    {
-        return EntityFactory::new();
     }
 }

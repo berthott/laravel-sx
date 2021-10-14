@@ -2,6 +2,7 @@
 
 namespace berthott\SX\Services;
 
+use berthott\SX\Facades\Sx;
 use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
@@ -79,11 +80,29 @@ class SxableService
             $single = Str::lower(class_basename($sxable));
             $baseTable = Str::plural($single);
             $valuesTable = $single.'_values';
-            $variablesTable = $single.'_variables';
+            $questionsTable = $single.'_questions';
 
             if (!Schema::hasTable($baseTable)) {
-                Schema::create($baseTable, function (Blueprint $table) {
+                $sx = Sx::forSurvey($sxable::surveyId());
+                Schema::create($baseTable, function (Blueprint $table) use ($sx) {
                     $table->bigIncrements('id');
+                    foreach ($sx->getBaseStructure() as $column) {
+                        switch ($column['subType']) {
+                            case 'Single':
+                            case 'Multiple':
+                                $table->integer($column['variableName']);
+                                break;
+                            case 'Double':
+                                $table->double($column['variableName']);
+                                break;
+                            case 'String':
+                                $table->string($column['variableName']);
+                                break;
+                            case 'Date':
+                                $table->dateTime($column['variableName']);
+                                break;
+                        }
+                    }
                     $table->timestamps();
                 });
             }
@@ -91,13 +110,19 @@ class SxableService
             if (!Schema::hasTable($valuesTable)) {
                 Schema::create($valuesTable, function (Blueprint $table) {
                     $table->bigIncrements('id');
+                    $table->string('questionName');
+                    $table->string('variableName');
+                    $table->smallInteger('choiceValue');
+                    $table->string('choiceText');
                     $table->timestamps();
                 });
             }
 
-            if (!Schema::hasTable($variablesTable)) {
-                Schema::create($variablesTable, function (Blueprint $table) {
+            if (!Schema::hasTable($questionsTable)) {
+                Schema::create($questionsTable, function (Blueprint $table) {
                     $table->bigIncrements('id');
+                    $table->string('questionName');
+                    $table->string('questionText');
                     $table->timestamps();
                 });
             }

@@ -4,7 +4,9 @@ namespace berthott\SX;
 
 use berthott\SX\Models\Contracts\Targetable;
 use berthott\SX\Services\SxableService;
+use berthott\SX\Services\SxApiService;
 use berthott\SX\Services\SxEntityService;
+use berthott\SX\Services\SxService;
 use Illuminate\Support\ServiceProvider;
 
 class SxServiceProvider extends ServiceProvider
@@ -20,6 +22,9 @@ class SxServiceProvider extends ServiceProvider
         });
         $this->app->singleton('Sxable', function () {
             return new SxableService();
+        });
+        $this->app->bind('Sx', function () {
+            return new SxService();
         });
 
         // bind exception singleton

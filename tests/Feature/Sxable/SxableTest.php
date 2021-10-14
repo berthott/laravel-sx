@@ -1,9 +1,9 @@
 <?php
 
-namespace berthott\SX\Tests\Unit\Sxable;
+namespace berthott\SX\Tests\Feature\Sxable;
 
+use berthott\SX\Facades\Sx;
 use berthott\SX\Facades\Sxable;
-use berthott\SX\Facades\SxController;
 use Illuminate\Support\Facades\Schema;
 
 class SxableTest extends SxableTestCase
@@ -19,6 +19,6 @@ class SxableTest extends SxableTestCase
         Sxable::getSxableClasses();
         $this->assertTrue(Schema::hasTable('entities'));
         $this->assertTrue(Schema::hasTable('entity_values'));
-        $this->assertTrue(Schema::hasTable('entity_variables'));
+        $this->assertTrue(Schema::hasTable('entity_questions'));
     }
 }

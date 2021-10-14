@@ -59,11 +59,9 @@ class SxApiService
         $url = $api[$endpoint]['api'];
 
         foreach ($values as $name => $value) {
-            $url = str_replace('{'.$name.'}', $value, $url);
-        }
-
-        if (isset($values['query'])) {
-            $url .= $url . '?' . http_build_query($values['query']);
+            if (is_string($value)) {
+                $url = str_replace('{'.$name.'}', $value, $url);
+            }
         }
 
         return [$url , $api[$endpoint]['method']];

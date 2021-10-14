@@ -71,55 +71,9 @@ class SxableService
      */
     private function initTables(): void
     {
-        if (!$this->sxables) {
-            return;
-        }
-
-        foreach ($this->sxables as $sxable) {
-            $sx = new SxControllerService($sxable::surveyId());
-
-            if (!Schema::hasTable($sxable::entityTable())) {
-                Schema::create($sxable::entityTable(), function (Blueprint $table) use ($sx) {
-                    $table->bigIncrements('id');
-                    foreach ($sx->getEntityStructure() as $column) {
-                        switch ($column['subType']) {
-                            case 'Single':
-                            case 'Multiple':
-                                $table->integer($column['variableName']);
-                                break;
-                            case 'Double':
-                                $table->double($column['variableName']);
-                                break;
-                            case 'String':
-                                $table->string($column['variableName']);
-                                break;
-                            case 'Date':
-                                $table->dateTime($column['variableName']);
-                                break;
-                        }
-                    }
-                    $table->timestamps();
-                });
-            }
-
-            if (!Schema::hasTable($sxable::labelsTable())) {
-                Schema::create($sxable::labelsTable(), function (Blueprint $table) {
-                    $table->bigIncrements('id');
-                    $table->string('questionName');
-                    $table->string('variableName');
-                    $table->smallInteger('choiceValue');
-                    $table->string('choiceText');
-                    $table->timestamps();
-                });
-            }
-
-            if (!Schema::hasTable($sxable::questionsTable())) {
-                Schema::create($sxable::questionsTable(), function (Blueprint $table) {
-                    $table->bigIncrements('id');
-                    $table->string('questionName');
-                    $table->string('questionText');
-                    $table->timestamps();
-                });
+        if ($this->sxables) {
+            foreach ($this->sxables as $sxable) {
+                $sxable::initTables();
             }
         }
     }

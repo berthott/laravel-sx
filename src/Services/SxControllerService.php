@@ -8,7 +8,7 @@ use League\Csv\Reader;
 use GuzzleHttp\Psr7\StreamWrapper;
 use Illuminate\Support\Collection;
 
-class SxService
+class SxControllerService
 {
     /**
      * The Survey structure.
@@ -34,21 +34,13 @@ class SxService
     private function initStructure()
     {
         if (!isset($this->structure)) {
-            $this->structure = $this->extractCsv($this->getStructureFromApi());
+            $this->structure = $this->extractCsv(SxHttpService::surveys()->exportStructure([
+                'survey' => $this->survey_id,
+                'query' => [
+                    'format' => 'EU',
+                ],
+            ]));
         }
-    }
-
-    /**
-     * Get the structure from SX.
-     */
-    public function getStructureFromApi(): Response
-    {
-        return SxHttpService::surveys()->exportStructure([
-            'survey' => $this->survey_id,
-            'query' => [
-                'format' => 'EU',
-            ],
-        ]);
     }
 
     /**
@@ -67,9 +59,9 @@ class SxService
     }
 
     /**
-     * Get the structure for the base table.
+     * Get the structure for the entity table.
      */
-    public function getBaseStructure(): Collection
+    public function getEntityStructure(): Collection
     {
         $this->initStructure();
         return $this->pluckFromCollection($this->structure, 'variableName', 'subType');

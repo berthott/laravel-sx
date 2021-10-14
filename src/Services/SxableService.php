@@ -76,15 +76,10 @@ class SxableService
         }
 
         foreach ($this->sxables as $sxable) {
-            $single = Str::lower(class_basename($sxable));
-            $entityTable = Str::plural($single);
-            $valuesTable = $single.'_values';
-            $questionsTable = $single.'_questions';
-
             $sx = new SxControllerService($sxable::surveyId());
 
-            if (!Schema::hasTable($entityTable)) {
-                Schema::create($entityTable, function (Blueprint $table) use ($sx) {
+            if (!Schema::hasTable($sxable::entityTable())) {
+                Schema::create($sxable::entityTable(), function (Blueprint $table) use ($sx) {
                     $table->bigIncrements('id');
                     foreach ($sx->getEntityStructure() as $column) {
                         switch ($column['subType']) {
@@ -107,8 +102,8 @@ class SxableService
                 });
             }
 
-            if (!Schema::hasTable($valuesTable)) {
-                Schema::create($valuesTable, function (Blueprint $table) {
+            if (!Schema::hasTable($sxable::labelsTable())) {
+                Schema::create($sxable::labelsTable(), function (Blueprint $table) {
                     $table->bigIncrements('id');
                     $table->string('questionName');
                     $table->string('variableName');
@@ -118,8 +113,8 @@ class SxableService
                 });
             }
 
-            if (!Schema::hasTable($questionsTable)) {
-                Schema::create($questionsTable, function (Blueprint $table) {
+            if (!Schema::hasTable($sxable::questionsTable())) {
+                Schema::create($sxable::questionsTable(), function (Blueprint $table) {
                     $table->bigIncrements('id');
                     $table->string('questionName');
                     $table->string('questionText');

@@ -95,7 +95,7 @@ class SxControllerService
     public function getQuestions(): Collection
     {
         $this->initStructure();
-        return $this->pluckFromCollection($this->structure, 'questionName', 'questionText')->unique();
+        return $this->pluckFromCollection($this->structure, 'questionName', 'variableName', 'questionText', 'subType', 'choiceValue', 'choiceText');
     }
 
     /**

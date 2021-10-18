@@ -136,7 +136,7 @@ trait Sxable
         self::initTable($table, function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('variableName');
-            $table->smallInteger('value');
+            $table->integer('value');
             $table->string('label');
             $table->timestamps();
         }, $force);
@@ -155,7 +155,11 @@ trait Sxable
         self::initTable($table, function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('questionName');
+            $table->string('variableName');
             $table->string('questionText');
+            $table->string('subType');
+            $table->integer('choiceValue')->nullable();
+            $table->string('choiceText')->nullable();
             $table->timestamps();
         }, $force);
 

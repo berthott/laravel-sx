@@ -29,10 +29,31 @@ trait Sxable
     }
 
     /**
-     * The single name of the model.
+     * The fields that should be excluded from being processed.
+     * Will be ignored when include is set
+     */
+    public static function exclude(): array
+    {
+        return [];
+    }
+
+    /**
+     * The fields that should be processed.
+     */
+    public static function include(): array
+    {
+        return [];
+    }
+
+    /**
+     * The fileds to be processed.
+     */
+    private static $_fields;
+
+    /**
+     * The controller service.
      */
     private static $_sxController;
-
 
     /**
      * The single name of the model.
@@ -108,6 +129,9 @@ trait Sxable
         self::initTable($table, function (Blueprint $table) use ($entityStructure) {
             $table->bigIncrements('id');
             foreach ($entityStructure as $column) {
+                if (!in_array($column['variableName'], self::fields())) {
+                    continue;
+                }
                 switch ($column['subType']) {
                     case 'Single':
                     case 'Multiple':
@@ -128,7 +152,7 @@ trait Sxable
         }, $force);
 
         if (DB::table($table)->get()->isEmpty()) {
-            DB::table($table)->insert(self::controller()->getEntities()->all());
+            DB::table($table)->insert(self::entities());
         }
     }
 
@@ -171,5 +195,22 @@ trait Sxable
         if (DB::table($table)->get()->isEmpty()) {
             DB::table($table)->insert(self::controller()->getQuestions()->all());
         }
+    }
+
+    private static function fields(): array
+    {
+        return self::$_fields ?: self::$_fields =
+            !empty(self::include())
+                ? array_intersect(self::controller()->getEntityStructure()->pluck('variableName')->all(), self::include())
+                : (!empty(self::exclude())
+                    ? array_diff(self::controller()->getEntityStructure()->pluck('variableName')->all(), self::exclude())
+                    : self::controller()->getEntityStructure()->pluck('variableName')->all());
+    }
+
+    private static function entities(): array
+    {
+        return self::controller()->getEntities()->map(function ($entity) {
+            return array_intersect_key($entity, array_fill_keys(self::fields(), ''));
+        })->all();
     }
 }

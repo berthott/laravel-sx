@@ -1,6 +1,6 @@
 <?php
 
-namespace berthott\SX\Tests\Feature\Sxable;
+namespace berthott\SX\Tests\Feature\Exclude;
 
 use berthott\SX\Facades\SxApiService;
 use berthott\SX\SxServiceProvider;
@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
-abstract class SxableTestCase extends BaseTestCase
+abstract class ExcludeTestCase extends BaseTestCase
 {
     public function setUp(): void
     {

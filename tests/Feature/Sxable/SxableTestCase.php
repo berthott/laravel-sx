@@ -26,6 +26,12 @@ abstract class SxableTestCase extends BaseTestCase
                 $headers = [],
                 File::get(__DIR__.'/labels.csv'),
             ));
+        SxApiService::shouldReceive('exportDataset')
+            ->andReturn(new Response(
+                $status = 200,
+                $headers = [],
+                File::get(__DIR__.'/dataset.csv'),
+            ));
         SxApiService::makePartial();
     }
 

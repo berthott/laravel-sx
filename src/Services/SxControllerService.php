@@ -16,6 +16,7 @@ class SxControllerService
      */
     private Collection $labels;
     private Collection $structure;
+    private Collection $dataset;
 
     /**
      * The Survey Id.
@@ -61,6 +62,21 @@ class SxControllerService
     }
 
     /**
+     * Initialize the dataset.
+     */
+    private function initDataset()
+    {
+        if (!isset($this->labels)) {
+            $this->dataset = $this->extractCsv(SxHttpService::surveys()->exportDataset([
+                'survey' => $this->survey_id,
+                'query' => [
+                    'format' => 'EU',
+                ],
+            ]));
+        }
+    }
+
+    /**
      * Initialize the Structure.
      */
     private function extractCsv(Response $response, array $header = null): Collection
@@ -87,6 +103,15 @@ class SxControllerService
     {
         $this->initStructure();
         return $this->pluckFromCollection($this->structure, 'variableName', 'subType');
+    }
+
+    /**
+     * Get the questions for the questions table.
+     */
+    public function getEntities(): Collection
+    {
+        $this->initDataset();
+        return $this->dataset;
     }
 
     /**

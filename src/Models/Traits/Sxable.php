@@ -103,8 +103,9 @@ trait Sxable
      */
     public static function initEntityTable(bool $force = false): void
     {
+        $table = self::entityTableName();
         $entityStructure = self::controller()->getEntityStructure();
-        self::initTable(self::entityTableName(), function (Blueprint $table) use ($entityStructure) {
+        self::initTable($table, function (Blueprint $table) use ($entityStructure) {
             $table->bigIncrements('id');
             foreach ($entityStructure as $column) {
                 switch ($column['subType']) {
@@ -125,6 +126,10 @@ trait Sxable
             }
             $table->timestamps();
         }, $force);
+
+        if (DB::table($table)->get()->isEmpty()) {
+            DB::table($table)->insert(self::controller()->getEntities()->all());
+        }
     }
 
     /**

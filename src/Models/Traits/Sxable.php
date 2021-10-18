@@ -3,7 +3,7 @@
 namespace berthott\SX\Models\Traits;
 
 use berthott\SX\Models\SxMode;
-use berthott\SX\Services\SxControllerService;
+use berthott\SX\Services\SxSurveyService;
 use Closure;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -46,6 +46,15 @@ trait Sxable
     }
 
     /**
+     * Returns an array of route options.
+     * See Route::apiResource documentation.
+     */
+    public static function routeOptions(): array
+    {
+        return [];
+    }
+
+    /**
      * The fileds to be processed.
      */
     private static $_fields;
@@ -58,9 +67,9 @@ trait Sxable
     /**
      * The single name of the model.
      */
-    public static function controller(): SxControllerService
+    public static function controller(): SxSurveyService
     {
-        return self::$_sxController ?: self::$_sxController = new SxControllerService(self::surveyId());
+        return self::$_sxController ?: self::$_sxController = new SxSurveyService(self::surveyId());
     }
 
     /**

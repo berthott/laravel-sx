@@ -2,10 +2,13 @@
 
 namespace berthott\SX;
 
+use berthott\SX\Facades\Sxable;
+use berthott\SX\Http\Controllers\SxableController;
 use berthott\SX\Models\Contracts\Targetable;
 use berthott\SX\Services\Http\SxApiService;
 use berthott\SX\Services\Http\SxEntityService;
 use berthott\SX\Services\SxableService;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class SxServiceProvider extends ServiceProvider
@@ -55,6 +58,13 @@ class SxServiceProvider extends ServiceProvider
             'path' => storage_path('logs/surveyxact.log'),
             'level' => 'debug',
         ]);
+
+        // add routes
+        Route::group($this->routeConfiguration(), function () {
+            foreach (Sxable::getSxableClasses() as $sxable) {
+                Route::apiResource($sxable::entityTableName(), SxableController::class, $sxable::routeOptions())->only(['index']);
+            }
+        });
     }
 
     protected function routeConfiguration(): array

@@ -14,6 +14,18 @@ abstract class SxableTestCase extends BaseTestCase
     public function setUp(): void
     {
         parent::setUp();
+    }
+
+    protected function getPackageProviders($app)
+    {
+        return [
+            SxServiceProvider::class
+        ];
+    }
+
+    protected function getEnvironmentSetUp($app)
+    {
+        Config::set('sx.namespace', __NAMESPACE__);
         SxApiService::shouldReceive('exportStructure')
             ->andReturn(new Response(
                 $status = 200,
@@ -33,17 +45,5 @@ abstract class SxableTestCase extends BaseTestCase
                 File::get(__DIR__.'/../dataset.csv'),
             ));
         SxApiService::makePartial();
-    }
-
-    protected function getPackageProviders($app)
-    {
-        return [
-            SxServiceProvider::class
-        ];
-    }
-
-    protected function getEnvironmentSetUp($app)
-    {
-        Config::set('sx.namespace', __NAMESPACE__);
     }
 }

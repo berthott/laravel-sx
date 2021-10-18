@@ -9,7 +9,7 @@ use GuzzleHttp\Psr7\StreamWrapper;
 use Illuminate\Support\Collection;
 use League\Csv\Statement;
 
-class SxControllerService
+class SxSurveyService
 {
     /**
      * The sx outputs.

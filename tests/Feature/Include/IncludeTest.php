@@ -2,14 +2,12 @@
 
 namespace berthott\SX\Tests\Feature\Include;
 
-use berthott\SX\Facades\Sxable;
 use Illuminate\Support\Facades\Schema;
 
 class IncludeTest extends IncludeTestCase
 {
     public function test_entity_table_creation(): void
     {
-        Sxable::getSxableClasses();
         $this->assertTrue(Schema::hasTable('entities'));
         $this->assertTrue(Schema::hasColumns('entities', [
             'survey', 'responde',
@@ -21,7 +19,6 @@ class IncludeTest extends IncludeTestCase
 
     public function test_included_values(): void
     {
-        Sxable::getSxableClasses();
         $entity = [
             'survey' => 1325978,
             'responde' => 825478429,

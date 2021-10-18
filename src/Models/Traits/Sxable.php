@@ -132,14 +132,18 @@ trait Sxable
      */
     public static function initLabelsTable(bool $force = false): void
     {
-        self::initTable(self::labelsTableName(), function (Blueprint $table) {
+        $table = self::labelsTableName();
+        self::initTable($table, function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('questionName');
             $table->string('variableName');
-            $table->smallInteger('choiceValue');
-            $table->string('choiceText');
+            $table->smallInteger('value');
+            $table->string('label');
             $table->timestamps();
         }, $force);
+
+        if (DB::table($table)->get()->isEmpty()) {
+            DB::table($table)->insert(self::controller()->getLabels()->all());
+        }
     }
 
     /**
@@ -156,7 +160,6 @@ trait Sxable
         }, $force);
 
         if (DB::table($table)->get()->isEmpty()) {
-            $data = self::controller()->getQuestions()->all();
             DB::table($table)->insert(self::controller()->getQuestions()->all());
         }
     }

@@ -7,12 +7,14 @@ use GuzzleHttp\Psr7\Response;
 use League\Csv\Reader;
 use GuzzleHttp\Psr7\StreamWrapper;
 use Illuminate\Support\Collection;
+use League\Csv\Statement;
 
 class SxControllerService
 {
     /**
-     * The Survey structure.
+     * The sx outputs.
      */
+    private Collection $labels;
     private Collection $structure;
 
     /**
@@ -29,7 +31,7 @@ class SxControllerService
     }
 
     /**
-     * Initialize the Structure.
+     * Initialize the structure.
      */
     private function initStructure()
     {
@@ -44,15 +46,34 @@ class SxControllerService
     }
 
     /**
+     * Initialize the labels.
+     */
+    private function initLabels()
+    {
+        if (!isset($this->labels)) {
+            $this->labels = $this->extractCsv(SxHttpService::surveys()->exportLabels([
+                'survey' => $this->survey_id,
+                'query' => [
+                    'format' => 'EU',
+                ],
+            ]), ['variableName', 'value', 'label']);
+        }
+    }
+
+    /**
      * Initialize the Structure.
      */
-    private function extractCsv(Response $response): Collection
+    private function extractCsv(Response $response, array $header = null): Collection
     {
         $collection = collect();
         $csv = Reader::createFromStream(StreamWrapper::getResource($response->getBody()));
-        $csv->setHeaderOffset(0);
         $csv->setDelimiter(';');
         $csv->addStreamFilter('convert.iconv.ISO-8859-15/UTF-8');
+        if (!$header) {
+            $csv->setHeaderOffset(0);
+        } else {
+            $csv = Statement::create()->process($csv, $header);
+        }
         foreach ($csv as $record) {
             $collection->push(($record));
         }
@@ -80,12 +101,10 @@ class SxControllerService
     /**
      * Get the values for the values table.
      */
-    public function getValues(): Collection
+    public function getLabels(): Collection
     {
-        $this->initStructure();
-        return $this->pluckFromCollection($this->structure->filter(function ($item) {
-            return in_array($item['subType'], ['Single', 'Multiple']);
-        }), 'questionName', 'variableName', 'choiceValue', 'choiceText');
+        $this->initLabels();
+        return $this->labels;
     }
 
     /**

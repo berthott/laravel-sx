@@ -22,6 +22,12 @@ class SxApiService
         return $this;
     }
 
+    /**
+     * Call to the API.
+     * Query parameter must be wrapped in 'query' array.
+     * Body parameter must be wrapped in 'form_params' array.
+     * URL parameter can be on top level.
+     */
     public function __call(string $name, array $arguments): mixed
     {
         $arguments = Arr::collapse($arguments);

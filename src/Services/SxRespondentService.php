@@ -41,7 +41,10 @@ class SxRespondentService
     /**
      * Delete a respondent.
      */
-    public function deleteRespondent(): void
+    public function deleteRespondent(): string
     {
+        return SxHttpService::respondents()->delete([
+            'respondent' => $this->respondent_id
+        ])->getBody()->getContents();
     }
 }

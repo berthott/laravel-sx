@@ -39,4 +39,12 @@ class SxableController implements Targetable
             ['survey' => $this->target::surveyId()]
         ));
     }
+
+    /**
+     * Destroy a resource.
+     */
+    public function destroy(int $id): string
+    {
+        return (new SxRespondentService($id))->deleteRespondent();
+    }
 }

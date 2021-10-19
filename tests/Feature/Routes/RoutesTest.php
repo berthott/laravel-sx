@@ -54,14 +54,21 @@ class RoutesTest extends RoutesTestCase
             ]);
     }
 
-    public function test_store_route(): void
+    public function test_store_and_delete_route(): void
     {
-        $this->post(route('entities.store'), [
+        $id = $this->post(route('entities.store'), [
             'form_params' => [
                     'email' => 'test@syspons.com'
                 ]
             ])
             ->assertStatus(200)
-            ;
+            ->assertJsonStructure([
+                'id', 'externalkey', 'collectstatus', 'collecturl', 'createts', 'closets', 'startts',
+                'modifyts', 'sessioncount', 'selfurl', 'surveyurl', 'answerurl', 'senddistributionmailurl', 'sendremindermailurl'
+            ])->json()['id'];
+
+        $this->delete(route('entities.destroy', ['entity' => $id]))
+            ->assertStatus(200)
+            ->assertSeeText('Success');
     }
 }

@@ -33,12 +33,9 @@ class SxRespondentService
     /**
      * Create a new respondent.
      */
-    public function createNewRespondent(?array $body, ?array $query): Respondent
+    public function createNewRespondent(array $args): Respondent
     {
-        return new Respondent(SxHttpService::respondents()->create([
-            'query' => $query,
-            'body' => $body,
-        ]));
+        return new Respondent(SxHttpService::respondents()->create($args));
     }
 
     /**

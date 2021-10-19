@@ -62,7 +62,7 @@ class SxServiceProvider extends ServiceProvider
         // add routes
         Route::group($this->routeConfiguration(), function () {
             foreach (Sxable::getSxableClasses() as $sxable) {
-                Route::apiResource($sxable::entityTableName(), SxableController::class, $sxable::routeOptions())->only(['index', 'show']);
+                Route::apiResource($sxable::entityTableName(), SxableController::class, $sxable::routeOptions())->except(['update']);
             }
         });
     }

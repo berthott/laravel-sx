@@ -11,6 +11,8 @@ class RoutesTest extends RoutesTestCase
         $expectedRoutes = [
             'entities.index',
             'entities.show',
+            'entities.store',
+            'entities.destroy',
         ];
         $registeredRoutes = array_keys(Route::getRoutes()->getRoutesByName());
         foreach ($expectedRoutes as $route) {
@@ -50,5 +52,16 @@ class RoutesTest extends RoutesTestCase
                 'senddistributionmailurl' => 'https://rest.survey-xact.dk/rest/respondents/TYCAN7PPW33U/sendmail/DistributionByMail',
                 'sendremindermailurl' => 'https://rest.survey-xact.dk/rest/respondents/TYCAN7PPW33U/sendmail/ReminderEmail',
             ]);
+    }
+
+    public function test_store_route(): void
+    {
+        $this->post(route('entities.store'), [
+            'form_params' => [
+                    'email' => 'test@syspons.com'
+                ]
+            ])
+            ->assertStatus(200)
+            ;
     }
 }

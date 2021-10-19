@@ -44,6 +44,12 @@ abstract class RoutesTestCase extends BaseTestCase
                 $headers = [],
                 File::get(__DIR__.'/../dataset.csv'),
             ));
+        SxApiService::shouldReceive('get')
+            ->andReturn(new Response(
+                $status = 200,
+                $headers = [],
+                File::get(__DIR__.'/../825478429.xml'),
+            ));
         SxApiService::makePartial();
     }
 }

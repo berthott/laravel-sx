@@ -46,6 +46,14 @@ trait Sxable
     }
 
     /**
+     * The fields that should be processed.
+     */
+    public static function unique(): array
+    {
+        return config('sx.defaultUnique');
+    }
+
+    /**
      * Returns an array of route options.
      * See Route::apiResource documentation.
      */
@@ -136,6 +144,7 @@ trait Sxable
         $table = self::entityTableName();
         $entityStructure = self::controller()->getEntityStructure();
         self::initTable($table, function (Blueprint $table) use ($entityStructure) {
+            $t = null;
             $table->bigIncrements('id');
             foreach ($entityStructure as $column) {
                 if (!in_array($column['variableName'], self::fields())) {
@@ -144,17 +153,20 @@ trait Sxable
                 switch ($column['subType']) {
                     case 'Single':
                     case 'Multiple':
-                        $table->integer($column['variableName']);
+                        $t = $table->integer($column['variableName']);
                         break;
                     case 'Double':
-                        $table->double($column['variableName']);
+                        $t = $table->double($column['variableName']);
                         break;
                     case 'String':
-                        $table->string($column['variableName']);
+                        $t = $table->string($column['variableName']);
                         break;
                     case 'Date':
-                        $table->dateTime($column['variableName']);
+                        $t = $table->dateTime($column['variableName']);
                         break;
+                }
+                if (in_array($column['variableName'], self::unique())) {
+                    $t->unique();
                 }
             }
             $table->timestamps();

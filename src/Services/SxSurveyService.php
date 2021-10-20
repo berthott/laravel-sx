@@ -14,9 +14,7 @@ class SxSurveyService
     /**
      * The sx outputs.
      */
-    private Collection $labels;
     private Collection $structure;
-    private Collection $dataset;
 
     /**
      * The Survey Id.
@@ -38,36 +36,6 @@ class SxSurveyService
     {
         if (!isset($this->structure)) {
             $this->structure = $this->extractCsv(SxHttpService::surveys()->exportStructure([
-                'survey' => $this->survey_id,
-                'query' => [
-                    'format' => 'EU',
-                ],
-            ]));
-        }
-    }
-
-    /**
-     * Initialize the labels.
-     */
-    private function initLabels()
-    {
-        if (!isset($this->labels)) {
-            $this->labels = $this->extractCsv(SxHttpService::surveys()->exportLabels([
-                'survey' => $this->survey_id,
-                'query' => [
-                    'format' => 'EU',
-                ],
-            ]), ['variableName', 'value', 'label']);
-        }
-    }
-
-    /**
-     * Initialize the dataset.
-     */
-    private function initDataset()
-    {
-        if (!isset($this->labels)) {
-            $this->dataset = $this->extractCsv(SxHttpService::surveys()->exportDataset([
                 'survey' => $this->survey_id,
                 'query' => [
                     'format' => 'EU',
@@ -106,12 +74,17 @@ class SxSurveyService
     }
 
     /**
-     * Get the questions for the questions table.
+     * Get the entities.
      */
-    public function getEntities(): Collection
+    public function getEntities(array $query = []): Collection
     {
-        $this->initDataset();
-        return $this->dataset;
+        return $this->extractCsv(SxHttpService::surveys()->exportDataset([
+            'survey' => $this->survey_id,
+            'query' => array_merge(
+                ['format' => 'EU'],
+                $query,
+            ),
+        ]));
     }
 
     /**
@@ -128,8 +101,12 @@ class SxSurveyService
      */
     public function getLabels(): Collection
     {
-        $this->initLabels();
-        return $this->labels;
+        return $this->extractCsv(SxHttpService::surveys()->exportLabels([
+            'survey' => $this->survey_id,
+            'query' => [
+                'format' => 'EU',
+            ],
+        ]), ['variableName', 'value', 'label']);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace berthott\SX\Http\Controllers;
 
+use berthott\SX\Http\Requests\StoreRequest;
 use berthott\SX\Models\Contracts\Targetable;
 use berthott\SX\Models\Respondent;
 use berthott\SX\Models\Traits\Targetable as TraitsTargetable;
@@ -32,7 +33,7 @@ class SxableController implements Targetable
     /**
      * Store a resource.
      */
-    public function store(Request $request): Respondent
+    public function store(StoreRequest $request): Respondent
     {
         return (new SxRespondentService())->createNewRespondent(array_merge(
             $request->all(),

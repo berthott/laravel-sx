@@ -71,4 +71,10 @@ class RoutesTest extends RoutesTestCase
             ->assertStatus(200)
             ->assertSeeText('Success');
     }
+
+    public function test_store_route_validation(): void
+    {
+        $this->post(route('entities.store'))
+            ->assertJsonValidationErrors('form_params.email');
+    }
 }

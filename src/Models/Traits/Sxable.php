@@ -6,6 +6,7 @@ use berthott\SX\Models\SxMode;
 use berthott\SX\Services\SxSurveyService;
 use Closure;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -63,7 +64,7 @@ trait Sxable
     }
 
     /**
-     * The fileds to be processed.
+     * The fields to be processed.
      */
     private static $_fields;
 
@@ -73,7 +74,7 @@ trait Sxable
     private static $_sxController;
 
     /**
-     * The single name of the model.
+     * The survey controller
      */
     public static function controller(): SxSurveyService
     {
@@ -173,7 +174,7 @@ trait Sxable
         }, $force);
 
         if (DB::table($table)->get()->isEmpty()) {
-            DB::table($table)->insert(self::entities());
+            DB::table($table)->insert(self::entities()->all());
         }
     }
 
@@ -188,11 +189,16 @@ trait Sxable
             $table->string('variableName');
             $table->integer('value');
             $table->string('label');
-            $table->timestamps();
+            $table->timestamp('created_at');
         }, $force);
 
         if (DB::table($table)->get()->isEmpty()) {
-            DB::table($table)->insert(self::controller()->getLabels()->all());
+            DB::table($table)->insert(
+                self::addTimestamp(
+                    self::controller()->getLabels(),
+                    'created_at'
+                )->all()
+            );
         }
     }
 
@@ -210,14 +216,22 @@ trait Sxable
             $table->string('subType');
             $table->integer('choiceValue')->nullable();
             $table->string('choiceText')->nullable();
-            $table->timestamps();
+            $table->timestamp('created_at');
         }, $force);
 
         if (DB::table($table)->get()->isEmpty()) {
-            DB::table($table)->insert(self::controller()->getQuestions()->all());
+            DB::table($table)->insert(
+                self::addTimestamp(
+                    self::controller()->getQuestions(),
+                    'created_at'
+                )->all()
+            );
         }
     }
 
+    /**
+     * The fields to be processed.
+     */
     private static function fields(): array
     {
         return self::$_fields ?: self::$_fields =
@@ -228,10 +242,23 @@ trait Sxable
                     : self::controller()->getEntityStructure()->pluck('variableName')->all());
     }
 
-    private static function entities(): array
+    /**
+     * The entities mapped to the fields.
+     */
+    private static function entities(array $query = []): Collection
     {
-        return self::controller()->getEntities()->map(function ($entity) {
+        return self::controller()->getEntities($query)->map(function ($entity) {
             return array_intersect_key($entity, array_fill_keys(self::fields(), ''));
-        })->all();
+        });
+    }
+
+    private static function addTimestamp(Collection $collection, ...$args): Collection
+    {
+        return $collection->map(function ($item) use ($args) {
+            foreach ($args as $arg) {
+                $item[$arg] = now();
+            };
+            return $item;
+        });
     }
 }

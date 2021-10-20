@@ -2,12 +2,14 @@
 
 namespace berthott\SX;
 
+use berthott\SX\Exceptions\Handler;
 use berthott\SX\Facades\Sxable;
 use berthott\SX\Http\Controllers\SxableController;
 use berthott\SX\Models\Contracts\Targetable;
 use berthott\SX\Services\Http\SxApiService;
 use berthott\SX\Services\Http\SxEntityService;
 use berthott\SX\Services\SxableService;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 

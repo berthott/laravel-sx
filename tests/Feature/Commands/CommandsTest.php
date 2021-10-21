@@ -36,4 +36,10 @@ class CommandsTest extends CommandsTestCase
         Artisan::call('import', ['--fresh' => true]);
         $this->assertDatabaseCount('entities', 1);
     }
+
+    public function test_import_command_output(): void
+    {
+        $command = $this->artisan('import', ['classes' => ['entities']]);
+        $command->expectsOutput('entities: import triggered.');
+    }
 }

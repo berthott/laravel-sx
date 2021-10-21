@@ -33,6 +33,7 @@ class SxApiService
     {
         $arguments = Arr::collapse($arguments);
         [$url , $method] = $this->getApi($name, $arguments);
+        SxLog::log("Rquesting $method $url...");
         return $this->http()->request($method, $url, $arguments);
     }
     

@@ -257,6 +257,7 @@ trait Sxable
 
     public static function import(): Collection
     {
+        SxLog::log(self::entityTableName().': import triggered.');
         $entries = self::entities(self::lastImport());
         DB::table(self::entityTableName())
             ->upsert(

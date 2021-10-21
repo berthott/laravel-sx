@@ -2,6 +2,7 @@
 
 namespace berthott\SX;
 
+use berthott\SX\Console\Import;
 use berthott\SX\Exceptions\Handler;
 use berthott\SX\Facades\Sxable;
 use berthott\SX\Helpers\Helpers;
@@ -71,6 +72,13 @@ class SxServiceProvider extends ServiceProvider
                 Route::apiResource($sxable::entityTableName(), SxableController::class, $sxable::routeOptions())->except(['update']);
             }
         });
+
+        // Register the command if we are using the application via the CLI
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                Import::class,
+            ]);
+        }
     }
 
     protected function routeConfiguration(): array

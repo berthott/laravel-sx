@@ -43,11 +43,18 @@ abstract class RoutesTestCase extends BaseTestCase
                 File::get(__DIR__.'/../labels.csv'),
             ));
         SxApiService::shouldReceive('exportDataset')
-            ->andReturn(new Response(
-                $status = 200,
-                $headers = [],
-                File::get(__DIR__.'/../dataset.csv'),
-            ));
+            ->andReturn(
+                new Response(
+                    $status = 200,
+                    $headers = [],
+                    File::get(__DIR__.'/../dataset.csv'),
+                ),
+                new Response(
+                    $status = 200,
+                    $headers = [],
+                    File::get(__DIR__.'/../import.csv'),
+                )
+            );
         SxApiService::shouldReceive('get')
             ->andReturn(new Response(
                 $status = 200,

@@ -2,13 +2,13 @@
 
 namespace berthott\SX\Http\Controllers;
 
+use berthott\SX\Http\Requests\ImportRequest;
 use berthott\SX\Http\Requests\StoreRequest;
 use berthott\SX\Models\Contracts\Targetable;
 use berthott\SX\Models\Respondent;
 use berthott\SX\Models\Traits\Targetable as TraitsTargetable;
 use berthott\SX\Services\SxRespondentService;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Request;
 
 class SxableController implements Targetable
 {
@@ -47,5 +47,15 @@ class SxableController implements Targetable
     public function destroy(int $id): string
     {
         return (new SxRespondentService($id))->deleteRespondent();
+    }
+
+    /**
+     * Trigger sx import.
+     */
+    public function import(ImportRequest $request): Collection
+    {
+        return $request->fresh
+            ? $this->target::initTables(force: true)
+            : $this->target::import();
     }
 }

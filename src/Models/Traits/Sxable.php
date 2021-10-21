@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -116,11 +117,12 @@ trait Sxable
     /**
      * Initialize the sxable tables.
      */
-    public static function initTables(bool $force = false): void
+    public static function initTables(bool $force = false): Collection
     {
         self::initEntityTable($force);
         self::initLabelsTable($force);
         self::initQuestionsTable($force);
+        return static::all();
     }
 
     /**
@@ -250,6 +252,47 @@ trait Sxable
         return self::controller()->getEntities($query)->map(function ($entity) {
             return array_intersect_key($entity, array_fill_keys(self::fields(), ''));
         });
+    }
+
+    public static function import(): Collection
+    {
+        $entries = self::entities(self::lastImport());
+        DB::table(self::entityTableName())
+            ->upsert(
+                self::addTimestamp($entries, 'created_at', 'updated_at')->all(),
+                self::unique(),
+                array_merge(self::fields(), ['updated_at']), // don't update created_at
+            );
+        
+        // return the imported entries from our database
+        return static::whereIn(config('sx.primary'), $entries->pluck(config('sx.primary'))->toArray())->get();
+    }
+
+
+    /**
+     * Return a last import as query array.
+     */
+    private static function lastImport(): array
+    {
+        $lastImportArray = [];
+        $lastRespondent = self::latest()->first();
+        if (isset($lastRespondent)) {
+            $lastImport = date('Ymd_His', strtotime($lastRespondent->created_at));
+            self::log("The last respondent import was $lastRespondent->created_at.");
+            $lastImportArray['modifiedSince'] = $lastImport;
+        } else {
+            self::log('There were no previous respondents.');
+        }
+        return $lastImportArray;
+    }
+
+    /**
+     * Log and output.
+     */
+    private static function log(string $message): void
+    {
+        //$this->line($message);
+        Log::channel('surveyxact')->info($message);
     }
 
     private static function addTimestamp(Collection $collection, ...$args): Collection

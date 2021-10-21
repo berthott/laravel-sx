@@ -13,6 +13,8 @@ class RoutesTest extends RoutesTestCase
             'entities.show',
             'entities.store',
             'entities.destroy',
+            
+            'entities.import',
         ];
         $registeredRoutes = array_keys(Route::getRoutes()->getRoutesByName());
         foreach ($expectedRoutes as $route) {
@@ -30,6 +32,8 @@ class RoutesTest extends RoutesTestCase
                 ['responde' => 825479792],
                 ['responde' => 834262051],
             ]);
+        
+        $this->assertDatabaseCount('entities', 4);
     }
 
     public function test_show_route(): void
@@ -76,5 +80,17 @@ class RoutesTest extends RoutesTestCase
     {
         $this->post(route('entities.store'))
             ->assertJsonValidationErrors('form_params.email');
+    }
+
+    public function test_import_route(): void
+    {
+        $id = ['responde' => 841931211];
+        $this->assertDatabaseCount('entities', 4);
+        $this->assertDatabaseMissing('entities', $id);
+        $this->post(route('entities.import'))
+            ->assertStatus(200)
+            ->assertJson([$id]);
+        $this->assertDatabaseCount('entities', 5);
+        $this->assertDatabaseHas('entities', $id);
     }
 }

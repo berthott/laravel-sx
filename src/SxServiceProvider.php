@@ -4,6 +4,7 @@ namespace berthott\SX;
 
 use berthott\SX\Exceptions\Handler;
 use berthott\SX\Facades\Sxable;
+use berthott\SX\Helpers\Helpers;
 use berthott\SX\Http\Controllers\SxableController;
 use berthott\SX\Models\Contracts\Targetable;
 use berthott\SX\Services\Http\SxApiService;
@@ -21,10 +22,12 @@ class SxServiceProvider extends ServiceProvider
     public function register(): void
     {
         // bind singletons
+        $this->app->singleton('Helpers', function () {
+            return new Helpers();
+        });
         $this->app->singleton('SxHttpService', function () {
             return new SxEntityService();
         });
-        // bind singletons
         $this->app->bind('SxApiService', function () {
             return new SxApiService();
         });

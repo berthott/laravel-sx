@@ -2,6 +2,7 @@
 
 namespace berthott\SX\Services;
 
+use berthott\SX\Facades\Helpers;
 use berthott\SX\Facades\SxHttpService;
 use GuzzleHttp\Psr7\Response;
 use League\Csv\Reader;
@@ -70,7 +71,7 @@ class SxSurveyService
     public function getEntityStructure(): Collection
     {
         $this->initStructure();
-        return $this->pluckFromCollection($this->structure, 'variableName', 'subType');
+        return Helpers::pluckFromCollection($this->structure, 'variableName', 'subType');
     }
 
     /**
@@ -93,7 +94,7 @@ class SxSurveyService
     public function getQuestions(): Collection
     {
         $this->initStructure();
-        return $this->pluckFromCollection($this->structure, 'questionName', 'variableName', 'questionText', 'subType', 'choiceValue', 'choiceText');
+        return Helpers::pluckFromCollection($this->structure, 'questionName', 'variableName', 'questionText', 'subType', 'choiceValue', 'choiceText');
     }
 
     /**
@@ -107,15 +108,5 @@ class SxSurveyService
                 'format' => 'EU',
             ],
         ]), ['variableName', 'value', 'label']);
-    }
-
-    /**
-     * Get the values for the values table.
-     */
-    private function pluckFromCollection(Collection $collection, string ...$args): Collection
-    {
-        return $collection->map(function ($item) use ($args) {
-            return array_intersect_key($item, array_fill_keys($args, ''));
-        });
     }
 }

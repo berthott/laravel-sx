@@ -5,6 +5,7 @@ namespace berthott\SX\Tests\Feature\Sxable;
 use berthott\SX\Facades\SxApiService;
 use berthott\SX\SxServiceProvider;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Orchestra\Testbench\TestCase as BaseTestCase;
@@ -25,6 +26,7 @@ abstract class SxableTestCase extends BaseTestCase
 
     protected function getEnvironmentSetUp($app)
     {
+        Carbon::setTestNow();
         Config::set('sx.namespace', __NAMESPACE__);
         SxApiService::shouldReceive('exportStructure')
             ->andReturn(new Response(

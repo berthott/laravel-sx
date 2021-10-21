@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 
 trait Sxable
 {
+
     /**
      * The Survey Id that should be connected to this Model.
      */
@@ -176,8 +177,10 @@ trait Sxable
             $table->timestamps();
         }, $force);
 
-        if (DB::table($table)->get()->isEmpty()) {
-            DB::table($table)->insert(self::entities()->all());
+        self::$unguarded = true;
+        if (self::all()->isEmpty()) {
+            self::upsert(self::entities()->all(), [config('sx.primary')]);
+            //self::create(self::entities()->all());
         }
     }
 
@@ -192,16 +195,11 @@ trait Sxable
             $table->string('variableName');
             $table->integer('value');
             $table->string('label');
-            $table->timestamp('created_at');
+            $table->timestamp('created_at')->default('CURRENT_TIMESTAMP');
         }, $force);
 
         if (DB::table($table)->get()->isEmpty()) {
-            DB::table($table)->insert(
-                self::addTimestamp(
-                    self::controller()->getLabels(),
-                    'created_at'
-                )->all()
-            );
+            DB::table($table)->insert(self::controller()->getLabels()->all());
         }
     }
 
@@ -219,16 +217,11 @@ trait Sxable
             $table->string('subType');
             $table->integer('choiceValue')->nullable();
             $table->string('choiceText')->nullable();
-            $table->timestamp('created_at');
+            $table->timestamp('created_at')->default('CURRENT_TIMESTAMP');
         }, $force);
 
         if (DB::table($table)->get()->isEmpty()) {
-            DB::table($table)->insert(
-                self::addTimestamp(
-                    self::controller()->getQuestions(),
-                    'created_at'
-                )->all()
-            );
+            DB::table($table)->insert(self::controller()->getQuestions()->all());
         }
     }
 
@@ -259,12 +252,7 @@ trait Sxable
     {
         SxLog::log(self::entityTableName().': import triggered.');
         $entries = self::entities(self::lastImport());
-        DB::table(self::entityTableName())
-            ->upsert(
-                self::addTimestamp($entries, 'created_at', 'updated_at')->all(),
-                self::unique(),
-                array_merge(self::fields(), ['updated_at']), // don't update created_at
-            );
+        self::upsert($entries->all(), [config('sx.primary')]);
         
         // return the imported entries from our database
         return static::whereIn(config('sx.primary'), $entries->pluck(config('sx.primary'))->toArray())->get();
@@ -286,15 +274,5 @@ trait Sxable
             SxLog::log('There were no previous respondents.');
         }
         return $lastImportArray;
-    }
-
-    private static function addTimestamp(Collection $collection, ...$args): Collection
-    {
-        return $collection->map(function ($item) use ($args) {
-            foreach ($args as $arg) {
-                $item[$arg] = now();
-            };
-            return $item;
-        });
     }
 }

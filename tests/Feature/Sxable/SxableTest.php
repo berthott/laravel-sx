@@ -4,6 +4,7 @@ namespace berthott\SX\Tests\Feature\Sxable;
 
 use berthott\SX\Facades\Sx;
 use berthott\SX\Facades\Sxable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 
 class SxableTest extends SxableTestCase
@@ -165,6 +166,8 @@ class SxableTest extends SxableTestCase
             'stato_3' => 0,
             'stato_4' => 1,
             'stato_5' => 0,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
         ];
         $this->assertDatabaseHas('entities', $entity);
     }

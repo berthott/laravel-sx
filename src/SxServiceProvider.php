@@ -6,6 +6,7 @@ use berthott\SX\Console\Import;
 use berthott\SX\Exceptions\Handler;
 use berthott\SX\Facades\Sxable;
 use berthott\SX\Helpers\Helpers;
+use berthott\SX\Helpers\SxLog as HelpersSxLog;
 use berthott\SX\Http\Controllers\SxableController;
 use berthott\SX\Models\Contracts\Targetable;
 use berthott\SX\Services\Http\SxApiService;
@@ -25,6 +26,9 @@ class SxServiceProvider extends ServiceProvider
         // bind singletons
         $this->app->singleton('Helpers', function () {
             return new Helpers();
+        });
+        $this->app->singleton('SxLog', function () {
+            return new HelpersSxLog();
         });
         $this->app->singleton('SxHttpService', function () {
             return new SxEntityService();

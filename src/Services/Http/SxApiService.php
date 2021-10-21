@@ -2,6 +2,7 @@
 
 namespace berthott\SX\Services\Http;
 
+use berthott\SX\Facades\SxLog;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\TransferStats;
@@ -49,10 +50,10 @@ class SxApiService
 
             'retry_on_status' => [500],
             'on_retry_callback' => function () {
-                $this->log("Error Response... retrying...");
+                SxLog::log("Error Response... retrying...");
             },
             'on_stats' => function (TransferStats $stats) {
-                $this->log('responded with '.$stats->getResponse()->getStatusCode().' after '.$stats->getTransferTime().'s');
+                SxLog::log('responded with '.$stats->getResponse()->getStatusCode().' after '.$stats->getTransferTime().'s');
             },
         ]);
     }
@@ -72,14 +73,5 @@ class SxApiService
         }
 
         return [$url , $api[$endpoint]['method']];
-    }
-
-    /**
-     * Log and output.
-     */
-    private function log(string $message)
-    {
-        //$this->line($message);
-        Log::channel('surveyxact')->info($message);
     }
 }

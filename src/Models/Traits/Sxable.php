@@ -2,6 +2,7 @@
 
 namespace berthott\SX\Models\Traits;
 
+use berthott\SX\Facades\SxLog;
 use berthott\SX\Models\SxMode;
 use berthott\SX\Services\SxSurveyService;
 use Closure;
@@ -278,21 +279,12 @@ trait Sxable
         $lastRespondent = self::latest()->first();
         if (isset($lastRespondent)) {
             $lastImport = date('Ymd_His', strtotime($lastRespondent->created_at));
-            self::log("The last respondent import was $lastRespondent->created_at.");
+            SxLog::log("The last respondent import was $lastRespondent->created_at.");
             $lastImportArray['modifiedSince'] = $lastImport;
         } else {
-            self::log('There were no previous respondents.');
+            SxLog::log('There were no previous respondents.');
         }
         return $lastImportArray;
-    }
-
-    /**
-     * Log and output.
-     */
-    private static function log(string $message): void
-    {
-        //$this->line($message);
-        Log::channel('surveyxact')->info($message);
     }
 
     private static function addTimestamp(Collection $collection, ...$args): Collection

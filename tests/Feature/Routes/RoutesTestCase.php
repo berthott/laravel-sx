@@ -53,7 +53,12 @@ abstract class RoutesTestCase extends BaseTestCase
                     $status = 200,
                     $headers = [],
                     File::get(__DIR__.'/../import.csv'),
-                )
+                ),
+                new Response(
+                    $status = 200,
+                    $headers = [],
+                    File::get(__DIR__.'/../update.csv'),
+                ),
             );
         SxApiService::shouldReceive('get')
             ->andReturn(new Response(

@@ -110,4 +110,25 @@ class RoutesTest extends RoutesTestCase
         $this->post(route('entities.import'), ['fresh' => true]);
         $this->assertDatabaseCount('entities', 1);
     }
+
+    public function test_import_route_update(): void
+    {
+        $this->assertDatabaseCount('entities', 4);
+        $this->post(route('entities.import'));
+        $this->assertDatabaseCount('entities', 5);
+        $this->assertDatabaseHas('entities', [
+            'responde' => 841931211,
+            's_2' => 2020,
+        ]);
+        $this->post(route('entities.import'));
+        $this->assertDatabaseCount('entities', 5);
+        $this->assertDatabaseMissing('entities', [
+            'responde' => 841931211,
+            's_2' => 2020,
+        ]);
+        $this->assertDatabaseHas('entities', [
+            'responde' => 841931211,
+            's_2' => 2021,
+        ]);
+    }
 }

@@ -184,6 +184,8 @@ trait Sxable
                 }
                 if (in_array($column['variableName'], self::unique())) {
                     $t->unique();
+                } else {
+                    $t->nullable();
                 }
             }
             $table->timestamps();

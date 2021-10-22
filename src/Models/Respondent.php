@@ -21,10 +21,12 @@ class Respondent implements Arrayable
         }
     }
 
-    public function __call(string $method, array $args)
+    public function __call(string $method, array $args): mixed
     {
         if (array_key_exists($method, $this->attributes)) {
-            $this->attributes[$method](...$args);
+            return is_callable($this->attributes[$method])
+                ? $this->attributes[$method](...$args)
+                : $this->attributes[$method];
         }
     }
 

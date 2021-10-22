@@ -35,10 +35,12 @@ class SxableController implements Targetable
      */
     public function store(StoreRequest $request): Respondent
     {
-        return (new SxRespondentService())->createNewRespondent(array_merge(
+        $respondent = (new SxRespondentService())->createNewRespondent(array_merge(
             $request->all(),
             ['survey' => $this->target::surveyId()]
         ));
+        $this->target::create([config('sx.primary') => $respondent->id()]);
+        return $respondent;
     }
 
     /**
@@ -46,6 +48,7 @@ class SxableController implements Targetable
      */
     public function destroy(int $id): string
     {
+        $this->target::where([config('sx.primary') => $id])->first()->delete();
         return (new SxRespondentService($id))->deleteRespondent();
     }
 

@@ -70,10 +70,12 @@ class RoutesTest extends RoutesTestCase
                 'id', 'externalkey', 'collectstatus', 'collecturl', 'createts', 'closets', 'startts',
                 'modifyts', 'sessioncount', 'selfurl', 'surveyurl', 'answerurl', 'senddistributionmailurl', 'sendremindermailurl'
             ])->json()['id'];
+        $this->assertDatabaseHas('entities', ['responde' => $id]);
 
         $this->delete(route('entities.destroy', ['entity' => $id]))
             ->assertStatus(200)
             ->assertSeeText('Success');
+        $this->assertDatabaseMissing('entities', ['responde' => $id]);
     }
 
     public function test_store_route_validation(): void

@@ -48,7 +48,9 @@ class SxableController implements Targetable
      */
     public function destroy(int $id): string
     {
-        $this->target::where([config('sx.primary') => $id])->first()->delete();
+        if ($model = $this->target::where([config('sx.primary') => $id])->first()) {
+            $model->delete();
+        }
         return (new SxRespondentService($id))->deleteRespondent();
     }
 

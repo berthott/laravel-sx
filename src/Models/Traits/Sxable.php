@@ -4,17 +4,29 @@ namespace berthott\SX\Models\Traits;
 
 use berthott\SX\Facades\SxLog;
 use berthott\SX\Models\SxMode;
+use berthott\SX\Observers\SxableObserver;
 use berthott\SX\Services\SxSurveyService;
 use Closure;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 trait Sxable
 {
+
+    /**
+     * Bootstrap services.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        self::$unguarded = true;
+        // observe Sxable
+        static::observe(SxableObserver::class);
+    }
 
     /**
      * The Survey Id that should be connected to this Model.
@@ -177,10 +189,11 @@ trait Sxable
             $table->timestamps();
         }, $force);
 
-        self::$unguarded = true;
         if (self::all()->isEmpty()) {
-            self::upsert(self::entities()->all(), [config('sx.primary')]);
-            //self::create(self::entities()->all());
+            //self::upsert(self::entities()->all(), [config('sx.primary')]);
+            foreach (self::entities()->all() as $entity) {
+                self::create($entity);
+            }
         }
     }
 
@@ -252,7 +265,14 @@ trait Sxable
     {
         SxLog::log(self::entityTableName().': import triggered.');
         $entries = self::entities(self::lastImport());
-        self::upsert($entries->all(), [config('sx.primary')]);
+        //self::upsert($entries->all(), [config('sx.primary')]);
+        foreach ($entries as $entry) {
+            if ($model = self::where(config('sx.primary'), $entry[config('sx.primary')])->first()) {
+                $model->update($entry);
+            } else {
+                self::create($entry);
+            }
+        }
         
         // return the imported entries from our database
         return static::whereIn(config('sx.primary'), $entries->pluck(config('sx.primary'))->toArray())->get();

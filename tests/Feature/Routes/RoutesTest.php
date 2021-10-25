@@ -62,7 +62,8 @@ class RoutesTest extends RoutesTestCase
     {
         $id = $this->post(route('entities.store'), [
             'form_params' => [
-                    'email' => 'test@syspons.com'
+                    'email' => 'test@syspons.com',
+                    's_2' => 3333
                 ]
             ])
             ->assertStatus(200)
@@ -70,12 +71,21 @@ class RoutesTest extends RoutesTestCase
                 'id', 'externalkey', 'collectstatus', 'collecturl', 'createts', 'closets', 'startts',
                 'modifyts', 'sessioncount', 'selfurl', 'surveyurl', 'answerurl', 'senddistributionmailurl', 'sendremindermailurl'
             ])->json()['id'];
-        $this->assertDatabaseHas('entities', ['responde' => $id]);
+        $this->assertDatabaseHas('entities', [
+            'responde' => $id,
+            'email' => 'test@syspons.com',
+            's_2' => 3333
+        ]);
+        $this->assertDatabaseHas('entities_long', [
+            'respondent_id' => $id,
+            'value_double' => 3333
+        ]);
 
         $this->delete(route('entities.destroy', ['entity' => $id]))
             ->assertStatus(200)
             ->assertSeeText('Success');
         $this->assertDatabaseMissing('entities', ['responde' => $id]);
+        $this->assertDatabaseMissing('entities_long', ['respondent_id' => $id]);
     }
 
     public function test_store_route_validation(): void

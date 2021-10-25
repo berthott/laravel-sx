@@ -36,7 +36,12 @@ class SxableObserver
      */
     public function deleted(Model $model): void
     {
-        $a = 0;
+        $this->makeLongEntry($model, function ($entry) use ($model) {
+            DB::table($model::longTableName())
+                ->where('respondent_id', $entry['respondent_id'])
+                ->where('variableName', $entry['variableName'])
+                ->delete();
+        });
     }
 
     /**

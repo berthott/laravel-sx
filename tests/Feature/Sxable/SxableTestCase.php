@@ -12,6 +12,8 @@ use Orchestra\Testbench\TestCase as BaseTestCase;
 
 abstract class SxableTestCase extends BaseTestCase
 {
+    protected $now;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -26,7 +28,8 @@ abstract class SxableTestCase extends BaseTestCase
 
     protected function getEnvironmentSetUp($app)
     {
-        Carbon::setTestNow();
+        $this->now = now();
+        Carbon::setTestNow($this->now);
         Config::set('sx.namespace', __NAMESPACE__);
         SxApiService::shouldReceive('exportStructure')
             ->andReturn(new Response(

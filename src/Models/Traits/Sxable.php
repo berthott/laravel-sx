@@ -113,6 +113,14 @@ trait Sxable
     }
 
     /**
+     * The long table name of the model.
+     */
+    public static function longTableName(): string
+    {
+        return Str::plural(self::singleName()).'_long';
+    }
+
+    /**
      * The labels table name of the model.
      */
     public static function labelsTableName(): string
@@ -158,6 +166,8 @@ trait Sxable
      */
     public static function initEntityTable(bool $force = false): void
     {
+        self::initLongTable($force); // before entity because it will write to long
+        
         $table = self::entityTableName();
         $entityStructure = self::controller()->getEntityStructure();
         self::initTable($table, function (Blueprint $table) use ($entityStructure) {
@@ -197,6 +207,24 @@ trait Sxable
                 self::create($entity);
             }
         }
+    }
+
+    /**
+     * Initialize the long table.
+     */
+    public static function initLongTable(bool $force = false): void
+    {
+        $table = self::longTableName();
+        self::initTable($table, function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->double('respondent_id');
+            $table->string('variableName');
+            $table->integer('value_single_multiple')->nullable();
+            $table->string('value_string')->nullable();
+            $table->double('value_double')->nullable();
+            $table->dateTime('value_datetime')->nullable();
+            $table->timestamps();
+        }, $force);
     }
 
     /**

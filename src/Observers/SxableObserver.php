@@ -2,6 +2,7 @@
 
 namespace berthott\SX\Observers;
 
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -12,7 +13,37 @@ class SxableObserver
      */
     public function created(Model $model): void
     {
-        $table = $model::longTableName();
+        $this->makeLongEntry($model, function ($entry) use ($model) {
+            DB::table($model::longTableName())->insert($entry);
+        });
+    }
+
+    /**
+     * Handle the Models "updated" event.
+     */
+    public function updated(Model $model): void
+    {
+        $this->makeLongEntry($model, function ($entry) use ($model) {
+            DB::table($model::longTableName())
+                ->where('respondent_id', $entry['respondent_id'])
+                ->where('variableName', $entry['variableName'])
+                ->update($entry);
+        });
+    }
+
+    /**
+     * Handle the Models "deleted" event.
+     */
+    public function deleted(Model $model): void
+    {
+        $a = 0;
+    }
+
+    /**
+     * Handle the Models "deleted" event.
+     */
+    private function makeLongEntry(Model $model, Closure $callback): void
+    {
         $attributes = $model->getAttributes();
         foreach ($attributes as $variableName => $value) {
             if (in_array($variableName, ['id', config('sx.primary'), 'created_at', 'updated_at'])) {
@@ -39,23 +70,7 @@ class SxableObserver
                     $entry['value_datetime'] = $value;
                     break;
             }
-            DB::table($table)->insert($entry);
+            $callback($entry);
         }
-    }
-
-    /**
-     * Handle the Models "updated" event.
-     */
-    public function updating(Model $model): void
-    {
-        $a = 0;
-    }
-
-    /**
-     * Handle the Models "deleted" event.
-     */
-    public function deleting(Model $model): void
-    {
-        $a = 0;
     }
 }

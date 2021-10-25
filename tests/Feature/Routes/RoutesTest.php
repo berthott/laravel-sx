@@ -122,15 +122,30 @@ class RoutesTest extends RoutesTestCase
             'responde' => 841931211,
             's_2' => 2020,
         ]);
+        $this->assertDatabaseHas('entities_long', [
+            'respondent_id' => 841931211,
+            'variableName' => 's_2',
+            'value_double' => 2020,
+        ]);
         $this->post(route('entities.import'));
         $this->assertDatabaseCount('entities', 5);
         $this->assertDatabaseMissing('entities', [
             'responde' => 841931211,
             's_2' => 2020,
         ]);
+        $this->assertDatabaseMissing('entities_long', [
+            'respondent_id' => 841931211,
+            'variableName' => 's_2',
+            'value_double' => 2020,
+        ]);
         $this->assertDatabaseHas('entities', [
             'responde' => 841931211,
             's_2' => 2021,
+        ]);
+        $this->assertDatabaseHas('entities_long', [
+            'respondent_id' => 841931211,
+            'variableName' => 's_2',
+            'value_double' => 2021,
         ]);
     }
 }

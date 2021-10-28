@@ -60,6 +60,9 @@ class SxSurveyService
             $csv = Statement::create()->process($csv, $header);
         }
         foreach ($csv as $row) {
+            $row = array_map(function ($entry) {
+                return !is_numeric($entry) && empty($entry) ? null : $entry;
+            }, $row);
             $collection->push(($row));
         }
         return $collection;

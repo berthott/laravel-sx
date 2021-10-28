@@ -238,7 +238,7 @@ trait Sxable
             $table->string('variableName');
             $table->integer('value');
             $table->string('label');
-            $table->timestamp('created_at')->default('CURRENT_TIMESTAMP');
+            $table->timestamp('created_at')->useCurrent();
         }, $force);
 
         if (DB::table($table)->get()->isEmpty()) {
@@ -260,7 +260,7 @@ trait Sxable
             $table->string('subType');
             $table->integer('choiceValue')->nullable();
             $table->string('choiceText')->nullable();
-            $table->timestamp('created_at')->default('CURRENT_TIMESTAMP');
+            $table->timestamp('created_at')->useCurrent();
         }, $force);
 
         if (DB::table($table)->get()->isEmpty()) {

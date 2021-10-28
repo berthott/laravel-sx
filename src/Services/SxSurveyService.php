@@ -39,7 +39,7 @@ class SxSurveyService
             $this->structure = $this->extractCsv(SxHttpService::surveys()->exportStructure([
                 'survey' => $this->survey_id,
                 'query' => [
-                    'format' => 'EU',
+                    'format' => 'INTL_US',
                 ],
             ]));
         }
@@ -52,15 +52,15 @@ class SxSurveyService
     {
         $collection = collect();
         $csv = Reader::createFromStream(StreamWrapper::getResource($response->getBody()));
-        $csv->setDelimiter(';');
-        $csv->addStreamFilter('convert.iconv.ISO-8859-15/UTF-8');
+        $csv->setDelimiter("\t");
+        $csv->addStreamFilter('convert.iconv.UTF-16/UTF-8');
         if (!$header) {
             $csv->setHeaderOffset(0);
         } else {
             $csv = Statement::create()->process($csv, $header);
         }
-        foreach ($csv as $record) {
-            $collection->push(($record));
+        foreach ($csv as $row) {
+            $collection->push(($row));
         }
         return $collection;
     }
@@ -82,7 +82,7 @@ class SxSurveyService
         return $this->extractCsv(SxHttpService::surveys()->exportDataset([
             'survey' => $this->survey_id,
             'query' => array_merge(
-                ['format' => 'EU'],
+                ['format' => 'INTL_US'],
                 $query,
             ),
         ]));
@@ -105,7 +105,7 @@ class SxSurveyService
         return $this->extractCsv(SxHttpService::surveys()->exportLabels([
             'survey' => $this->survey_id,
             'query' => [
-                'format' => 'EU',
+                'format' => 'INTL_US',
             ],
         ]), ['variableName', 'value', 'label']);
     }

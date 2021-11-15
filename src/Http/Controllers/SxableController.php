@@ -9,6 +9,7 @@ use berthott\SX\Models\Respondent;
 use berthott\SX\Models\Traits\Targetable as TraitsTargetable;
 use berthott\SX\Services\SxRespondentService;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Response;
 
 class SxableController implements Targetable
 {
@@ -49,12 +50,12 @@ class SxableController implements Targetable
     /**
      * Destroy a resource.
      */
-    public function destroy(int $id): string
+    public function destroy(int $id): Response
     {
         if ($model = $this->target::where([config('sx.primary') => $id])->first()) {
             $model->delete();
         }
-        return (new SxRespondentService($id))->deleteRespondent();
+        return response(['response' => (new SxRespondentService($id))->deleteRespondent()]);
     }
 
     /**

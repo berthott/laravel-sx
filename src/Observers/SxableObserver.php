@@ -25,9 +25,10 @@ class SxableObserver
     {
         $this->makeLongEntry($model, function ($entry) use ($model) {
             DB::table($model::longTableName())
-                ->where('respondent_id', $entry['respondent_id'])
-                ->where('variableName', $entry['variableName'])
-                ->update($entry);
+                ->updateOrInsert([
+                    'respondent_id' => $entry['respondent_id'],
+                    'variableName' => $entry['variableName'],
+                ], $entry);
         });
     }
 
@@ -53,6 +54,9 @@ class SxableObserver
         foreach ($attributes as $variableName => $value) {
             if (in_array($variableName, ['id', config('sx.primary'), 'created_at', 'updated_at'])) {
                 continue;
+            }
+            if ($variableName === 's_2') {
+                $a = 0;
             }
             $type = DB::getSchemaBuilder()->getColumnType($model::entityTableName(), $variableName);
             $entry = [

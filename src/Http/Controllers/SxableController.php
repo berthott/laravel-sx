@@ -9,6 +9,7 @@ use berthott\SX\Models\Respondent;
 use berthott\SX\Models\Traits\Targetable as TraitsTargetable;
 use berthott\SX\Services\SxRespondentService;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
 
 class SxableController implements Targetable
@@ -26,9 +27,9 @@ class SxableController implements Targetable
     /**
      * Display a single resource.
      */
-    public function show(int $id): Respondent
+    public function show(int $id): Model
     {
-        return (new SxRespondentService($id))->getRespondent();
+        return $this->target::where([config('sx.primary') => $id])->first();
     }
 
     /**
@@ -60,6 +61,14 @@ class SxableController implements Targetable
             $model->delete();
         }
         return response(['response' => (new SxRespondentService($id))->deleteRespondent()]);
+    }
+
+    /**
+     * Display the sx respondent data.
+     */
+    public function respondent(int $id): Respondent
+    {
+        return (new SxRespondentService($id))->getRespondent();
     }
 
     /**

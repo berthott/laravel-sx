@@ -153,11 +153,14 @@ trait Sxable
     private static function initTable(string $name, Closure $callback, bool $force = false): void
     {
         if ($force) {
+            SxLog::log("$name: Table dropped.");
             Schema::dropIfExists($name);
         }
 
         if (!Schema::hasTable($name)) {
+            SxLog::log("$name: Creating table.");
             Schema::create($name, $callback);
+            SxLog::log("$name: Table created.");
         }
     }
 
@@ -202,10 +205,13 @@ trait Sxable
         }, $force);
 
         if (self::all()->isEmpty()) {
+            SxLog::log("$table: Filling table.");
             //self::upsert(self::entities()->all(), [config('sx.primary')]);
             foreach (self::entities()->all() as $entity) {
+                SxLog::log('Creating respondent '.$entity[config('sx.primary')]);
                 self::create($entity);
             }
+            SxLog::log("$table: Table filled.");
         }
     }
 
@@ -242,7 +248,9 @@ trait Sxable
         }, $force);
 
         if (DB::table($table)->get()->isEmpty()) {
+            SxLog::log("$table: Filling table.");
             DB::table($table)->insert(self::controller()->getLabels()->all());
+            SxLog::log("$table: Table filled.");
         }
     }
 
@@ -264,7 +272,9 @@ trait Sxable
         }, $force);
 
         if (DB::table($table)->get()->isEmpty()) {
+            SxLog::log("$table: Filling table.");
             DB::table($table)->insert(self::controller()->getQuestions()->all());
+            SxLog::log("$table: Table filled.");
         }
     }
 
@@ -293,16 +303,19 @@ trait Sxable
 
     public static function import(): Collection
     {
-        SxLog::log(self::entityTableName().': import triggered.');
+        SxLog::log(self::entityTableName().': Import triggered.');
         $entries = self::entities(self::lastImport());
         //self::upsert($entries->all(), [config('sx.primary')]);
         foreach ($entries as $entry) {
             if ($model = self::where(config('sx.primary'), $entry[config('sx.primary')])->first()) {
+                SxLog::log('Updating respondent '.$entry[config('sx.primary')]);
                 $model->update($entry);
             } else {
+                SxLog::log('Creating respondent '.$entry[config('sx.primary')]);
                 self::create($entry);
             }
         }
+        SxLog::log(self::entityTableName().': Import finished.');
         
         // return the imported entries from our database
         return static::whereIn(config('sx.primary'), $entries->pluck(config('sx.primary'))->toArray())->get();

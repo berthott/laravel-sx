@@ -40,6 +40,6 @@ class CommandsTest extends CommandsTestCase
     public function test_import_command_output(): void
     {
         $command = $this->artisan('import', ['classes' => ['entities']]);
-        $command->expectsOutput('entities: import triggered.');
+        $command->expectsOutput('entities: Import triggered.');
     }
 }

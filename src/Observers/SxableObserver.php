@@ -55,9 +55,6 @@ class SxableObserver
             if (in_array($variableName, ['id', config('sx.primary'), 'created_at', 'updated_at'])) {
                 continue;
             }
-            if ($variableName === 's_2') {
-                $a = 0;
-            }
             $type = DB::getSchemaBuilder()->getColumnType($model::entityTableName(), $variableName);
             $entry = [
                 'respondent_id' => $attributes[config('sx.primary')],

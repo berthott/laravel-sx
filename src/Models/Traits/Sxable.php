@@ -169,8 +169,8 @@ trait Sxable
         self::initLongTable($force); // before entity because it will write to long
         
         $table = self::entityTableName();
-        $entityStructure = self::controller()->getEntityStructure();
-        self::initTable($table, function (Blueprint $table) use ($entityStructure) {
+        self::initTable($table, function (Blueprint $table) {
+            $entityStructure = self::controller()->getEntityStructure();
             $t = null;
             $table->bigIncrements('id');
             foreach ($entityStructure as $column) {

@@ -15,6 +15,7 @@ class RoutesTest extends RoutesTestCase
             'entities.destroy',
             
             'entities.respondent',
+            'entities.structure',
             'entities.import',
         ];
         $registeredRoutes = array_keys(Route::getRoutes()->getRoutesByName());
@@ -107,6 +108,16 @@ class RoutesTest extends RoutesTestCase
             ]);
     }
 
+    public function test_structure_route(): void
+    {
+        $this->get(route('entities.structure'))
+            ->assertStatus(200)
+            ->assertJsonFragment(['variableName' => 'survey', 'subType' => 'Single'])
+            ->assertJsonFragment(['variableName' => 'responde', 'subType' => 'Double'])
+            ->assertJsonFragment(['variableName' => 'stat_1', 'subType' => 'Multiple'])
+            ->assertJsonFragment(['variableName' => 'created', 'subType' => 'Date']);
+    }
+    
     public function test_import_route(): void
     {
         $id = ['responde' => 841931211];

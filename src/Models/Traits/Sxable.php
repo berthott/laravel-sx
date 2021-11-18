@@ -79,6 +79,14 @@ trait Sxable
     }
 
     /**
+     * Returns the structure of the current entity.
+     */
+    public static function structure(): Collection
+    {
+        return Schema::hasTable(self::structureTableName()) ? DB::table(self::structureTableName())->get() : collect();
+    }
+
+    /**
      * The fields to be processed.
      */
     private static $_fields;
@@ -113,6 +121,14 @@ trait Sxable
     }
 
     /**
+     * The structure table name of the model.
+     */
+    public static function structureTableName(): string
+    {
+        return self::singleName().'_structure';
+    }
+
+    /**
      * The long table name of the model.
      */
     public static function longTableName(): string
@@ -141,6 +157,7 @@ trait Sxable
      */
     public static function initTables(bool $force = false): Collection
     {
+        self::initStructureTable($force);
         self::initEntityTable($force);
         self::initLabelsTable($force);
         self::initQuestionsTable($force);
@@ -165,6 +182,26 @@ trait Sxable
     }
 
     /**
+     * Initialize the structure table.
+     */
+    public static function initStructureTable(bool $force = false): void
+    {
+        $table = self::structureTableName();
+        self::initTable($table, function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('variableName');
+            $table->string('subType');
+            $table->timestamps();
+        }, $force);
+
+        if (DB::table($table)->get()->isEmpty()) {
+            SxLog::log("$table: Filling table.");
+            DB::table($table)->insert(self::controller()->getEntityStructure()->all());
+            SxLog::log("$table: Table filled.");
+        }
+    }
+
+    /**
      * Initialize the entity table.
      */
     public static function initEntityTable(bool $force = false): void
@@ -173,29 +210,29 @@ trait Sxable
         
         $table = self::entityTableName();
         self::initTable($table, function (Blueprint $table) {
-            $entityStructure = self::controller()->getEntityStructure();
+            $entityStructure = self::structure();
             $t = null;
             $table->bigIncrements('id');
             foreach ($entityStructure as $column) {
-                if (!in_array($column['variableName'], self::fields())) {
+                if (!in_array($column->variableName, self::fields())) {
                     continue;
                 }
-                switch ($column['subType']) {
+                switch ($column->subType) {
                     case 'Single':
                     case 'Multiple':
-                        $t = $table->integer($column['variableName']);
+                        $t = $table->integer($column->variableName);
                         break;
                     case 'Double':
-                        $t = $table->double($column['variableName']);
+                        $t = $table->double($column->variableName);
                         break;
                     case 'String':
-                        $t = $table->string($column['variableName']);
+                        $t = $table->string($column->variableName);
                         break;
                     case 'Date':
-                        $t = $table->dateTime($column['variableName']);
+                        $t = $table->dateTime($column->variableName);
                         break;
                 }
-                if (in_array($column['variableName'], self::unique())) {
+                if (in_array($column->variableName, self::unique())) {
                     $t->unique();
                 } else {
                     $t->nullable();
@@ -285,10 +322,10 @@ trait Sxable
     {
         return self::$_fields ?: self::$_fields =
             !empty(self::include())
-                ? array_intersect(self::controller()->getEntityStructure()->pluck('variableName')->all(), self::include())
+                ? array_intersect(self::structure()->pluck('variableName')->all(), self::include())
                 : (!empty(self::exclude())
-                    ? array_diff(self::controller()->getEntityStructure()->pluck('variableName')->all(), self::exclude())
-                    : self::controller()->getEntityStructure()->pluck('variableName')->all());
+                    ? array_diff(self::structure()->pluck('variableName')->all(), self::exclude())
+                    : self::structure()->pluck('variableName')->all());
     }
 
     /**

@@ -8,9 +8,9 @@ use berthott\SX\Models\Contracts\Targetable;
 use berthott\SX\Models\Respondent;
 use berthott\SX\Models\Traits\Targetable as TraitsTargetable;
 use berthott\SX\Services\SxRespondentService;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 
 class SxableController implements Targetable
 {
@@ -69,6 +69,14 @@ class SxableController implements Targetable
     public function respondent(int $id): Respondent
     {
         return (new SxRespondentService($id))->getRespondent();
+    }
+
+    /**
+     * Display the sx respondent data.
+     */
+    public function structure(): Collection
+    {
+        return $this->target::structure();
     }
 
     /**

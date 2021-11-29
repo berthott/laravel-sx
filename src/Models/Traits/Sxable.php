@@ -109,7 +109,7 @@ trait Sxable
      */
     public static function singleName(): string
     {
-        return Str::lower(class_basename(get_called_class()));
+        return Str::snake(class_basename(get_called_class()));
     }
 
     /**
@@ -117,7 +117,7 @@ trait Sxable
      */
     public static function entityTableName(): string
     {
-        return Str::plural(self::singleName());
+        return Str::snake(Str::pluralStudly(class_basename(get_called_class())));
     }
 
     /**

@@ -11,6 +11,8 @@ use Orchestra\Testbench\TestCase as BaseTestCase;
 
 abstract class RoutesTestCase extends BaseTestCase
 {
+    protected string $now;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -25,6 +27,7 @@ abstract class RoutesTestCase extends BaseTestCase
 
     protected function getEnvironmentSetUp($app)
     {
+        $this->now = now()->format('Y-m-d H:i:s');
         Config::set('sx.namespace', __NAMESPACE__);
         Config::set('sx.auth', [
             'Syspons_API',

@@ -73,6 +73,7 @@ class SxServiceProvider extends ServiceProvider
         Route::group($this->routeConfiguration(), function () {
             foreach (Sxable::getSxableClasses() as $sxable) {
                 Route::post($sxable::entityTableName().'/import', [SxableController::class, 'import'])->name($sxable::entityTableName().'.import');
+                Route::get($sxable::entityTableName().'/export', [SxableController::class, 'export'])->name($sxable::entityTableName().'.export');
                 Route::get("{$sxable::entityTableName()}/structure", [SxableController::class, 'structure'])->name($sxable::entityTableName().'.structure');
                 Route::get("{$sxable::entityTableName()}/{{$sxable::singleName()}}/respondent", [SxableController::class, 'respondent'])->name($sxable::entityTableName().'.respondent');
                 Route::apiResource($sxable::entityTableName(), SxableController::class, $sxable::routeOptions())->except(['update']);

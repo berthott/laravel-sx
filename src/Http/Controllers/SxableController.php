@@ -2,6 +2,9 @@
 
 namespace berthott\SX\Http\Controllers;
 
+use berthott\SX\Exports\SxExport;
+use berthott\SX\Exports\SxExportAll;
+use berthott\SX\Http\Requests\ExportRequest;
 use berthott\SX\Http\Requests\ImportRequest;
 use berthott\SX\Http\Requests\StoreRequest;
 use berthott\SX\Models\Contracts\Targetable;
@@ -11,6 +14,8 @@ use berthott\SX\Services\SxRespondentService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SxableController implements Targetable
 {
@@ -87,5 +92,30 @@ class SxableController implements Targetable
         return $request->fresh
             ? $this->target::initTables(force: true)
             : $this->target::import();
+    }
+
+    /**
+     * Trigger import.
+     */
+    public function export(ExportRequest $request): BinaryFileResponse
+    {
+        if (empty($request->table)) {
+            $fileName = $this->target::entityTableName().'.'.strtolower(config('sx.exportFormat'));
+            return Excel::download(new SxExportAll($this->target), $fileName);
+        }
+        switch($request->table) {
+            case 'wide':
+                $tableName = $this->target::entityTableName();
+                break;
+            case 'long':
+                $tableName = $this->target::entityTableName().'_'.$request->table;
+                break;
+            case 'questions':
+            case 'labels':
+                $tableName = $this->target::singleName().'_'.$request->table;
+                break;
+        }
+        $fileName = $tableName.'.'.strtolower(config('sx.exportFormat'));
+        return Excel::download(new SxExport($tableName), $fileName);
     }
 }

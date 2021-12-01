@@ -7,9 +7,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 use Maatwebsite\Excel\Concerns\WithTitle;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class SxExport implements FromCollection, WithHeadings, WithTitle
+class SxExport implements FromCollection, WithHeadings, WithTitle, WithStrictNullComparison
 {
     private string $tableName;
 
@@ -31,5 +34,22 @@ class SxExport implements FromCollection, WithHeadings, WithTitle
     public function headings(): array
     {
         return Schema::getColumnListing($this->tableName);
+    }
+
+    // intentionally disabled because of missing WithColumnFormatting Concern
+    public function columnFormats(): array
+    {
+        $i = 1;
+        return array_reduce($this->headings(), function ($reduced, $column) use (&$i) {
+            $type = DB::getSchemaBuilder()->getColumnType($this->tableName, $column);
+            switch ($type) {
+                case 'integer':
+                    $reduced[Coordinate::stringFromColumnIndex($i)] = NumberFormat::FORMAT_NUMBER;
+                    break;
+            }
+            $i++;
+            return $reduced;
+        }, []);
+        ;
     }
 }

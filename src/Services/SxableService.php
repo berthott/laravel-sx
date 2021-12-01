@@ -40,7 +40,7 @@ class SxableService
         $sxables = [];
         $namespaces = config('sx.namespace');
         foreach (is_array($namespaces) ? $namespaces : [$namespaces] as $namespace) {
-            foreach (ClassFinder::getClassesInNamespace($namespace) as $class) {
+            foreach (ClassFinder::getClassesInNamespace($namespace, ClassFinder::RECURSIVE_MODE) as $class) {
                 foreach (class_uses_recursive($class) as $trait) {
                     if ('berthott\SX\Models\Traits\Sxable' == $trait) {
                         array_push($sxables, $class);

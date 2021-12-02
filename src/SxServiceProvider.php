@@ -3,6 +3,8 @@
 namespace berthott\SX;
 
 use berthott\SX\Console\Import;
+use berthott\SX\Console\Init;
+use berthott\SX\Console\Drop;
 use berthott\SX\Exceptions\Handler;
 use berthott\SX\Facades\Sxable;
 use berthott\SX\Helpers\Helpers;
@@ -84,6 +86,8 @@ class SxServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Import::class,
+                Init::class,
+                Drop::class,
             ]);
         }
     }

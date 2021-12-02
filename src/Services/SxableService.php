@@ -21,7 +21,6 @@ class SxableService
     public function __construct()
     {
         $this->initSxableClasses();
-        $this->initTables();
     }
 
     /**
@@ -64,17 +63,5 @@ class SxableService
         return $this->sxables->first(function ($sxable) use ($model) {
             return Str::contains($sxable, $model);
         });
-    }
-
-    /**
-     * Initialize the sxable tables.
-     */
-    private function initTables(): void
-    {
-        if ($this->sxables) {
-            foreach ($this->sxables as $sxable) {
-                $sxable::initTables();
-            }
-        }
     }
 }

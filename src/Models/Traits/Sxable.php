@@ -165,6 +165,27 @@ trait Sxable
     }
 
     /**
+     * Drop the sxable tables.
+     */
+    public static function dropTables(): void
+    {
+        self::dropTable(self::entityTableName());
+        self::dropTable(self::longTableName());
+        self::dropTable(self::structureTableName());
+        self::dropTable(self::labelsTableName());
+        self::dropTable(self::questionsTableName());
+    }
+
+    /**
+     * Drop the sxable tables.
+     */
+    private static function dropTable(string $table): void
+    {
+        SxLog::log("$table: Table dropped.");
+        Schema::dropIfExists($table);
+    }
+
+    /**
      * Initialize the a table with the given name and closure.
      */
     private static function initTable(string $name, Closure $callback, bool $force = false): void

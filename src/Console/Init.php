@@ -7,10 +7,10 @@ use berthott\SX\Facades\SxLog;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
-class Import extends Command
+class Init extends Command
 {
-    protected $signature = 'sx:import {classes?*} {--fresh}';
-    protected $description = 'Import SX data';
+    protected $signature = 'sx:init {classes?*} {--fresh}';
+    protected $description = 'Initialize SX tables';
 
     public function handle()
     {
@@ -25,9 +25,7 @@ class Import extends Command
             if ($this->argument('classes') && !in_array($class::entityTableName(), $this->argument('classes'))) {
                 continue;
             }
-            $this->option('fresh')
-              ? $class::initTables(force: true)
-              : $class::import();
+            $class::initTables($this->option('fresh'));
         }
     }
 }

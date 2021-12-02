@@ -217,7 +217,7 @@ trait Sxable
 
         if (DB::table($table)->get()->isEmpty()) {
             SxLog::log("$table: Filling table.");
-            DB::table($table)->insert(self::controller()->getEntityStructure()->all());
+            DB::table($table)->insert(self::entityStructure()->all());
             SxLog::log("$table: Table filled.");
         }
     }
@@ -247,7 +247,7 @@ trait Sxable
                         $t = $table->double($column->variableName);
                         break;
                     case 'String':
-                        $t = $table->string($column->variableName);
+                        $t = $table->text($column->variableName);
                         break;
                     case 'Date':
                         $t = $table->dateTime($column->variableName);
@@ -265,8 +265,11 @@ trait Sxable
         if (self::all()->isEmpty()) {
             SxLog::log("$table: Filling table.");
             //self::upsert(self::entities()->all(), [config('sx.primary')]);
-            foreach (self::entities()->all() as $entity) {
-                SxLog::log('Creating respondent '.$entity[config('sx.primary')]);
+            $entities = self::entities()->all();
+            $count = count($entities);
+            foreach ($entities as $index => $entity) {
+                $index++;
+                SxLog::log("[$index/$count] Creating respondent: ".$entity[config('sx.primary')]);
                 self::create($entity);
             }
             SxLog::log("$table: Table filled.");
@@ -284,7 +287,7 @@ trait Sxable
             $table->double('respondent_id');
             $table->string('variableName');
             $table->integer('value_single_multiple')->nullable();
-            $table->string('value_string')->nullable();
+            $table->text('value_string')->nullable();
             $table->double('value_double')->nullable();
             $table->dateTime('value_datetime')->nullable();
             $table->timestamps();
@@ -307,7 +310,7 @@ trait Sxable
 
         if (DB::table($table)->get()->isEmpty()) {
             SxLog::log("$table: Filling table.");
-            DB::table($table)->insert(self::controller()->getLabels()->all());
+            DB::table($table)->insert(self::labels()->all());
             SxLog::log("$table: Table filled.");
         }
     }
@@ -322,7 +325,7 @@ trait Sxable
             $table->bigIncrements('id');
             $table->string('questionName');
             $table->string('variableName');
-            $table->string('questionText');
+            $table->text('questionText');
             $table->string('subType');
             $table->integer('choiceValue')->nullable();
             $table->string('choiceText')->nullable();
@@ -331,7 +334,7 @@ trait Sxable
 
         if (DB::table($table)->get()->isEmpty()) {
             SxLog::log("$table: Filling table.");
-            DB::table($table)->insert(self::controller()->getQuestions()->all());
+            DB::table($table)->insert(self::questions()->all());
             SxLog::log("$table: Table filled.");
         }
     }
@@ -341,12 +344,13 @@ trait Sxable
      */
     private static function fields(): array
     {
+        $structure = self::controller()->getEntityStructure();
         return self::$_fields ?: self::$_fields =
             !empty(self::include())
-                ? array_intersect(self::structure()->pluck('variableName')->all(), self::include())
+                ? array_intersect($structure->pluck('variableName')->all(), self::include())
                 : (!empty(self::exclude())
-                    ? array_diff(self::structure()->pluck('variableName')->all(), self::exclude())
-                    : self::structure()->pluck('variableName')->all());
+                    ? array_diff($structure->pluck('variableName')->all(), self::exclude())
+                    : $structure->pluck('variableName')->all());
     }
 
     /**
@@ -359,17 +363,50 @@ trait Sxable
         });
     }
 
+    /**
+     * The questions mapped to the fields.
+     */
+    private static function questions(): Collection
+    {
+        $questions = self::controller()->getQuestions()->filter(function ($question) {
+            return in_array($question['variableName'], self::fields());
+        });
+        return $questions;
+    }
+
+    /**
+     * The labels mapped to the fields.
+     */
+    private static function labels(): Collection
+    {
+        return self::controller()->getLabels()->filter(function ($label) {
+            return in_array($label['variableName'], self::fields());
+        });
+    }
+
+    /**
+     * The labels mapped to the fields.
+     */
+    private static function entityStructure(): Collection
+    {
+        return self::controller()->getEntityStructure()->filter(function ($entry) {
+            return in_array($entry['variableName'], self::fields());
+        });
+    }
+
     public static function import(): Collection
     {
         SxLog::log(self::entityTableName().': Import triggered.');
         $entries = self::entities(self::lastImport());
         //self::upsert($entries->all(), [config('sx.primary')]);
-        foreach ($entries as $entry) {
+        $count = count($entries);
+        foreach ($entries as $index => $entry) {
+            $index++;
             if ($model = self::where(config('sx.primary'), $entry[config('sx.primary')])->first()) {
-                SxLog::log('Updating respondent '.$entry[config('sx.primary')]);
+                SxLog::log("[$index/$count] Updating respondent: ".$entry[config('sx.primary')]);
                 $model->update($entry);
             } else {
-                SxLog::log('Creating respondent '.$entry[config('sx.primary')]);
+                SxLog::log("[$index/$count] Creating respondent: ".$entry[config('sx.primary')]);
                 self::create($entry);
             }
         }

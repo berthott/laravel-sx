@@ -124,5 +124,8 @@ class ExcludeTest extends ExcludeTestCase
             'stato_5' => 0,
         ];
         $this->assertDatabaseHas('entities', $entity);
+        $this->assertDatabaseMissing('entity_questions', ['variableName' => 'survey']);
+        $this->assertDatabaseMissing('entity_labels', ['variableName' => 'survey']);
+        $this->assertDatabaseMissing('entity_structure', ['variableName' => 'survey']);
     }
 }

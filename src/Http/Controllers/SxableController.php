@@ -52,7 +52,7 @@ class SxableController implements Targetable
                 'created' => $respondent->createts(),
                 'modified' => $respondent->modifyts(),
             ],
-            $request->form_params
+            $this->target::filterFormParams($request->form_params)
         ));
         return $respondent;
     }
@@ -103,7 +103,7 @@ class SxableController implements Targetable
             $fileName = $this->target::entityTableName().'.'.strtolower(config('sx.exportFormat'));
             return Excel::download(new SxExportAll($this->target), $fileName);
         }
-        switch($request->table) {
+        switch ($request->table) {
             case 'wide':
                 $tableName = $this->target::entityTableName();
                 break;

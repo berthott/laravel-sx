@@ -28,6 +28,10 @@ abstract class ExcludeTestCase extends BaseTestCase
     protected function getEnvironmentSetUp($app)
     {
         Config::set('sx.namespace', __NAMESPACE__);
+        Config::set('sx.auth', [
+            'Syspons_API',
+            'SySpons$$'
+        ]);
         SxApiService::shouldReceive('exportStructure')
             ->andReturn(new Response(
                 $status = 200,

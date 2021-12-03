@@ -354,6 +354,16 @@ trait Sxable
     }
 
     /**
+     * The formparams filtered to the fields.
+     */
+    public static function filterFormParams(array $formParams): array
+    {
+        return array_filter($formParams, function ($param) {
+            return in_array($param, self::fields());
+        }, ARRAY_FILTER_USE_KEY);
+    }
+
+    /**
      * The entities mapped to the fields.
      */
     private static function entities(array $query = []): Collection

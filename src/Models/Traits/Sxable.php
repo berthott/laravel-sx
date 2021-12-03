@@ -344,13 +344,31 @@ trait Sxable
      */
     private static function fields(): array
     {
-        $structure = self::controller()->getEntityStructure();
-        return self::$_fields ?: self::$_fields =
-            !empty(self::include())
-                ? array_intersect($structure->pluck('variableName')->all(), self::include())
-                : (!empty(self::exclude())
-                    ? array_diff($structure->pluck('variableName')->all(), self::exclude())
-                    : $structure->pluck('variableName')->all());
+        return isset(self::$_fields) ? self::$_fields : self::$_fields = self::buildFields();
+    }
+
+    /**
+     * bUILD The fields to be processed.
+     */
+    private static function buildFields(): array
+    {
+        $allFields = self::controller()->getEntityStructure()->pluck('variableName')->all();
+        $filteredFields = $allFields;
+        if (!empty(self::include())) {
+            $filteredFields = array_intersect($allFields, self::include());
+        } elseif (!empty(self::exclude())) {
+            $filteredFields = array_diff($allFields, self::exclude());
+        }
+        return array_filter($filteredFields, function ($field) {
+            $doFiler = true;
+            foreach (config('sx.filters') as $filter) {
+                if (str_starts_with($field, $filter)) {
+                    $doFiler = false;
+                    break;
+                }
+            }
+            return $doFiler;
+        });
     }
 
     /**

@@ -3,10 +3,9 @@
 namespace berthott\SX\Services;
 
 use HaydenPierce\ClassFinder\ClassFinder;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 
 class SxableService
 {
@@ -55,13 +54,13 @@ class SxableService
      */
     public function getTarget(): string
     {
-        if (!request()->segments() || !$this->sxables) {
+        if (!request()->segments() || $this->sxables->isEmpty()) {
             return '';
         }
-        $model = Str::studly(Str::singular(request()->segment(count(explode('/', config('sx.prefix'))) + 1)));
+        $model = Str::studly(Str::singular(request()->segment(count(explode('/', config('permissions.prefix'))) + 1)));
 
-        return $this->sxables->first(function ($sxable) use ($model) {
-            return Str::contains($sxable, $model);
-        });
+        return $this->sxables->first(function ($class) use ($model) {
+            return Arr::last(explode('\\', $class)) === $model;
+        }) ?: '';
     }
 }

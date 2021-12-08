@@ -22,7 +22,7 @@ class SxExportAll implements WithMultipleSheets
     {
         return [
           new SxExport($this->target::entityTableName()),
-          new SxExport($this->target::entityTableName().'_long'),
+          //new SxExport($this->target::entityTableName().'_long'),
           new SxExport($this->target::singleName().'_questions'),
           new SxExport($this->target::singleName().'_labels'),
         ];

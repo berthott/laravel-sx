@@ -6,6 +6,9 @@ use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
+
+const CACHE_KEY = 'SxableService-Cache-Key';
 
 class SxableService
 {
@@ -35,18 +38,20 @@ class SxableService
      */
     private function initSxableClasses(): void
     {
-        $sxables = [];
-        $namespaces = config('sx.namespace');
-        foreach (is_array($namespaces) ? $namespaces : [$namespaces] as $namespace) {
-            foreach (ClassFinder::getClassesInNamespace($namespace, ClassFinder::RECURSIVE_MODE) as $class) {
-                foreach (class_uses_recursive($class) as $trait) {
-                    if ('berthott\SX\Models\Traits\Sxable' == $trait) {
-                        array_push($sxables, $class);
+        $this->sxables = Cache::sear(CACHE_KEY, function () {
+            $sxables = [];
+            $namespaces = config('sx.namespace');
+            foreach (is_array($namespaces) ? $namespaces : [$namespaces] as $namespace) {
+                foreach (ClassFinder::getClassesInNamespace($namespace, ClassFinder::RECURSIVE_MODE) as $class) {
+                    foreach (class_uses_recursive($class) as $trait) {
+                        if ('berthott\SX\Models\Traits\Sxable' == $trait) {
+                            array_push($sxables, $class);
+                        }
                     }
                 }
             }
-        }
-        $this->sxables = collect($sxables);
+            return collect($sxables);
+        });
     }
 
     /**

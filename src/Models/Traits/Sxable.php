@@ -444,7 +444,6 @@ trait Sxable
         return static::whereIn(config('sx.primary'), $entries->pluck(config('sx.primary'))->toArray())->get();
     }
 
-
     /**
      * Return a last import as query array.
      */
@@ -460,5 +459,22 @@ trait Sxable
             SxLog::log('There were no previous respondents.');
         }
         return $lastImportArray;
+    }
+
+    /**
+     * Return a last import as query array.
+     */
+    public static function guessFullVariableName(string $shortName): string
+    {
+        $entry = DB::table(self::questionsTableName())->where('variableName', $shortName)->first();
+        $base = Str::lower($entry->questionName);
+        if ($entry->choiceValue) {
+            $questionNameEntries = DB::table(self::questionsTableName())->where('questionName', $entry->questionName)->get();
+            $index = $questionNameEntries->search(function ($entity) use ($shortName) {
+                return $entity->variableName === $shortName;
+            });
+            return $base.'_'.++$index;
+        }
+        return $base;
     }
 }

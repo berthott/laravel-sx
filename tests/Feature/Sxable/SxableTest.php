@@ -345,4 +345,11 @@ class SxableTest extends SxableTestCase
             'updated_at' => $this->now,
         ]);
     }
+    
+    public function test_guess_full_variable_name(): void
+    {
+        $this->assertEquals('responsecollectsessions', Entity::guessFullVariableName('response'));
+        $this->assertEquals('statcreation_2', Entity::guessFullVariableName('statc_5'));
+        $this->assertEquals('statdistribution_1', Entity::guessFullVariableName('statd_1'));
+    }
 }

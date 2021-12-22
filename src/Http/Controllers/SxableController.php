@@ -49,6 +49,7 @@ class SxableController implements Targetable
         $this->target::create(array_merge(
             [
                 config('sx.primary') => $respondent->id(),
+                'survey' => $this->target::surveyId(),
                 'created' => $respondent->createts(),
                 'modified' => $respondent->modifyts(),
             ],

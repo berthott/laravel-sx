@@ -2,8 +2,7 @@
 
 namespace berthott\SX\Exports;
 
-use berthott\SX\Exports\SxExport;
-use Illuminate\Database\Eloquent\Model;
+use berthott\SX\Exports\SxTableExport;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
@@ -21,10 +20,11 @@ class SxExportAll implements WithMultipleSheets
     public function sheets(): array
     {
         return [
-          new SxExport($this->target::entityTableName()),
+          new SxLabeledExport($this->target),
+          new SxTableExport($this->target::entityTableName()),
           //new SxExport($this->target::entityTableName().'_long'),
-          new SxExport($this->target::singleName().'_questions'),
-          new SxExport($this->target::singleName().'_labels'),
+          new SxTableExport($this->target::singleName().'_questions'),
+          new SxTableExport($this->target::singleName().'_labels'),
         ];
     }
 }

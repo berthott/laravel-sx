@@ -87,6 +87,35 @@ trait Sxable
     }
 
     /**
+     * Returns the labeled structure.
+     */
+    public static function labeledStructure(): Collection
+    {
+        return self::structure()->map(function ($entry) {
+            if ($entry->subType === 'Multiple') {
+                $entry->variableName = $entry->variableName.' - '.DB::table(self::questionsTableName())->where('variableName', $entry->variableName)->first()->choiceText;
+            }
+            return $entry;
+        });
+    }
+
+    /**
+     * Returns the labeled structure + id and timestamps.
+     */
+    public static function labeledAttributes(): array
+    {
+        $questions = DB::table(self::questionsTableName())->get()->keyBy('variableName');
+        $ret = [];
+        foreach(Schema::getColumnListing(self::entityTableName()) as $variableName) {
+            if ($questions->has($variableName) && $questions[$variableName]->subType === 'Multiple') {
+                $variableName = $variableName.' - '.$questions[$variableName]->choiceText;
+            }
+            array_push($ret, $variableName);
+        }
+        return $ret;
+    }
+
+    /**
      * The fields to be processed.
      */
     private static $_fields;

@@ -4,7 +4,7 @@ namespace berthott\SX\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ExportRequest extends FormRequest
+class LabeledRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -12,7 +12,7 @@ class ExportRequest extends FormRequest
     public function rules(): array
     {
         return [
-          'table' => 'nullable|string|in:questions,labels,long,wide,wide_labeled',
+          'labeled' => 'nullable|boolean',
         ];
     }
 }

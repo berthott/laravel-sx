@@ -2,16 +2,20 @@
 
 namespace berthott\SX\Http\Controllers;
 
-use berthott\SX\Exports\SxExport;
+use berthott\SX\Exports\SxTableExport;
+use berthott\SX\Exports\SxLabeledExport;
 use berthott\SX\Exports\SxExportAll;
 use berthott\SX\Http\Requests\ExportRequest;
 use berthott\SX\Http\Requests\ImportRequest;
+use berthott\SX\Http\Requests\LabeledRequest;
 use berthott\SX\Http\Requests\StoreRequest;
 use berthott\SX\Models\Contracts\Targetable;
+use berthott\SX\Models\Resources\SxableLabeledResource;
 use berthott\SX\Models\Respondent;
 use berthott\SX\Models\Traits\Targetable as TraitsTargetable;
 use berthott\SX\Services\SxRespondentService;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -24,9 +28,11 @@ class SxableController implements Targetable
     /**
      * Display a listing of the resource.
      */
-    public function index(): Collection
+    public function index(LabeledRequest $request): Collection | ResourceCollection
     {
-        return $this->target::all();
+        return $request->labeled
+            ? SxableLabeledResource::collection($this->target::all())
+            : $this->target::all();
     }
 
     /**
@@ -80,9 +86,11 @@ class SxableController implements Targetable
     /**
      * Display the sx respondent data.
      */
-    public function structure(): Collection
+    public function structure(LabeledRequest $request): Collection | ResourceCollection
     {
-        return $this->target::structure();
+        return $request->labeled
+            ? $this->target::labeledStructure()
+            : $this->target::structure();
     }
 
     /**
@@ -105,6 +113,8 @@ class SxableController implements Targetable
             return Excel::download(new SxExportAll($this->target), $fileName);
         }
         switch ($request->table) {
+            case 'wide_labeled':
+                return Excel::download(new SxLabeledExport($this->target), $this->target::entityTableName().'_labeled.'.strtolower(config('sx.exportFormat')));
             case 'wide':
                 $tableName = $this->target::entityTableName();
                 break;
@@ -117,6 +127,6 @@ class SxableController implements Targetable
                 break;
         }
         $fileName = $tableName.'.'.strtolower(config('sx.exportFormat'));
-        return Excel::download(new SxExport($tableName), $fileName);
+        return Excel::download(new SxTableExport($tableName), $fileName);
     }
 }

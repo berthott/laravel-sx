@@ -10,11 +10,14 @@ use berthott\SX\Facades\Sxable;
 use berthott\SX\Helpers\Helpers;
 use berthott\SX\Helpers\SxLog as HelpersSxLog;
 use berthott\SX\Http\Controllers\SxableController;
+use berthott\SX\Http\Middleware\ConvertStringBooleans;
 use berthott\SX\Models\Contracts\Targetable;
 use berthott\SX\Services\Http\SxApiService;
 use berthott\SX\Services\Http\SxEntityService;
 use berthott\SX\Services\SxableService;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -71,6 +74,10 @@ class SxServiceProvider extends ServiceProvider
             'level' => 'debug',
         ]);
 
+        // add middleware
+        $router = app(Router::class);
+        $router->aliasMiddleware('string.booleans', ConvertStringBooleans::class);
+
         // add routes
         Route::group($this->routeConfiguration(), function () {
             foreach (Sxable::getSxableClasses() as $sxable) {
@@ -90,12 +97,15 @@ class SxServiceProvider extends ServiceProvider
                 Drop::class,
             ]);
         }
+
+        // Disable Data Wrapping on resources
+        JsonResource::withoutWrapping();
     }
 
     protected function routeConfiguration(): array
     {
         return [
-            'middleware' => config('sx.middleware'),
+            'middleware' => [...config('sx.middleware'), 'string.booleans'],
             'prefix' => config('sx.prefix'),
         ];
     }

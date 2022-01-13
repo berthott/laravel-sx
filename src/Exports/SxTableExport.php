@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class SxExport implements FromCollection, WithHeadings, WithTitle, WithStrictNullComparison
+class SxTableExport implements FromCollection, WithHeadings, WithTitle, WithStrictNullComparison
 {
     private string $tableName;
 

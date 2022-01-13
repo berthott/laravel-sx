@@ -2,7 +2,8 @@
 
 namespace berthott\SX\Tests\Feature\Routes;
 
-use berthott\SX\Exports\SxExport;
+use berthott\SX\Exports\SxLabeledExport;
+use berthott\SX\Exports\SxTableExport;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -32,13 +33,33 @@ class RoutesTest extends RoutesTestCase
         $this->get(route('entities.index'))
             ->assertStatus(200)
             ->assertJson([
-                ['responde' => 825478429],
+                [
+                    'responde' => 825478429,
+                    's_12' => 2
+                ],
                 ['responde' => 825478569],
                 ['responde' => 825479792],
                 ['responde' => 834262051],
             ]);
         
         $this->assertDatabaseCount('entities', 4);
+    }
+
+    public function test_index_route_labeled(): void
+    {
+        $this->get(route('entities.index', [
+            'labeled' => true
+        ]))
+            ->assertStatus(200)
+            ->assertJson([
+                [
+                    'responde' => 825478429,
+                    's_12' => 'Demokratie, Zivilgesellschaft und öffentliche Verwaltung'
+                ],
+                ['responde' => 825478569],
+                ['responde' => 825479792],
+                ['responde' => 834262051],
+            ]);
     }
 
     public function test_show_route(): void
@@ -119,6 +140,18 @@ class RoutesTest extends RoutesTestCase
             ->assertJsonFragment(['variableName' => 'survey', 'subType' => 'Single'])
             ->assertJsonFragment(['variableName' => 'responde', 'subType' => 'Double'])
             ->assertJsonFragment(['variableName' => 'stat_1', 'subType' => 'Multiple'])
+            ->assertJsonFragment(['variableName' => 'created', 'subType' => 'Date']);
+    }
+    
+    public function test_structure_route_labeled(): void
+    {
+        $this->get(route('entities.structure', [
+            'labeled' => true
+        ]))
+            ->assertStatus(200)
+            ->assertJsonFragment(['variableName' => 'survey', 'subType' => 'Single'])
+            ->assertJsonFragment(['variableName' => 'responde', 'subType' => 'Double'])
+            ->assertJsonFragment(['variableName' => 'stat_1 - E-Mail gesendet', 'subType' => 'Multiple'])
             ->assertJsonFragment(['variableName' => 'created', 'subType' => 'Date']);
     }
     
@@ -304,7 +337,131 @@ class RoutesTest extends RoutesTestCase
             'created_at' => $this->now,
             'updated_at' => $this->now,
         ];
-        Excel::assertDownloaded('entities.xlsx', function (SxExport $export) use ($entity) {
+        Excel::assertDownloaded('entities.xlsx', function (SxTableExport $export) use ($entity) {
+            $excelEntity = json_decode(json_encode($export->collection()[0]), true);
+            return empty(array_diff($export->headings(), array_keys($entity))) &&
+                empty(array_diff($excelEntity, $entity));
+        });
+    }
+
+    public function test_export_wide_labeled(): void
+    {
+        Excel::fake();
+
+        $this->call('GET', route('entities.export', [
+            'table' => 'wide_labeled'
+        ]))->assertStatus(200);
+        
+        $entity = [
+            'id' => 1,
+            'survey' => 'HF 4 - GfE Applicants/participants',
+            'responde' => '825478429.0',
+            'organiza' => 'GIZ - PMD FMD M&Q Tool',
+            'stat_1 - E-Mail gesendet' => 'Ausgewählt',
+            'stat_2 - Fragebogen gedruckt' => 'Nicht ausgewählt',
+            'stat_3 - Hintergrunddaten für Serienbrief exportiert' => 'Nicht ausgewählt',
+            'stat_4 - Über Link verteilt' => 'Nicht ausgewählt',
+            'stat_5 - Importierte Antworten' => 'Nicht ausgewählt',
+            'stat_6 - Es wurden einige Fragen beantwortet.' => 'Ausgewählt',
+            'stat_7 - Letzte Seite, die dem Teilnehmer angezeigt wurde' => 'Ausgewählt',
+            'stat_8 - Vom Administrator erstellt' => 'Ausgewählt',
+            'stat_9 - Durch Import erstellt' => 'Nicht ausgewählt',
+            'stat_10 - Erstellt vom Benutzer des Eingabemoduls' => 'Nicht ausgewählt',
+            'stat_11 - Vom Teilnehmer erstellt' => 'Nicht ausgewählt',
+            'stat_12 - Über Webdienst erstellt' => 'Nicht ausgewählt',
+            'stat_13 - Vom Teilnehmer eingegebene Antworten' => 'Ausgewählt',
+            'stat_14 - Vom Administrator eingegebene Antworten' => 'Ausgewählt',
+            'stat_15 - Über Interview eingegebene Antworten' => 'Nicht ausgewählt',
+            'stat_16 - Über Webdienst erfasste Antworten' => 'Nicht ausgewählt',
+            'stat_17 - Vom Interviewer geschlossener Teilnehmer' => 'Nicht ausgewählt',
+            'stat_18 - Letzte Seite, die dem Interviewer angezeigt wurde' => 'Nicht ausgewählt',
+            'stat_19 - Abgelehnt durch zurückgesendete Mail' => 'Nicht ausgewählt',
+            'stat_20 - Durch Import vom Panel erstellt' => 'Nicht ausgewählt',
+            'created' => '2021-09-02 18:49:08',
+            'modified' => '2021-10-18 16:42:00',
+            'closetim' => '2021-09-02 18:52:40',
+            'starttim' => '2021-09-02 18:50:24',
+            'difftime' => 135.407,
+            'response' => '2.0',
+            'numberof' => '0.0',
+            'importgr' => null,
+            'distribu' => null,
+            'email' => 'henrike.junge@syspons.com',
+            'digitald' => 1,
+            'digit_1' => null,
+            's_5' => 'abgelehnte Bewerbung',
+            's_2' => '2021.0',
+            's_3' => 'GfE Klassik',
+            'name' => null,
+            's_4' => 'weiblich',
+            's_1' => null,
+            's_6' => null,
+            's_7' => 'Georgien',
+            's_14' => 'Female Future',
+            's_9' => 'Georgien',
+            's_15' => 'Frauenhaus in Georgien im ländlichen Gebiet',
+            's_10' => 'Frauenhaus in Georgien im ländlichen Gebiet',
+            's_11_1 - 01 - no poverty' => 'Nicht ausgewählt',
+            's_11_2 - 02 - zero hunger' => 'Nicht ausgewählt',
+            's_11_3 - 03 - good health and well-being' => 'Ausgewählt',
+            's_11_4 - 04 - quality education' => 'Nicht ausgewählt',
+            's_11_5 - 05 - gender equality' => 'Ausgewählt',
+            's_11_6 - 06 - clean water and sanitation' => 'Nicht ausgewählt',
+            's_11_7 - 07 - affordable and clean energy' => 'Nicht ausgewählt',
+            's_11_8 - 08 - decent work and economic growth' => 'Nicht ausgewählt',
+            's_11_9 - 09 - industry, innovation and infrastructure' => 'Nicht ausgewählt',
+            's_11_10 - 10 - reduced inequalities' => 'Nicht ausgewählt',
+            's_11_11 - 11 - sustainable cities and communities' => 'Nicht ausgewählt',
+            's_11_12 - 12 - responsible consumption and  production' => 'Nicht ausgewählt',
+            's_11_13 - 13 - climate action' => 'Nicht ausgewählt',
+            's_11_14 - 14 - life below water' => 'Nicht ausgewählt',
+            's_11_15 - 15 - life on land' => 'Nicht ausgewählt',
+            's_11_16 - 16 - peace, justice and strong institutions' => 'Nicht ausgewählt',
+            's_11_17 - 17 - partnerships for the goals' => 'Nicht ausgewählt',
+            's_12' => 'Demokratie, Zivilgesellschaft und öffentliche Verwaltung',
+            's_17' => null,
+            's_18' => null,
+            'social_e' => null,
+            'inclusio' => null,
+            'number_j' => null,
+            'still_ac' => null,
+            'best_pra' => null,
+            'validati' => 'ja',
+            'lang' => 'Deutsch',
+            'statc_1 - Beendet' => 'Ausgewählt',
+            'statc_2 - Abgeschlossen' => 'Ausgewählt',
+            'statc_3 - Abgelehnt durch zurückgesendete Mail' => 'Nicht ausgewählt',
+            'statc_4 - Manuell von Administrator erstellt' => 'Ausgewählt',
+            'statc_5 - Durch Administrator importiert' => 'Nicht ausgewählt',
+            'statc_6 - Erstellt vom Benutzer des Eingabemoduls' => 'Nicht ausgewählt',
+            'statc_7 - Von Teilnehmer über Link erstellt' => 'Nicht ausgewählt',
+            'statc_8 - Über Webdienst erstellt' => 'Nicht ausgewählt',
+            'statc_9 - Erstellungstyp unbekannt' => 'Nicht ausgewählt',
+            'stat_21 - Durch Import vom Panel erstellt' => 'Nicht ausgewählt',
+            'statd_1 - Serienbrief' => 'Nicht ausgewählt',
+            'statd_2 - Ohne' => 'Nicht ausgewählt',
+            'statd_3 - E-Mail' => 'Ausgewählt',
+            'statd_4 - Papier' => 'Nicht ausgewählt',
+            'statd_5 - Link' => 'Nicht ausgewählt',
+            'stats_1 - Vom Teilnehmer eingegebene Antworten' => 'Ausgewählt',
+            'stats_2 - Von einem Administrator eingegebene Antworten' => 'Ausgewählt',
+            'stats_3 - Über Interview erfasste Antworten' => 'Nicht ausgewählt',
+            'stats_4 - Importierte Antworten' => 'Nicht ausgewählt',
+            'stats_5 - Webdienst' => 'Nicht ausgewählt',
+            'stats_6 - Ursprung der Antwort unbekannt' => 'Nicht ausgewählt',
+            'stat_22 - Ohne' => 'Nicht ausgewählt',
+            'stat_23 - Teilweise abgeschlossen' => 'Nicht ausgewählt',
+            'stat_24 - Abgeschlossen' => 'Ausgewählt',
+            'stat_25 - Abgelehnt' => 'Nicht ausgewählt',
+            'stato_1 - Neu' => 'Nicht ausgewählt',
+            'stato_2 - Versendet' => 'Nicht ausgewählt',
+            'stato_3 - Teilweise abgeschlossen' => 'Nicht ausgewählt',
+            'stato_4 - Abgeschlossen' => 'Ausgewählt',
+            'stato_5 - Abgelehnt' => 'Nicht ausgewählt',
+            'created_at' => $this->now,
+            'updated_at' => $this->now,
+        ];
+        Excel::assertDownloaded('entities_labeled.xlsx', function (SxLabeledExport $export) use ($entity) {
             $excelEntity = json_decode(json_encode($export->collection()[0]), true);
             return empty(array_diff($export->headings(), array_keys($entity))) &&
                 empty(array_diff($excelEntity, $entity));
@@ -351,7 +508,7 @@ class RoutesTest extends RoutesTestCase
             ],
         ];
 
-        Excel::assertDownloaded('entities_long.xlsx', function (SxExport $export) use ($entries) {
+        Excel::assertDownloaded('entities_long.xlsx', function (SxTableExport $export) use ($entries) {
             $correct = true;
             foreach ($entries as $entry) {
                 $exportEntry = $export->collection()->where('variableName', $entry['variableName'])->where('respondent_id', 825478429)->first();
@@ -380,7 +537,7 @@ class RoutesTest extends RoutesTestCase
             ['questionName' => 'lang', 'variableName' => 'lang', 'subType' => 'Single', 'questionText' => 'Sprache', 'choiceValue' => null, 'choiceText' => null],
         ];
 
-        Excel::assertDownloaded('entity_questions.xlsx', function (SxExport $export) use ($questions) {
+        Excel::assertDownloaded('entity_questions.xlsx', function (SxTableExport $export) use ($questions) {
             $correct = true;
             foreach ($questions as $question) {
                 $exportQuestion = $export->collection()->firstWhere('variableName', $question['variableName']);
@@ -409,7 +566,7 @@ class RoutesTest extends RoutesTestCase
             ['variableName' => 's_12', 'value' => 2, 'label' => 'Demokratie, Zivilgesellschaft und öffentliche Verwaltung'],
         ];
 
-        Excel::assertDownloaded('entity_labels.xlsx', function (SxExport $export) use ($labels) {
+        Excel::assertDownloaded('entity_labels.xlsx', function (SxTableExport $export) use ($labels) {
             $correct = true;
             foreach ($labels as $label) {
                 $exportLabel = $export->collection()->where('variableName', $label['variableName'])->where('value', $label['value'])->first();

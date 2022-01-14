@@ -9,6 +9,7 @@ use League\Csv\Reader;
 use GuzzleHttp\Psr7\StreamWrapper;
 use Illuminate\Support\Collection;
 use League\Csv\Statement;
+use Illuminate\Support\Str;
 
 class SxSurveyService
 {
@@ -48,15 +49,20 @@ class SxSurveyService
     /**
      * Initialize the Structure.
      */
-    private function extractCsv(Response $response, array $header = null): Collection
+    private function extractCsv(Response $response, array $header = null, bool $fullNameHeaders = false): Collection
     {
         $collection = collect();
         $csv = Reader::createFromStream(StreamWrapper::getResource($response->getBody()));
         $csv->setDelimiter("\t");
         $csv->addStreamFilter('convert.iconv.UTF-16/UTF-8');
-        if (!$header) {
+        if (!$header && !$fullNameHeaders) {
             $csv->setHeaderOffset(0);
         } else {
+            if ($fullNameHeaders) {
+                $header = array_map(function ($shortName) {
+                    return $this->guessFullVariableName($shortName);
+                }, $csv->fetchOne());
+            }
             $csv = Statement::create()->process($csv, $header);
         }
         foreach ($csv as $row) {
@@ -74,7 +80,7 @@ class SxSurveyService
     public function getEntityStructure(): Collection
     {
         $this->initStructure();
-        return Helpers::pluckFromCollection($this->structure, 'variableName', 'subType');
+        return $this->mapToFullVariableName(Helpers::pluckFromCollection($this->structure, 'variableName', 'subType'));
     }
 
     /**
@@ -88,7 +94,7 @@ class SxSurveyService
                 ['format' => 'INTL_US'],
                 $query,
             ),
-        ]));
+        ]), null, true);
     }
 
     /**
@@ -97,7 +103,7 @@ class SxSurveyService
     public function getQuestions(): Collection
     {
         $this->initStructure();
-        return Helpers::pluckFromCollection($this->structure, 'questionName', 'variableName', 'questionText', 'subType', 'choiceValue', 'choiceText');
+        return $this->mapToFullVariableName(Helpers::pluckFromCollection($this->structure, 'questionName', 'variableName', 'questionText', 'subType', 'choiceValue', 'choiceText'));
     }
 
     /**
@@ -105,11 +111,37 @@ class SxSurveyService
      */
     public function getLabels(): Collection
     {
-        return $this->extractCsv(SxHttpService::surveys()->exportLabels([
+        return $this->mapToFullVariableName($this->extractCsv(SxHttpService::surveys()->exportLabels([
             'survey' => $this->survey_id,
             'query' => [
                 'format' => 'INTL_US',
             ],
-        ]), ['variableName', 'value', 'label']);
+        ]), ['variableName', 'value', 'label']));
+    }
+
+    /**
+     * Return a last import as query array.
+     */
+    public function guessFullVariableName(string $shortName): string
+    {
+        $this->initStructure();
+        $entry = $this->structure->firstWhere('variableName', $shortName);
+        $base = Str::lower($entry['questionName']);
+        if ($entry['choiceValue']) {
+            $questionNameEntries = $this->structure->where('questionName', $entry['questionName'])->values();
+            $index = $questionNameEntries->search(function ($entity) use ($shortName) {
+                return $entity['variableName'] === $shortName;
+            });
+            return $base.'_'.++$index;
+        }
+        return $base;
+    }
+
+    private function mapToFullVariableName(Collection $collection): Collection
+    {
+        return $collection->map(function ($entry) {
+            $entry['variableName'] = $this->guessFullVariableName($entry['variableName']);
+            return $entry;
+        });
     }
 }

@@ -3,8 +3,8 @@
 namespace berthott\SX\Tests\Feature\Sxable;
 
 use berthott\SX\Facades\Sxable;
+use berthott\SX\Services\SxSurveyService;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class SxableTest extends SxableTestCase
@@ -348,9 +348,10 @@ class SxableTest extends SxableTestCase
     
     public function test_guess_full_variable_name(): void
     {
-        $this->assertEquals('responsecollectsessions', Entity::guessFullVariableName('response'));
-        $this->assertEquals('statcreation_2', Entity::guessFullVariableName('statc_5'));
-        $this->assertEquals('statdistribution_1', Entity::guessFullVariableName('statd_1'));
-        $this->assertEquals('s_11_17', Entity::guessFullVariableName('s_11_17'));
+        $service = new SxSurveyService('mocked');
+        $this->assertEquals('responsecollectsessions', $service->guessFullVariableName('response'));
+        $this->assertEquals('statcreation_2', $service->guessFullVariableName('statc_5'));
+        $this->assertEquals('statdistribution_1', $service->guessFullVariableName('statd_1'));
+        $this->assertEquals('s_11_17', $service->guessFullVariableName('s_11_17'));
     }
 }

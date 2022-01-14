@@ -57,10 +57,4 @@ class CommandsTest extends CommandsTestCase
         Artisan::call('sx:import', ['--fresh' => true]);
         $this->assertDatabaseCount('entities', 1);
     }
-
-    /* public function test_import_command_output(): void
-    {
-        $command = $this->artisan('sx:import', ['classes' => ['entities']]);
-        $command->expectsOutput('entities: Import triggered.');
-    } */
 }

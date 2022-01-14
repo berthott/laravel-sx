@@ -62,6 +62,7 @@ class SxSurveyService
                 $header = array_map(function ($shortName) {
                     return $this->guessFullVariableName($shortName);
                 }, $csv->fetchOne());
+                $csv->setHeaderOffset(0);
             }
             $csv = Statement::create()->process($csv, $header);
         }

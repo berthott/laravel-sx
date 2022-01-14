@@ -61,7 +61,7 @@ return [
     */
 
     'defaultUnique' => [
-        'responde'
+        'respondentid'
     ],
 
 
@@ -86,7 +86,7 @@ return [
     |
     */
 
-    'primary' => 'responde',
+    'primary' => 'respondentid',
 
     /*
     |--------------------------------------------------------------------------

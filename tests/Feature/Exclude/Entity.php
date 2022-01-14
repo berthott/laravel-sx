@@ -23,6 +23,6 @@ class Entity extends Model
      */
     public static function exclude(): array
     {
-        return ['organiza', 'email'];
+        return ['organization', 'email'];
     }
 }

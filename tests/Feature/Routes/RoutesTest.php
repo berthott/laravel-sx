@@ -35,12 +35,12 @@ class RoutesTest extends RoutesTestCase
             ->assertStatus(200)
             ->assertJson([
                 [
-                    'responde' => 825478429,
+                    'respondentid' => 825478429,
                     's_12' => 2
                 ],
-                ['responde' => 825478569],
-                ['responde' => 825479792],
-                ['responde' => 834262051],
+                ['respondentid' => 825478569],
+                ['respondentid' => 825479792],
+                ['respondentid' => 834262051],
             ]);
         
         $this->assertDatabaseCount('entities', 4);
@@ -54,12 +54,12 @@ class RoutesTest extends RoutesTestCase
             ->assertStatus(200)
             ->assertJson([
                 [
-                    'responde' => 825478429,
+                    'respondentid' => 825478429,
                     's_12' => 'Demokratie, Zivilgesellschaft und öffentliche Verwaltung'
                 ],
-                ['responde' => 825478569],
-                ['responde' => 825479792],
-                ['responde' => 834262051],
+                ['respondentid' => 825478569],
+                ['respondentid' => 825479792],
+                ['respondentid' => 834262051],
             ]);
     }
 
@@ -68,7 +68,7 @@ class RoutesTest extends RoutesTestCase
         $this->get(route('entities.show', ['entity' => 825478429]))
             ->assertStatus(200)
             ->assertJson([
-                'responde' => 825478429,
+                'respondentid' => 825478429,
                 'email' => 'henrike.junge@syspons.com',
             ]);
     }
@@ -92,7 +92,7 @@ class RoutesTest extends RoutesTestCase
             ->assertStatus(200)
             ->assertJsonStructure($respondentStructure)->json()['id'];
         $this->assertDatabaseHas('entities', [
-            'responde' => $id,
+            'respondentid' => $id,
             'survey' => 1325978,
             //'created' => '2021-09-02 18:49:08',
             //'modified' => '2021-10-18 16:42:00',
@@ -129,7 +129,7 @@ class RoutesTest extends RoutesTestCase
             ->assertStatus(200)
             ->assertJsonStructure($respondentStructure);
         $this->assertDatabaseHas('entities', [
-            'responde' => $id,
+            'respondentid' => $id,
             'survey' => 1325978,
             //'created' => '2021-09-02 18:49:08',
             //'modified' => '2021-10-18 16:42:00',
@@ -157,7 +157,7 @@ class RoutesTest extends RoutesTestCase
         $this->delete(route('entities.destroy', ['entity' => $id]))
             ->assertStatus(200)
             ->assertSeeText('Success');
-        $this->assertDatabaseMissing('entities', ['responde' => $id]);
+        $this->assertDatabaseMissing('entities', ['respondentid' => $id]);
         $this->assertDatabaseMissing('entities_long', ['respondent_id' => $id]);
     }
 
@@ -194,8 +194,8 @@ class RoutesTest extends RoutesTestCase
         $this->get(route('entities.structure'))
             ->assertStatus(200)
             ->assertJsonFragment(['variableName' => 'survey', 'subType' => 'Single'])
-            ->assertJsonFragment(['variableName' => 'responde', 'subType' => 'Double'])
-            ->assertJsonFragment(['variableName' => 'stat_1', 'subType' => 'Multiple'])
+            ->assertJsonFragment(['variableName' => 'respondentid', 'subType' => 'Double'])
+            ->assertJsonFragment(['variableName' => 'statinternal_1', 'subType' => 'Multiple'])
             ->assertJsonFragment(['variableName' => 'created', 'subType' => 'Date']);
     }
     
@@ -206,14 +206,14 @@ class RoutesTest extends RoutesTestCase
         ]))
             ->assertStatus(200)
             ->assertJsonFragment(['variableName' => 'survey', 'subType' => 'Single'])
-            ->assertJsonFragment(['variableName' => 'responde', 'subType' => 'Double'])
-            ->assertJsonFragment(['variableName' => 'stat_1 - E-Mail gesendet', 'subType' => 'Multiple'])
+            ->assertJsonFragment(['variableName' => 'respondentid', 'subType' => 'Double'])
+            ->assertJsonFragment(['variableName' => 'statinternal_1 - E-Mail gesendet', 'subType' => 'Multiple'])
             ->assertJsonFragment(['variableName' => 'created', 'subType' => 'Date']);
     }
     
     public function test_import_route(): void
     {
-        $id = ['responde' => 841931211];
+        $id = ['respondentid' => 841931211];
         $this->assertDatabaseCount('entities', 4);
         $this->assertDatabaseMissing('entities', $id);
         $this->post(route('entities.import'))
@@ -246,7 +246,7 @@ class RoutesTest extends RoutesTestCase
         $this->post(route('entities.import'));
         $this->assertDatabaseCount('entities', 5);
         $this->assertDatabaseHas('entities', [
-            'responde' => 841931211,
+            'respondentid' => 841931211,
             's_2' => 2020,
         ]);
         $this->assertDatabaseHas('entities_long', [
@@ -257,7 +257,7 @@ class RoutesTest extends RoutesTestCase
         $this->post(route('entities.import'));
         $this->assertDatabaseCount('entities', 5);
         $this->assertDatabaseMissing('entities', [
-            'responde' => 841931211,
+            'respondentid' => 841931211,
             's_2' => 2020,
         ]);
         $this->assertDatabaseMissing('entities_long', [
@@ -266,7 +266,7 @@ class RoutesTest extends RoutesTestCase
             'value_double' => 2020,
         ]);
         $this->assertDatabaseHas('entities', [
-            'responde' => 841931211,
+            'respondentid' => 841931211,
             's_2' => 2021,
         ]);
         $this->assertDatabaseHas('entities_long', [
@@ -287,40 +287,40 @@ class RoutesTest extends RoutesTestCase
         $entity = [
             'id' => 1,
             'survey' => 1325978,
-            'responde' => '825478429.0',
-            'organiza' => 269318,
-            'stat_1' => 1,
-            'stat_2' => 0,
-            'stat_3' => 0,
-            'stat_4' => 0,
-            'stat_5' => 0,
-            'stat_6' => 1,
-            'stat_7' => 1,
-            'stat_8' => 1,
-            'stat_9' => 0,
-            'stat_10' => 0,
-            'stat_11' => 0,
-            'stat_12' => 0,
-            'stat_13' => 1,
-            'stat_14' => 1,
-            'stat_15' => 0,
-            'stat_16' => 0,
-            'stat_17' => 0,
-            'stat_18' => 0,
-            'stat_19' => 0,
-            'stat_20' => 0,
+            'respondentid' => '825478429.0',
+            'organization' => 269318,
+            'statinternal_1' => 1,
+            'statinternal_2' => 0,
+            'statinternal_3' => 0,
+            'statinternal_4' => 0,
+            'statinternal_5' => 0,
+            'statinternal_6' => 1,
+            'statinternal_7' => 1,
+            'statinternal_8' => 1,
+            'statinternal_9' => 0,
+            'statinternal_10' => 0,
+            'statinternal_11' => 0,
+            'statinternal_12' => 0,
+            'statinternal_13' => 1,
+            'statinternal_14' => 1,
+            'statinternal_15' => 0,
+            'statinternal_16' => 0,
+            'statinternal_17' => 0,
+            'statinternal_18' => 0,
+            'statinternal_19' => 0,
+            'statinternal_20' => 0,
             'created' => '2021-09-02 18:49:08',
             'modified' => '2021-10-18 16:42:00',
-            'closetim' => '2021-09-02 18:52:40',
-            'starttim' => '2021-09-02 18:50:24',
+            'closetime' => '2021-09-02 18:52:40',
+            'starttime' => '2021-09-02 18:50:24',
             'difftime' => 135.407,
-            'response' => '2.0',
-            'numberof' => '0.0',
-            'importgr' => null,
-            'distribu' => null,
+            'responsecollectsessions' => '2.0',
+            'numberofreturnedmail' => '0.0',
+            'importgroup' => null,
+            'distributionschedule' => null,
             'email' => 'henrike.junge@syspons.com',
-            'digitald' => 1,
-            'digit_1' => null,
+            'digitaldistributionstatus' => 1,
+            'digitaldistributionerrormessage' => null,
             's_5' => 2,
             's_2' => '2021.0',
             's_3' => 3,
@@ -353,43 +353,43 @@ class RoutesTest extends RoutesTestCase
             's_12' => 2,
             's_17' => null,
             's_18' => null,
-            'social_e' => null,
-            'inclusio' => null,
-            'number_j' => null,
-            'still_ac' => null,
-            'best_pra' => null,
-            'validati' => 1,
+            'social_entrepreneur' => null,
+            'inclusion' => null,
+            'number_jobs' => null,
+            'still_active' => null,
+            'best_practice' => null,
+            'validation' => 1,
             'lang' => 2,
-            'statc_1' => 1,
-            'statc_2' => 1,
-            'statc_3' => 0,
-            'statc_4' => 1,
-            'statc_5' => 0,
-            'statc_6' => 0,
-            'statc_7' => 0,
-            'statc_8' => 0,
-            'statc_9' => 0,
-            'stat_21' => 0,
-            'statd_1' => 0,
-            'statd_2' => 0,
-            'statd_3' => 1,
-            'statd_4' => 0,
-            'statd_5' => 0,
-            'stats_1' => 1,
-            'stats_2' => 1,
-            'stats_3' => 0,
-            'stats_4' => 0,
-            'stats_5' => 0,
-            'stats_6' => 0,
-            'stat_22' => 0,
-            'stat_23' => 0,
-            'stat_24' => 1,
-            'stat_25' => 0,
-            'stato_1' => 0,
-            'stato_2' => 0,
-            'stato_3' => 0,
-            'stato_4' => 1,
-            'stato_5' => 0,
+            'statcompletion_1' => 1,
+            'statcompletion_2' => 1,
+            'statcompletion_3' => 0,
+            'statcreation_1' => 1,
+            'statcreation_2' => 0,
+            'statcreation_3' => 0,
+            'statcreation_4' => 0,
+            'statcreation_5' => 0,
+            'statcreation_6' => 0,
+            'statcreation_7' => 0,
+            'statdistribution_1' => 0,
+            'statdistribution_2' => 0,
+            'statdistribution_3' => 1,
+            'statdistribution_4' => 0,
+            'statdistribution_5' => 0,
+            'statsource_1' => 1,
+            'statsource_2' => 1,
+            'statsource_3' => 0,
+            'statsource_4' => 0,
+            'statsource_5' => 0,
+            'statsource_6' => 0,
+            'statcollect_1' => 0,
+            'statcollect_2' => 0,
+            'statcollect_3' => 1,
+            'statcollect_4' => 0,
+            'statoverall_1' => 0,
+            'statoverall_2' => 0,
+            'statoverall_3' => 0,
+            'statoverall_4' => 1,
+            'statoverall_5' => 0,
             'created_at' => $this->now,
             'updated_at' => $this->now,
         ];
@@ -411,40 +411,40 @@ class RoutesTest extends RoutesTestCase
         $entity = [
             'id' => 1,
             'survey' => 'HF 4 - GfE Applicants/participants',
-            'responde' => '825478429.0',
-            'organiza' => 'GIZ - PMD FMD M&Q Tool',
-            'stat_1 - E-Mail gesendet' => 'Ausgewählt',
-            'stat_2 - Fragebogen gedruckt' => 'Nicht ausgewählt',
-            'stat_3 - Hintergrunddaten für Serienbrief exportiert' => 'Nicht ausgewählt',
-            'stat_4 - Über Link verteilt' => 'Nicht ausgewählt',
-            'stat_5 - Importierte Antworten' => 'Nicht ausgewählt',
-            'stat_6 - Es wurden einige Fragen beantwortet.' => 'Ausgewählt',
-            'stat_7 - Letzte Seite, die dem Teilnehmer angezeigt wurde' => 'Ausgewählt',
-            'stat_8 - Vom Administrator erstellt' => 'Ausgewählt',
-            'stat_9 - Durch Import erstellt' => 'Nicht ausgewählt',
-            'stat_10 - Erstellt vom Benutzer des Eingabemoduls' => 'Nicht ausgewählt',
-            'stat_11 - Vom Teilnehmer erstellt' => 'Nicht ausgewählt',
-            'stat_12 - Über Webdienst erstellt' => 'Nicht ausgewählt',
-            'stat_13 - Vom Teilnehmer eingegebene Antworten' => 'Ausgewählt',
-            'stat_14 - Vom Administrator eingegebene Antworten' => 'Ausgewählt',
-            'stat_15 - Über Interview eingegebene Antworten' => 'Nicht ausgewählt',
-            'stat_16 - Über Webdienst erfasste Antworten' => 'Nicht ausgewählt',
-            'stat_17 - Vom Interviewer geschlossener Teilnehmer' => 'Nicht ausgewählt',
-            'stat_18 - Letzte Seite, die dem Interviewer angezeigt wurde' => 'Nicht ausgewählt',
-            'stat_19 - Abgelehnt durch zurückgesendete Mail' => 'Nicht ausgewählt',
-            'stat_20 - Durch Import vom Panel erstellt' => 'Nicht ausgewählt',
+            'respondentid' => '825478429.0',
+            'organization' => 'GIZ - PMD FMD M&Q Tool',
+            'statinternal_1 - E-Mail gesendet' => 'Ausgewählt',
+            'statinternal_2 - Fragebogen gedruckt' => 'Nicht ausgewählt',
+            'statinternal_3 - Hintergrunddaten für Serienbrief exportiert' => 'Nicht ausgewählt',
+            'statinternal_4 - Über Link verteilt' => 'Nicht ausgewählt',
+            'statinternal_5 - Importierte Antworten' => 'Nicht ausgewählt',
+            'statinternal_6 - Es wurden einige Fragen beantwortet.' => 'Ausgewählt',
+            'statinternal_7 - Letzte Seite, die dem Teilnehmer angezeigt wurde' => 'Ausgewählt',
+            'statinternal_8 - Vom Administrator erstellt' => 'Ausgewählt',
+            'statinternal_9 - Durch Import erstellt' => 'Nicht ausgewählt',
+            'statinternal_10 - Erstellt vom Benutzer des Eingabemoduls' => 'Nicht ausgewählt',
+            'statinternal_11 - Vom Teilnehmer erstellt' => 'Nicht ausgewählt',
+            'statinternal_12 - Über Webdienst erstellt' => 'Nicht ausgewählt',
+            'statinternal_13 - Vom Teilnehmer eingegebene Antworten' => 'Ausgewählt',
+            'statinternal_14 - Vom Administrator eingegebene Antworten' => 'Ausgewählt',
+            'statinternal_15 - Über Interview eingegebene Antworten' => 'Nicht ausgewählt',
+            'statinternal_16 - Über Webdienst erfasste Antworten' => 'Nicht ausgewählt',
+            'statinternal_17 - Vom Interviewer geschlossener Teilnehmer' => 'Nicht ausgewählt',
+            'statinternal_18 - Letzte Seite, die dem Interviewer angezeigt wurde' => 'Nicht ausgewählt',
+            'statinternal_19 - Abgelehnt durch zurückgesendete Mail' => 'Nicht ausgewählt',
+            'statinternal_20 - Durch Import vom Panel erstellt' => 'Nicht ausgewählt',
             'created' => '2021-09-02 18:49:08',
             'modified' => '2021-10-18 16:42:00',
-            'closetim' => '2021-09-02 18:52:40',
-            'starttim' => '2021-09-02 18:50:24',
+            'closetime' => '2021-09-02 18:52:40',
+            'starttime' => '2021-09-02 18:50:24',
             'difftime' => 135.407,
-            'response' => '2.0',
-            'numberof' => '0.0',
-            'importgr' => null,
-            'distribu' => null,
+            'responsecollectsessions' => '2.0',
+            'numberofreturnedmail' => '0.0',
+            'importgroup' => null,
+            'distributionschedule' => null,
             'email' => 'henrike.junge@syspons.com',
-            'digitald' => 1,
-            'digit_1' => null,
+            'digitaldistributionstatus' => 1,
+            'digitaldistributionerrormessage' => null,
             's_5' => 'abgelehnte Bewerbung',
             's_2' => '2021.0',
             's_3' => 'GfE Klassik',
@@ -477,43 +477,43 @@ class RoutesTest extends RoutesTestCase
             's_12' => 'Demokratie, Zivilgesellschaft und öffentliche Verwaltung',
             's_17' => null,
             's_18' => null,
-            'social_e' => null,
-            'inclusio' => null,
-            'number_j' => null,
-            'still_ac' => null,
-            'best_pra' => null,
-            'validati' => 'ja',
+            'social_entrepreneur' => null,
+            'inclusion' => null,
+            'number_jobs' => null,
+            'still_active' => null,
+            'best_practice' => null,
+            'validation' => 'ja',
             'lang' => 'Deutsch',
-            'statc_1 - Beendet' => 'Ausgewählt',
-            'statc_2 - Abgeschlossen' => 'Ausgewählt',
-            'statc_3 - Abgelehnt durch zurückgesendete Mail' => 'Nicht ausgewählt',
-            'statc_4 - Manuell von Administrator erstellt' => 'Ausgewählt',
-            'statc_5 - Durch Administrator importiert' => 'Nicht ausgewählt',
-            'statc_6 - Erstellt vom Benutzer des Eingabemoduls' => 'Nicht ausgewählt',
-            'statc_7 - Von Teilnehmer über Link erstellt' => 'Nicht ausgewählt',
-            'statc_8 - Über Webdienst erstellt' => 'Nicht ausgewählt',
-            'statc_9 - Erstellungstyp unbekannt' => 'Nicht ausgewählt',
-            'stat_21 - Durch Import vom Panel erstellt' => 'Nicht ausgewählt',
-            'statd_1 - Serienbrief' => 'Nicht ausgewählt',
-            'statd_2 - Ohne' => 'Nicht ausgewählt',
-            'statd_3 - E-Mail' => 'Ausgewählt',
-            'statd_4 - Papier' => 'Nicht ausgewählt',
-            'statd_5 - Link' => 'Nicht ausgewählt',
-            'stats_1 - Vom Teilnehmer eingegebene Antworten' => 'Ausgewählt',
-            'stats_2 - Von einem Administrator eingegebene Antworten' => 'Ausgewählt',
-            'stats_3 - Über Interview erfasste Antworten' => 'Nicht ausgewählt',
-            'stats_4 - Importierte Antworten' => 'Nicht ausgewählt',
-            'stats_5 - Webdienst' => 'Nicht ausgewählt',
-            'stats_6 - Ursprung der Antwort unbekannt' => 'Nicht ausgewählt',
-            'stat_22 - Ohne' => 'Nicht ausgewählt',
-            'stat_23 - Teilweise abgeschlossen' => 'Nicht ausgewählt',
-            'stat_24 - Abgeschlossen' => 'Ausgewählt',
-            'stat_25 - Abgelehnt' => 'Nicht ausgewählt',
-            'stato_1 - Neu' => 'Nicht ausgewählt',
-            'stato_2 - Versendet' => 'Nicht ausgewählt',
-            'stato_3 - Teilweise abgeschlossen' => 'Nicht ausgewählt',
-            'stato_4 - Abgeschlossen' => 'Ausgewählt',
-            'stato_5 - Abgelehnt' => 'Nicht ausgewählt',
+            'statcompletion_1 - Beendet' => 'Ausgewählt',
+            'statcompletion_2 - Abgeschlossen' => 'Ausgewählt',
+            'statcompletion_3 - Abgelehnt durch zurückgesendete Mail' => 'Nicht ausgewählt',
+            'statcreation_1 - Manuell von Administrator erstellt' => 'Ausgewählt',
+            'statcreation_2 - Durch Administrator importiert' => 'Nicht ausgewählt',
+            'statcreation_3 - Erstellt vom Benutzer des Eingabemoduls' => 'Nicht ausgewählt',
+            'statcreation_4 - Von Teilnehmer über Link erstellt' => 'Nicht ausgewählt',
+            'statcreation_5 - Über Webdienst erstellt' => 'Nicht ausgewählt',
+            'statcreation_6 - Erstellungstyp unbekannt' => 'Nicht ausgewählt',
+            'statcreation_7 - Durch Import vom Panel erstellt' => 'Nicht ausgewählt',
+            'statdistribution_1 - Serienbrief' => 'Nicht ausgewählt',
+            'statdistribution_2 - Ohne' => 'Nicht ausgewählt',
+            'statdistribution_3 - E-Mail' => 'Ausgewählt',
+            'statdistribution_4 - Papier' => 'Nicht ausgewählt',
+            'statdistribution_5 - Link' => 'Nicht ausgewählt',
+            'statsource_1 - Vom Teilnehmer eingegebene Antworten' => 'Ausgewählt',
+            'statsource_2 - Von einem Administrator eingegebene Antworten' => 'Ausgewählt',
+            'statsource_3 - Über Interview erfasste Antworten' => 'Nicht ausgewählt',
+            'statsource_4 - Importierte Antworten' => 'Nicht ausgewählt',
+            'statsource_5 - Webdienst' => 'Nicht ausgewählt',
+            'statsource_6 - Ursprung der Antwort unbekannt' => 'Nicht ausgewählt',
+            'statcollect_1 - Ohne' => 'Nicht ausgewählt',
+            'statcollect_2 - Teilweise abgeschlossen' => 'Nicht ausgewählt',
+            'statcollect_3 - Abgeschlossen' => 'Ausgewählt',
+            'statcollect_4 - Abgelehnt' => 'Nicht ausgewählt',
+            'statoverall_1 - Neu' => 'Nicht ausgewählt',
+            'statoverall_2 - Versendet' => 'Nicht ausgewählt',
+            'statoverall_3 - Teilweise abgeschlossen' => 'Nicht ausgewählt',
+            'statoverall_4 - Abgeschlossen' => 'Ausgewählt',
+            'statoverall_5 - Abgelehnt' => 'Nicht ausgewählt',
             'created_at' => $this->now,
             'updated_at' => $this->now,
         ];
@@ -542,7 +542,7 @@ class RoutesTest extends RoutesTestCase
                 'value_datetime' => null,
             ], [
                 'respondent_id' => '825478429.0',
-                'variableName' => 'stat_1',
+                'variableName' => 'statinternal_1',
                 'value_single_multiple' => 1,
                 'value_string' => null,
                 'value_double' => null,
@@ -586,10 +586,10 @@ class RoutesTest extends RoutesTestCase
         ])->assertStatus(200);
 
         $questions = [
-            ['questionName' => 'statinternal', 'variableName' => 'stat_19', 'subType' => 'Multiple', 'questionText' => 'Basisstatus', 'choiceValue' => 19, 'choiceText' => 'Abgelehnt durch zurückgesendete Mail'],
+            ['questionName' => 'statinternal', 'variableName' => 'statinternal_19', 'subType' => 'Multiple', 'questionText' => 'Basisstatus', 'choiceValue' => 19, 'choiceText' => 'Abgelehnt durch zurückgesendete Mail'],
             ['questionName' => 'modified', 'variableName' => 'modified', 'subType' => 'Date', 'questionText' => 'Geändert', 'choiceValue' => null, 'choiceText' => null],
             ['questionName' => 's_10', 'variableName' => 's_10', 'subType' => 'String', 'questionText' => 'business_idea_description', 'choiceValue' => null, 'choiceText' => null],
-            ['questionName' => 'number_jobs', 'variableName' => 'number_j', 'subType' => 'Double', 'questionText' => 'number_jobs', 'choiceValue' => null, 'choiceText' => null],
+            ['questionName' => 'number_jobs', 'variableName' => 'number_jobs', 'subType' => 'Double', 'questionText' => 'number_jobs', 'choiceValue' => null, 'choiceText' => null],
             ['questionName' => 'lang', 'variableName' => 'lang', 'subType' => 'Single', 'questionText' => 'Sprache', 'choiceValue' => null, 'choiceText' => null],
         ];
 
@@ -616,7 +616,7 @@ class RoutesTest extends RoutesTestCase
 
         $labels = [
             ['variableName' => 'survey', 'value' => 1325978, 'label' => 'HF 4 - GfE Applicants/participants'],
-            ['variableName' => 'digitald', 'value' => 1, 'label' => '1'],
+            ['variableName' => 'digitaldistributionstatus', 'value' => 1, 'label' => '1'],
             ['variableName' => 's_5', 'value' => 3, 'label' => 'teilnehmend ohne Gründung'],
             ['variableName' => 's_11_1', 'value' => 1, 'label' => 'Ausgewählt'],
             ['variableName' => 's_12', 'value' => 2, 'label' => 'Demokratie, Zivilgesellschaft und öffentliche Verwaltung'],

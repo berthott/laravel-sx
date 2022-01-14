@@ -33,8 +33,8 @@ $ php artisan vendor:publish --provider="berthott\SX\SxServiceProvider" --tag="c
 * `namespace`: string or array with one ore multiple namespaces that should be monitored for the Crudable-Trait. Defaults to `App\Models`.
 * `prefix`: route prefix. Defaults to `api`
 * `auth`: the basic auth for SX. Defaults to env variables `SX_USERNAME` and `SX_PASSWORD`.
-* `defaultUnique`: an array of unique keys inside the SX database. Defaults to `['responde']`.
-* `primary`: the primary key inside the SX database. Defaults to `responde`.
+* `defaultUnique`: an array of unique keys inside the SX database. Defaults to `['respondentid']`.
+* `primary`: the primary key inside the SX database. Defaults to `respondentid`.
 * `api`: a JSON representation of the SX API. 
 
 ## Compatibility

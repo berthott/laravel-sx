@@ -29,7 +29,7 @@ class CommandsTest extends CommandsTestCase
 
     public function test_import_command(): void
     {
-        $id = ['responde' => 841931211];
+        $id = ['respondentid' => 841931211];
         $this->assertDatabaseCount('entities', 4);
         $this->assertDatabaseCount('dummies', 4);
         $this->assertDatabaseMissing('entities', $id);
@@ -41,7 +41,7 @@ class CommandsTest extends CommandsTestCase
 
     public function test_import_command_only_entities(): void
     {
-        $id = ['responde' => 841931211];
+        $id = ['respondentid' => 841931211];
         $this->assertDatabaseCount('entities', 4);
         $this->assertDatabaseCount('dummies', 4);
         $this->assertDatabaseMissing('entities', $id);

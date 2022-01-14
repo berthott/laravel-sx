@@ -15,7 +15,7 @@ class Entity extends Model
      */
     public static function exclude(): array
     {
-        return ['survey', 'responde'];
+        return ['survey', 'respondentid'];
     }
 
     /**
@@ -23,6 +23,6 @@ class Entity extends Model
      */
     public static function include(): array
     {
-        return ['survey', 'responde'];
+        return ['survey', 'respondentid'];
     }
 }

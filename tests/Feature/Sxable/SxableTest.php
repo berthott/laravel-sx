@@ -351,5 +351,6 @@ class SxableTest extends SxableTestCase
         $this->assertEquals('responsecollectsessions', Entity::guessFullVariableName('response'));
         $this->assertEquals('statcreation_2', Entity::guessFullVariableName('statc_5'));
         $this->assertEquals('statdistribution_1', Entity::guessFullVariableName('statd_1'));
+        $this->assertEquals('s_11_17', Entity::guessFullVariableName('s_11_17'));
     }
 }

@@ -9,6 +9,7 @@ use berthott\SX\Http\Requests\ExportRequest;
 use berthott\SX\Http\Requests\ImportRequest;
 use berthott\SX\Http\Requests\LabeledRequest;
 use berthott\SX\Http\Requests\StoreRequest;
+use berthott\SX\Http\Requests\UpdateRequest;
 use berthott\SX\Models\Contracts\Targetable;
 use berthott\SX\Models\Resources\SxableLabeledResource;
 use berthott\SX\Models\Respondent;
@@ -61,6 +62,25 @@ class SxableController implements Targetable
             ],
             $this->target::filterFormParams($request->form_params)
         ));
+        return $respondent;
+    }
+
+    /**
+     * update a resource.
+     */
+    public function update(UpdateRequest $request, int $id): Respondent
+    {
+        $key = $this->respondent($id)->externalkey();
+        $respondent = (new SxRespondentService($key))->updateRespondentAnswers($request->all());
+        if ($model = $this->target::where([config('sx.primary') => $id])->first()) {
+            $model->update(array_merge(
+                [
+                'created' => $respondent->createts(),
+                'modified' => $respondent->modifyts(),
+            ],
+                $this->target::filterFormParams($request->form_params)
+            ));
+        }
         return $respondent;
     }
 

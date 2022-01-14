@@ -39,6 +39,17 @@ class SxRespondentService
     }
 
     /**
+     * Create a new respondent.
+     */
+    public function updateRespondentAnswers(array $args): Respondent
+    {
+        return new Respondent(SxHttpService::respondents()->updateAnswers(array_merge(
+            ['respondent' => $this->respondent_id],
+            $args,
+        )));
+    }
+
+    /**
      * Delete a respondent.
      */
     public function deleteRespondent(): string

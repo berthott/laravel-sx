@@ -10,6 +10,7 @@ use berthott\SX\Facades\Sxable;
 use berthott\SX\Helpers\Helpers;
 use berthott\SX\Helpers\SxLog as HelpersSxLog;
 use berthott\SX\Http\Controllers\SxableController;
+use berthott\SX\Http\Middleware\ConvertLabelsToValues;
 use berthott\SX\Http\Middleware\ConvertStringBooleans;
 use berthott\SX\Models\Contracts\Targetable;
 use berthott\SX\Services\Http\SxApiService;
@@ -74,9 +75,10 @@ class SxServiceProvider extends ServiceProvider
             'level' => 'debug',
         ]);
 
-        // add middleware
+        // add middlewares
         $router = app(Router::class);
-        $router->aliasMiddleware('string.booleans', ConvertStringBooleans::class);
+        $router->aliasMiddleware('sx.string_booleans', ConvertStringBooleans::class);
+        $router->aliasMiddleware('sx.labels_to_values', ConvertLabelsToValues::class);
 
         // add routes
         Route::group($this->routeConfiguration(), function () {
@@ -85,7 +87,7 @@ class SxServiceProvider extends ServiceProvider
                 Route::get($sxable::entityTableName().'/export', [SxableController::class, 'export'])->name($sxable::entityTableName().'.export');
                 Route::get("{$sxable::entityTableName()}/structure", [SxableController::class, 'structure'])->name($sxable::entityTableName().'.structure');
                 Route::get("{$sxable::entityTableName()}/{{$sxable::singleName()}}/respondent", [SxableController::class, 'respondent'])->name($sxable::entityTableName().'.respondent');
-                Route::apiResource($sxable::entityTableName(), SxableController::class, $sxable::routeOptions())->except(['update']);
+                Route::apiResource($sxable::entityTableName(), SxableController::class, $sxable::routeOptions());
             }
         });
 
@@ -105,7 +107,7 @@ class SxServiceProvider extends ServiceProvider
     protected function routeConfiguration(): array
     {
         return [
-            'middleware' => [...config('sx.middleware'), 'string.booleans'],
+            'middleware' => [...config('sx.middleware'), 'sx.string_booleans', 'sx.labels_to_values'],
             'prefix' => config('sx.prefix'),
         ];
     }

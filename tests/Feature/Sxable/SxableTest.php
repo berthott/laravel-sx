@@ -4,6 +4,7 @@ namespace berthott\SX\Tests\Feature\Sxable;
 
 use berthott\SX\Facades\Sxable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class SxableTest extends SxableTestCase
@@ -322,8 +323,7 @@ class SxableTest extends SxableTestCase
             'updated_at' => $this->now,
         ]);
         // value_string
-        // TODO FIX TEST (because of TEXT DB Format)
-        /* $this->assertDatabaseHas('entities_long', [
+        $this->assertDatabaseHas('entities_long', [
             'respondent_id' => 825478429,
             'variableName' => 's_15',
             'value_single_multiple' => null,
@@ -332,7 +332,7 @@ class SxableTest extends SxableTestCase
             'value_datetime' => null,
             'created_at' => $this->now,
             'updated_at' => $this->now,
-        ]); */
+        ]);
         // value_datetime
         $this->assertDatabaseHas('entities_long', [
             'respondent_id' => 825478429,

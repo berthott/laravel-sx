@@ -66,6 +66,7 @@ class SxableObserver
                 case 'integer':
                     $entry['value_single_multiple'] = $value;
                     break;
+                case 'text':
                 case 'string':
                     $entry['value_string'] = $value;
                     break;

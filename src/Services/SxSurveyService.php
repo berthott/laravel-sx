@@ -127,6 +127,9 @@ class SxSurveyService
     {
         $this->initStructure();
         $entry = $this->structure->firstWhere('variableName', $shortName);
+        if (!$entry) {
+            return $shortName;
+        }
         $base = Str::lower($entry['questionName']);
         if ($entry['choiceValue']) {
             $questionNameEntries = $this->structure->where('questionName', $entry['questionName'])->values();

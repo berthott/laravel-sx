@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -112,6 +113,17 @@ class SxableController implements Targetable
             ? $this->target::labeledStructure()
             : $this->target::structure();
     }
+
+    /**
+     * Display the sx labels.
+     */
+    public function labels(LabeledRequest $request): Collection
+    {
+        return $request->labeled
+            ? $this->target::labeledLabels()
+            : $this->target::labels();
+    }
+
 
     /**
      * Trigger sx import.

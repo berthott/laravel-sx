@@ -435,9 +435,24 @@ trait Sxable
     /**
      * The labels mapped to the fields.
      */
-    private static function labels(): Collection
+    public static function labels(): Collection
     {
         return self::filterByFields(self::controller()->getLabels());
+    }
+
+    /**
+     * Returns the labeled structure + id and timestamps.
+     */
+    public static function labeledLabels(): Collection
+    {
+        $questions = DB::table(self::questionsTableName())->get()->keyBy('variableName');
+        return self::labels()->map(function($entry) use ($questions) {
+            $variableName = $entry['variableName'];
+            if ($questions->has($variableName) && $questions[$variableName]->subType === 'Multiple') {
+                $entry['variableName'] = $variableName.' - '.$questions[$variableName]->choiceText;
+            }
+            return $entry;
+        });
     }
 
     /**

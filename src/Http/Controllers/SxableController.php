@@ -116,11 +116,11 @@ class SxableController implements Targetable
     /**
      * Trigger sx import.
      */
-    public function import(ImportRequest $request): Collection
+    public function import(ImportRequest $request): Collection | ResourceCollection
     {
         return $request->fresh
-            ? $this->target::initTables(force: true)
-            : $this->target::import();
+            ? $this->target::initTables(force: true, labeled: (bool) $request->labeled)
+            : $this->target::import((bool) $request->labeled);
     }
 
     /**

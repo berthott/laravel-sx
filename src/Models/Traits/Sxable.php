@@ -3,11 +3,13 @@
 namespace berthott\SX\Models\Traits;
 
 use berthott\SX\Facades\SxLog;
+use berthott\SX\Models\Resources\SxableLabeledResource;
 use berthott\SX\Models\SxMode;
 use berthott\SX\Observers\SxableObserver;
 use berthott\SX\Services\SxSurveyService;
 use Closure;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -184,13 +186,15 @@ trait Sxable
     /**
      * Initialize the sxable tables.
      */
-    public static function initTables(bool $force = false): Collection
+    public static function initTables(bool $force = false, bool $labeled = false): Collection | ResourceCollection
     {
         self::initStructureTable($force);
         self::initEntityTable($force);
         self::initLabelsTable($force);
         self::initQuestionsTable($force);
-        return static::all();
+        return $labeled
+            ? SxableLabeledResource::collection(static::all())
+            : static::all();
     }
 
     /**
@@ -451,7 +455,7 @@ trait Sxable
         });
     }
 
-    public static function import(): Collection
+    public static function import(bool $labeled = false): Collection | ResourceCollection
     {
         SxLog::log(self::entityTableName().': Import triggered.');
         $entries = self::entities(self::lastImport());
@@ -470,7 +474,10 @@ trait Sxable
         SxLog::log(self::entityTableName().': Import finished.');
         
         // return the imported entries from our database
-        return static::whereIn(config('sx.primary'), $entries->pluck(config('sx.primary'))->toArray())->get();
+        $imported = static::whereIn(config('sx.primary'), $entries->pluck(config('sx.primary'))->toArray())->get();
+        return $labeled
+            ? SxableLabeledResource::collection($imported)
+            : $imported;
     }
 
     /**

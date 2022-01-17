@@ -213,7 +213,10 @@ class RoutesTest extends RoutesTestCase
     
     public function test_import_route(): void
     {
-        $id = ['respondentid' => 841931211];
+        $id = [
+            'respondentid' => 841931211,
+            'statinternal_2' => 0
+        ];
         $this->assertDatabaseCount('entities', 4);
         $this->assertDatabaseMissing('entities', $id);
         $this->post(route('entities.import'))
@@ -221,6 +224,29 @@ class RoutesTest extends RoutesTestCase
             ->assertJson([$id]);
         $this->assertDatabaseCount('entities', 5);
         $this->assertDatabaseHas('entities', $id);
+    }
+    
+    public function test_import_route_labeled(): void
+    {
+        $this->post(route('entities.import', [ 'labeled' => true ]))
+            ->assertStatus(200)
+            ->assertJson([
+                [
+                    'respondentid' => 841931211,
+                    'statinternal_2 - Fragebogen gedruckt' => 'Nicht ausgewählt'
+                ]
+            ]);
+        $this->post(route('entities.import', [
+            'labeled' => true,
+            'force' => true
+        ]))
+            ->assertStatus(200)
+            ->assertJson([
+                [
+                    'respondentid' => 841931211,
+                    'statinternal_2 - Fragebogen gedruckt' => 'Nicht ausgewählt'
+                ]
+            ]);
     }
 
     public function test_import_route_validation(): void

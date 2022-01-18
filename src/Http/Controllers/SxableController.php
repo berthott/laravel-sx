@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Maatwebsite\Excel\Facades\Excel;
@@ -50,10 +51,17 @@ class SxableController implements Targetable
      */
     public function store(StoreRequest $request): Respondent
     {
-        $respondent = (new SxRespondentService())->createNewRespondent(array_merge(
+        $a = array_merge_recursive(
             $request->all(),
+            Auth::user() ? [
+                'form_params' => [
+                    'created_' => Auth::user()->id,
+                    'updated_' => Auth::user()->id,
+                ]
+            ] : [],
             ['survey' => $this->target::surveyId()]
-        ));
+        );
+        $respondent = (new SxRespondentService())->createNewRespondent($a);
         $this->target::create(array_merge(
             [
                 config('sx.primary') => $respondent->id(),
@@ -72,13 +80,20 @@ class SxableController implements Targetable
     public function update(UpdateRequest $request, int $id): Respondent
     {
         $key = $this->respondent($id)->externalkey();
-        $respondent = (new SxRespondentService($key))->updateRespondentAnswers($request->all());
+        $respondent = (new SxRespondentService($key))->updateRespondentAnswers(array_merge_recursive(
+            $request->all(),
+            Auth::user() ? [
+                'form_params' => [
+                    'updated_' => Auth::user()->id,
+                ]
+            ] : [],
+        ));
         if ($model = $this->target::where([config('sx.primary') => $id])->first()) {
             $model->update(array_merge(
                 [
-                'created' => $respondent->createts(),
-                'modified' => $respondent->modifyts(),
-            ],
+                    'created' => $respondent->createts(),
+                    'modified' => $respondent->modifyts(),
+                ],
                 $this->target::filterFormParams($request->form_params)
             ));
         }

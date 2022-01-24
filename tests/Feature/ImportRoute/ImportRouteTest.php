@@ -2,11 +2,6 @@
 
 namespace berthott\SX\Tests\Feature\ImportRoute;
 
-use berthott\SX\Exports\SxLabeledExport;
-use berthott\SX\Exports\SxTableExport;
-use Illuminate\Support\Facades\Route;
-use Maatwebsite\Excel\Facades\Excel;
-
 class ImportRouteTest extends ImportRouteTestCase
 {
     public function test_import_route(): void

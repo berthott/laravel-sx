@@ -2,10 +2,7 @@
 
 namespace berthott\SX\Tests\Feature\Routes;
 
-use berthott\SX\Exports\SxLabeledExport;
-use berthott\SX\Exports\SxTableExport;
 use Illuminate\Support\Facades\Route;
-use Maatwebsite\Excel\Facades\Excel;
 
 class RoutesTest extends RoutesTestCase
 {

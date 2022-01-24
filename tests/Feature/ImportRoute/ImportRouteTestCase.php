@@ -31,10 +31,6 @@ abstract class ImportRouteTestCase extends BaseTestCase
     {
         $this->now = now()->format('Y-m-d H:i:s');
         Config::set('sx.namespace', __NAMESPACE__);
-        Config::set('sx.auth', [
-            'Syspons_API',
-            'SySpons$$'
-        ]);
         SxApiService::shouldReceive('exportStructure')
             ->andReturn(new Response(
                 $status = 200,
@@ -65,12 +61,6 @@ abstract class ImportRouteTestCase extends BaseTestCase
                     File::get(__DIR__.'/../update.csv'),
                 ),
             );
-        SxApiService::shouldReceive('get')
-            ->andReturn(new Response(
-                $status = 200,
-                $headers = [],
-                File::get(__DIR__.'/../825478429.xml'),
-            ));
         SxApiService::makePartial();
     }
 }

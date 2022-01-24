@@ -141,6 +141,32 @@ class SxSurveyService
         return $base;
     }
 
+    /**
+     * Return a last import as query array.
+     */
+    public function guessShortVariableName(string $fullName): string
+    {
+        $fullNameArray = explode('_', $fullName);
+        if (count($fullNameArray) === 1) {
+            $index = false;
+            $base = $fullNameArray[0];
+        } else {
+            $index = array_pop($fullNameArray) - 1;
+            $base = join('_', $fullNameArray);
+        }
+        $this->initStructure();
+        $entries = $this->structure->filter(function ($entry) use ($base) {
+            return Str::lower($entry['questionName']) === Str::lower($base);
+        });
+        if ($entries->count() === 1) {
+            return $entries->first()['variableName'];
+        } elseif ($entries->count() > 1 && is_int($index)) {
+            return $entries->values()[$index]['variableName'];
+        } else {
+            return $fullName;
+        }
+    }
+
     private function mapToFullVariableName(Collection $collection): Collection
     {
         return $collection->map(function ($entry) {

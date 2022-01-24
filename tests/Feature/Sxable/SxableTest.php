@@ -354,4 +354,13 @@ class SxableTest extends SxableTestCase
         $this->assertEquals('statdistribution_1', $service->guessFullVariableName('statd_1'));
         $this->assertEquals('s_11_17', $service->guessFullVariableName('s_11_17'));
     }
+    
+    public function test_guess_short_variable_name(): void
+    {
+        $service = new SxSurveyService('mocked');
+        $this->assertEquals('response', $service->guessShortVariableName('responsecollectsessions'));
+        $this->assertEquals('statc_5', $service->guessShortVariableName('statcreation_2'));
+        $this->assertEquals('statd_1', $service->guessShortVariableName('statdistribution_1'));
+        $this->assertEquals('s_11_17', $service->guessShortVariableName('s_11_17'));
+    }
 }

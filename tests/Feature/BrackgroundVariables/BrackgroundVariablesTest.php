@@ -14,42 +14,48 @@ class BrackgroundVariablesTest extends BrackgroundVariablesTestCase
         // create
         $id = $this->post(route('entities.store'), [
             'form_params' => [
-                    'email' => 'test@syspons.com', // string
-                    'gender_rel' => 'GG0', // single
+                    'email' => 'test@syspons.com',
+                    'gender_rel' => 'GG1',
+                    's_5' => 'teilnehmend mit Gründung', // neccesary for gender_rel
                 ]
             ])
             ->assertStatus(200)->json()['id'];
         $this->assertDatabaseHas('entities', [
             'respondentid' => $id,
-            'survey' => 1325978,
-            'email' => 'test@syspons.com',
-            'gender_rel' => '1',
+            'gender_rel' => 2,
+            's_5' => 4,
         ]);
 
         // check creation
-        /* $this->post(route('entities.import'))
+        $this->post(route('entities.import'))
             ->assertStatus(200)
-            ->assertJson([
-                'respondentid' => $id,
-                'survey' => 1325978,
-                'email' => 'test@syspons.com',
-                'gender_r' => '1',
-            ]); */
+            ->assertJsonFragment([
+                'respondentid' => $id.'.0',
+                'gender_rel' => '2',
+                's_5' => '4',
+            ]);
 
         // update
         $this->put(route('entities.update', [
                 'entity' => $id,
                 'form_params' => [
-                    'gender_rel' => 'GG1'
+                    'gender_rel' => 'GG2'
                 ],
             ]))
             ->assertStatus(200);
         $this->assertDatabaseHas('entities', [
             'respondentid' => $id,
-            'survey' => 1325978,
-            'email' => 'test@syspons.com',
-            'gender_rel' => '2',
+            'gender_rel' => 3,
         ]);
+
+
+        // check creation
+        $this->post(route('entities.import'))
+            ->assertStatus(200)
+            ->assertJsonFragment([
+                'respondentid' => $id.'.0',
+                'gender_rel' => '3',
+            ]);
 
         // clean up
         $this->delete(route('entities.destroy', ['entity' => $id]))

@@ -16,11 +16,11 @@ use berthott\SX\Models\Respondent;
 use berthott\SX\Models\Traits\Targetable as TraitsTargetable;
 use berthott\SX\Services\SxRespondentService;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -52,7 +52,7 @@ class SxableController implements Targetable
     public function store(StoreRequest $request): Respondent
     {
         $a = array_merge_recursive(
-            $request->all(),
+            $this->formParamsWithShortNames($request),
             Auth::user() ? [
                 'form_params' => [
                     'created_' => Auth::user()->id,
@@ -81,7 +81,7 @@ class SxableController implements Targetable
     {
         $key = $this->respondent($id)->externalkey();
         $respondent = (new SxRespondentService($key))->updateRespondentAnswers(array_merge_recursive(
-            $request->all(),
+            $this->formParamsWithShortNames($request),
             Auth::user() ? [
                 'form_params' => [
                     'updated_' => Auth::user()->id,
@@ -175,5 +175,15 @@ class SxableController implements Targetable
         }
         $fileName = $tableName.'.'.strtolower(config('sx.exportFormat'));
         return Excel::download(new SxTableExport($tableName), $fileName);
+    }
+
+    /**
+     * Map to params to short names
+     */
+    private function formParamsWithShortNames(FormRequest $request): array
+    {
+        $all = $request->all();
+        $all['form_params'] = $this->target::mapToShortNames($all['form_params']);
+        return $all;
     }
 }

@@ -446,7 +446,7 @@ trait Sxable
     public static function labeledLabels(): Collection
     {
         $questions = DB::table(self::questionsTableName())->get()->keyBy('variableName');
-        return self::labels()->map(function($entry) use ($questions) {
+        return self::labels()->map(function ($entry) use ($questions) {
             $variableName = $entry['variableName'];
             if ($questions->has($variableName) && $questions[$variableName]->subType === 'Multiple') {
                 $entry['variableName'] = $variableName.' - '.$questions[$variableName]->choiceText;
@@ -510,5 +510,17 @@ trait Sxable
             SxLog::log('There were no previous respondents.');
         }
         return $lastImportArray;
+    }
+
+    /**
+     * Return a last import as query array.
+     */
+    public static function mapToShortNames(array $fullNames): array
+    {
+        $ret = [];
+        foreach ($fullNames as $name => $value) {
+            $ret[self::controller()->guessShortVariableName($name)] = $value;
+        }
+        return $ret;
     }
 }

@@ -151,7 +151,9 @@ class SxSurveyService
             $index = false;
             $base = $fullNameArray[0];
         } else {
-            $index = array_pop($fullNameArray) - 1;
+            $index = intval($fullNameArray[count($fullNameArray) - 1]) > 0
+                ? (int) array_pop($fullNameArray) - 1
+                : false;
             $base = join('_', $fullNameArray);
         }
         $this->initStructure();

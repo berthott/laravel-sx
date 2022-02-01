@@ -129,7 +129,7 @@ class SxableController implements Targetable
             : $this->target::structure();
         return $structure->filter(function ($entry) {
             return !in_array($entry->variableName, $this->target::excludeFromStructureRoute());
-        });
+        })->values();
     }
 
     /**

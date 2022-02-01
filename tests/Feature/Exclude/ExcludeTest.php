@@ -149,4 +149,14 @@ class ExcludeTest extends ExcludeTestCase
             ->assertStatus(200);
         $this->assertDatabaseMissing('entities', ['respondentid' => $id]);
     }
+    
+    public function test_exclude_from_structure_route(): void
+    {
+        $this->get(route('entities.structure'))
+            ->assertStatus(200)
+            ->assertJsonMissing(['variableName' => 'survey'])
+            ->assertJsonFragment(['variableName' => 'respondentid'])
+            ->assertJsonFragment(['variableName' => 'statinternal_1'])
+            ->assertJsonFragment(['variableName' => 'created']);
+    }
 }

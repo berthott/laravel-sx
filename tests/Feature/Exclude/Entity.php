@@ -25,4 +25,12 @@ class Entity extends Model
     {
         return ['organization', 'email'];
     }
+
+    /**
+     * The fields that should be excluded from the structure.
+     */
+    public static function excludeFromStructureRoute(): array
+    {
+        return ['survey'];
+    }
 }

@@ -64,6 +64,14 @@ trait Sxable
     }
 
     /**
+     * The fields that should be excluded from the structure.
+     */
+    public static function excludeFromStructureRoute(): array
+    {
+        return [];
+    }
+
+    /**
      * The fields that should be processed.
      */
     public static function unique(): array

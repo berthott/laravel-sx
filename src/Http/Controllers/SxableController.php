@@ -124,9 +124,12 @@ class SxableController implements Targetable
      */
     public function structure(LabeledRequest $request): Collection | ResourceCollection
     {
-        return $request->labeled
+        $structure = $request->labeled
             ? $this->target::labeledStructure()
             : $this->target::structure();
+        return $structure->filter(function ($entry) {
+            return !in_array($entry->variableName, $this->target::excludeFromStructureRoute());
+        });
     }
 
     /**

@@ -51,17 +51,17 @@ class SxableController implements Targetable
      */
     public function store(StoreRequest $request): Respondent
     {
-        $a = array_merge_recursive(
-            $this->formParamsWithShortNames($request),
+        $a = $this->formParamsWithShortNames(array_merge_recursive(
+            $request->all(),
             Auth::user() ? [
                 'form_params' => [
-                    'created_' => Auth::user()->id,
-                    'updated_' => Auth::user()->id,
+                    'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id,
                 ]
             ] : [],
             $this->target::generatedUniqueFieldsParams(),
             ['survey' => $this->target::surveyId()]
-        );
+        ));
         $respondent = (new SxRespondentService())->createNewRespondent($a);
         $this->target::create(array_merge(
             [
@@ -81,14 +81,14 @@ class SxableController implements Targetable
     public function update(UpdateRequest $request, int $id): Respondent
     {
         $key = $this->respondent($id)->externalkey();
-        $respondent = (new SxRespondentService($key))->updateRespondentAnswers(array_merge_recursive(
-            $this->formParamsWithShortNames($request),
+        $respondent = (new SxRespondentService($key))->updateRespondentAnswers($this->formParamsWithShortNames(array_merge_recursive(
+            $request->all(),
             Auth::user() ? [
                 'form_params' => [
-                    'updated_' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id,
                 ]
             ] : [],
-        ));
+        )));
         if ($model = $this->target::where([config('sx.primary') => $id])->first()) {
             $model->update(array_merge(
                 [
@@ -184,9 +184,8 @@ class SxableController implements Targetable
     /**
      * Map to params to short names
      */
-    private function formParamsWithShortNames(FormRequest $request): array
+    private function formParamsWithShortNames(array $all): array
     {
-        $all = $request->all();
         $all['form_params'] = $this->target::mapToShortNames($all['form_params']);
         return $all;
     }

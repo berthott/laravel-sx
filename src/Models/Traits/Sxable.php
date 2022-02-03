@@ -72,6 +72,15 @@ trait Sxable
     }
 
     /**
+     * Defines unique fields with 'field' => 'key'.
+     * The key defines a string that is appended by a number.
+     */
+    public static function generatedUniqueFields(): array
+    {
+        return [];
+    }
+
+    /**
      * The fields that should be processed.
      */
     public static function unique(): array
@@ -528,6 +537,33 @@ trait Sxable
         $ret = [];
         foreach ($fullNames as $name => $value) {
             $ret[self::controller()->guessShortVariableName($name)] = $value;
+        }
+        return $ret;
+    }
+
+    /**
+     * Return a unique value for that column.
+     */
+    public static function generateUniqueValue(string $column): string
+    {
+        if (!array_key_exists($column, self::generatedUniqueFields())) {
+            return '';
+        }
+        $previousId = (int) filter_var(DB::table(self::entityTableName())->select($column)->orderBy($column)->get()->last()->$column, FILTER_SANITIZE_NUMBER_INT);
+        return self::generatedUniqueFields()[$column].Str::padLeft(++$previousId, 3, '0');
+    }
+
+    /**
+     * Return a an array with generated background variables for sx.
+     */
+    public static function generatedUniqueFieldsParams(): array
+    {
+        $ret = ['form_params' => []];
+        foreach (self::generatedUniqueFields() as $field => $val) {
+            $val = self::generateUniqueValue($field);
+            if (!empty($val)) {
+                $ret['form_params'][$field] = $val;
+            }
         }
         return $ret;
     }

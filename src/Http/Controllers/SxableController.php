@@ -59,6 +59,7 @@ class SxableController implements Targetable
                     'updated_' => Auth::user()->id,
                 ]
             ] : [],
+            $this->target::generatedUniqueFieldsParams(),
             ['survey' => $this->target::surveyId()]
         );
         $respondent = (new SxRespondentService())->createNewRespondent($a);

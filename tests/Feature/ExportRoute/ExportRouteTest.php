@@ -61,7 +61,7 @@ class ExportRouteTest extends ExportRouteTestCase
             's_1' => null,
             's_6' => null,
             's_7' => 1,
-            's_14' => 'Female Future',
+            'generated_id' => 'GEN001',
             's_9' => 1,
             's_15' => 'Frauenhaus in Georgien im ländlichen Gebiet',
             's_10' => 'Frauenhaus in Georgien im ländlichen Gebiet',
@@ -185,7 +185,7 @@ class ExportRouteTest extends ExportRouteTestCase
             's_1' => null,
             's_6' => null,
             's_7' => 'Georgien',
-            's_14' => 'Female Future',
+            'generated_id' => 'GEN001',
             's_9' => 'Georgien',
             's_15' => 'Frauenhaus in Georgien im ländlichen Gebiet',
             's_10' => 'Frauenhaus in Georgien im ländlichen Gebiet',
@@ -267,9 +267,9 @@ class ExportRouteTest extends ExportRouteTestCase
         $entries = [
             [
                 'respondent_id' => '825478429.0',
-                'variableName' => 's_14',
+                'variableName' => 'generated_id',
                 'value_single_multiple' => null,
-                'value_string' => 'Female Future',
+                'value_string' => 'GEN001',
                 'value_double' => null,
                 'value_datetime' => null,
             ], [

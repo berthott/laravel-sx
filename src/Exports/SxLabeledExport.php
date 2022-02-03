@@ -31,6 +31,8 @@ class SxLabeledExport implements FromCollection, WithHeadings, WithTitle, WithSt
 
     public function headings(): array
     {
-        return $this->target::labeledAttributes();
+        return array_filter($this->target::labeledAttributes(), function ($column) {
+            return !in_array($column, config('sx.excludeFromExport'));
+        });
     }
 }

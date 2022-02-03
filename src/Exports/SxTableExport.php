@@ -28,12 +28,14 @@ class SxTableExport implements FromCollection, WithHeadings, WithTitle, WithStri
 
     public function collection(): Collection
     {
-        return DB::table($this->tableName)->get();
+        return DB::table($this->tableName)->select(...$this->headings())->get();
     }
 
     public function headings(): array
     {
-        return Schema::getColumnListing($this->tableName);
+        return array_filter(Schema::getColumnListing($this->tableName), function ($column) {
+            return !in_array($column, config('sx.excludeFromExport'));
+        });
     }
 
     // intentionally disabled because of missing WithColumnFormatting Concern

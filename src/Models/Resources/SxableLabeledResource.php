@@ -18,6 +18,9 @@ class SxableLabeledResource extends JsonResource
         $ret = [];
         $questions = DB::table($this->resource->questionsTableName())->get()->keyBy('variableName');
         foreach ($this->resource->getAttributes() as $variableName => $value) {
+            if (in_array($variableName, config('sx.excludeFromExport'))) {
+                continue;
+            }
             $header = $variableName;
             if (!$questions->has($variableName)) {
                 $ret[$header] = $value;

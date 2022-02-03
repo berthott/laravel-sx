@@ -122,8 +122,8 @@ class ExportRouteTest extends ExportRouteTestCase
             'statoverall_3' => 0,
             'statoverall_4' => 1,
             'statoverall_5' => 0,
-            'created_at' => $this->now,
-            'updated_at' => $this->now,
+            //'created_at' => $this->now,
+            //'updated_at' => $this->now,
         ];
         Excel::assertDownloaded('entities.xlsx', function (SxTableExport $export) use ($entity) {
             $excelEntity = json_decode(json_encode($export->collection()[0]), true);
@@ -246,8 +246,8 @@ class ExportRouteTest extends ExportRouteTestCase
             'statoverall_3 - Teilweise abgeschlossen' => 'Nicht ausgewählt',
             'statoverall_4 - Abgeschlossen' => 'Ausgewählt',
             'statoverall_5 - Abgelehnt' => 'Nicht ausgewählt',
-            'created_at' => $this->now,
-            'updated_at' => $this->now,
+            //'created_at' => $this->now,
+            //'updated_at' => $this->now,
         ];
         Excel::assertDownloaded('entities_labeled.xlsx', function (SxLabeledExport $export) use ($entity) {
             $excelEntity = json_decode(json_encode($export->collection()[0]), true);
@@ -301,7 +301,7 @@ class ExportRouteTest extends ExportRouteTestCase
             foreach ($entries as $entry) {
                 $exportEntry = $export->collection()->where('variableName', $entry['variableName'])->where('respondent_id', 825478429)->first();
                 $diff = array_diff(json_decode(json_encode($exportEntry), true), $entry);
-                if (count($diff) !== 3) {
+                if (count($diff) !== 1) { // id does not match, 3 if timestamps are not filtered
                     $correct = false;
                 }
             };
@@ -330,7 +330,7 @@ class ExportRouteTest extends ExportRouteTestCase
             foreach ($questions as $question) {
                 $exportQuestion = $export->collection()->firstWhere('variableName', $question['variableName']);
                 $diff = array_diff(json_decode(json_encode($exportQuestion), true), $question);
-                if (count($diff) !== 2) {
+                if (count($diff) !== 1) { // id does not match, 2 if timestamps are not filtered
                     $correct = false;
                 }
             };
@@ -359,7 +359,7 @@ class ExportRouteTest extends ExportRouteTestCase
             foreach ($labels as $label) {
                 $exportLabel = $export->collection()->where('variableName', $label['variableName'])->where('value', $label['value'])->first();
                 $diff = array_diff(json_decode(json_encode($exportLabel), true), $label);
-                if (count($diff) !== 2) {
+                if (count($diff) !== 1) { // id does not match, 2 if timestamps are not filtered
                     $correct = false;
                 }
             };

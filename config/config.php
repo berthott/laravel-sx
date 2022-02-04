@@ -84,7 +84,7 @@ return [
     | Exclude a field from the export
     |
     */
-    'excludeFromExport' => ['created_at', 'updated_at'],
+    'excludeFromExport' => ['created_at', 'updated_at', 'survey', 'respondentid'],
 
     /*
     |--------------------------------------------------------------------------

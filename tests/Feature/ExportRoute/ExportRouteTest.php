@@ -18,8 +18,8 @@ class ExportRouteTest extends ExportRouteTestCase
         
         $entity = [
             'id' => 1,
-            'survey' => 1325978,
-            'respondentid' => '825478429.0',
+            //'survey' => 1325978,
+            //'respondentid' => '825478429.0',
             'organization' => 269318,
             'statinternal_1' => 1,
             'statinternal_2' => 0,
@@ -142,8 +142,8 @@ class ExportRouteTest extends ExportRouteTestCase
         
         $entity = [
             'id' => 1,
-            'survey' => 'HF 4 - GfE Applicants/participants',
-            'respondentid' => '825478429.0',
+            //'survey' => 'HF 4 - GfE Applicants/participants',
+            //'respondentid' => '825478429.0',
             'organization' => 'GIZ - PMD FMD M&Q Tool',
             'statinternal_1 - E-Mail gesendet' => 'Ausgewählt',
             'statinternal_2 - Fragebogen gedruckt' => 'Nicht ausgewählt',

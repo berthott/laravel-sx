@@ -158,9 +158,57 @@ class RoutesTest extends RoutesTestCase
         $this->assertDatabaseMissing('entities_long', ['respondent_id' => $id]);
     }
 
+    public function test_store_delete_many_route(): void
+    {
+        // create
+        $id1 = $this->post(route('entities.store'), [
+            'form_params' => [
+                    'email' => 'test@syspons.com', // string
+                    's_2' => 3333, // double
+                    's_5' => 'laufende Bewerbung', // single
+                    's_7' => 'Georgien' // multiple
+                ]
+            ])
+            ->assertStatus(200)
+            ->json()['id'];
+        $id2 = $this->post(route('entities.store'), [
+            'form_params' => [
+                    'email' => 'test@syspons.com', // string
+                    's_2' => 3333, // double
+                    's_5' => 'laufende Bewerbung', // single
+                    's_7' => 'Georgien' // multiple
+                ]
+            ])
+            ->assertStatus(200)
+            ->json()['id'];
+        $this->assertDatabaseHas('entities', ['respondentid' => $id1]);
+        $this->assertDatabaseHas('entities', ['respondentid' => $id2]);
+
+        // delete_many
+        $this->delete(route('entities.destroy_many'), ['ids' => [$id1, $id2]])
+            ->assertStatus(200)
+            ->assertJson([
+                $id1 => 'Success',
+                $id2 => 'Success',
+            ]);
+        $this->assertDatabaseMissing('entities', ['respondentid' => $id1]);
+        $this->assertDatabaseMissing('entities', ['respondentid' => $id2]);
+    }
+
+    public function test_delete_many_validation(): void
+    {
+        $this->delete(route('entities.destroy_many'))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('ids');
+        $this->delete(route('entities.destroy_many'), ['ids' => [12345]])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('ids.0');
+    }
+
     public function test_store_route_validation(): void
     {
         $this->post(route('entities.store'))
+            ->assertStatus(422)
             ->assertJsonValidationErrors('form_params.email');
     }
 

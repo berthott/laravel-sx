@@ -46,6 +46,7 @@ class ImportRouteTest extends ImportRouteTestCase
     {
         $this->assertDatabaseCount('entities', 4);
         $this->post(route('entities.import'), ['fresh' => 'yes'])
+            ->assertStatus(422)
             ->assertJsonValidationErrors('fresh');
         $this->assertDatabaseCount('entities', 4);
         $this->post(route('entities.import'), ['fresh' => true]);

@@ -5,6 +5,7 @@ namespace berthott\SX\Http\Controllers;
 use berthott\SX\Exports\SxTableExport;
 use berthott\SX\Exports\SxLabeledExport;
 use berthott\SX\Exports\SxExportAll;
+use berthott\SX\Http\Requests\DestroyManyRequest;
 use berthott\SX\Http\Requests\ExportRequest;
 use berthott\SX\Http\Requests\ImportRequest;
 use berthott\SX\Http\Requests\LabeledRequest;
@@ -109,6 +110,18 @@ class SxableController implements Targetable
             $model->delete();
         }
         return response(['response' => (new SxRespondentService($id))->deleteRespondent()]);
+    }
+
+    /**
+     * Destroy a resource.
+     */
+    public function destroy_many(DestroyManyRequest $request): Response
+    {
+        $ret = [];
+        foreach ($request->ids as $id) {
+            $ret[$id] = $this->destroy($id)->getOriginalContent()['response'];
+        }
+        return response($ret);
     }
 
     /**

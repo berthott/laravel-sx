@@ -371,6 +371,8 @@ class ExportRouteTest extends ExportRouteTestCase
     {
         $this->call('GET', route('entities.export'), [
             'table' => 'wrong'
-        ])->assertJsonValidationErrors('table');
+        ])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('table');
     }
 }

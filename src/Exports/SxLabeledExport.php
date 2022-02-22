@@ -13,10 +13,12 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 class SxLabeledExport implements FromCollection, WithHeadings, WithTitle, WithStrictNullComparison
 {
     private string $target;
+    private array $ids;
 
-    public function __construct(string $target)
+    public function __construct(string $target, array $ids = [])
     {
         $this->target = $target;
+        $this->ids = $ids;
     }
     
     public function title(): string
@@ -26,7 +28,8 @@ class SxLabeledExport implements FromCollection, WithHeadings, WithTitle, WithSt
 
     public function collection(): Collection | ResourceCollection
     {
-        return SxableLabeledExportResource::collection($this->target::all());
+        $entries = !empty($this->ids) ? $this->target::whereIn(config('sx.primary'), $this->ids)->get() : $this->target::all();
+        return SxableLabeledExportResource::collection($entries);
     }
 
     public function headings(): array

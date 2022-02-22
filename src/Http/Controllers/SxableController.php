@@ -171,13 +171,14 @@ class SxableController implements Targetable
      */
     public function export(ExportRequest $request): BinaryFileResponse
     {
+        $ids = $request->input('ids', []);
         if (empty($request->table)) {
             $fileName = $this->target::entityTableName().'.'.strtolower(config('sx.exportFormat'));
-            return Excel::download(new SxExportAll($this->target), $fileName);
+            return Excel::download(new SxExportAll($this->target, $ids), $fileName);
         }
         switch ($request->table) {
             case 'wide_labeled':
-                return Excel::download(new SxLabeledExport($this->target), $this->target::entityTableName().'_labeled.'.strtolower(config('sx.exportFormat')));
+                return Excel::download(new SxLabeledExport($this->target, $ids), $this->target::entityTableName().'_labeled.'.strtolower(config('sx.exportFormat')));
             case 'wide':
                 $tableName = $this->target::entityTableName();
                 break;
@@ -190,7 +191,7 @@ class SxableController implements Targetable
                 break;
         }
         $fileName = $tableName.'.'.strtolower(config('sx.exportFormat'));
-        return Excel::download(new SxTableExport($tableName), $fileName);
+        return Excel::download(new SxTableExport($tableName, $ids), $fileName);
     }
 
     /**

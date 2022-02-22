@@ -15,10 +15,12 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 class SxTableExport implements FromCollection, WithHeadings, WithTitle, WithStrictNullComparison
 {
     private string $tableName;
+    private array $ids;
 
-    public function __construct(string $tableName)
+    public function __construct(string $tableName, array $ids = [])
     {
         $this->tableName = $tableName;
+        $this->ids = $ids;
     }
     
     public function title(): string
@@ -28,7 +30,8 @@ class SxTableExport implements FromCollection, WithHeadings, WithTitle, WithStri
 
     public function collection(): Collection
     {
-        return DB::table($this->tableName)->select(...$this->headings())->get();
+        $query = DB::table($this->tableName)->select(...$this->headings());
+        return !empty($this->ids) ? $query->whereIn(config('sx.primary'), $this->ids)->get() : $query->get();
     }
 
     public function headings(): array

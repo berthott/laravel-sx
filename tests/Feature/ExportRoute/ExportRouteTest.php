@@ -19,7 +19,7 @@ class ExportRouteTest extends ExportRouteTestCase
         $entity = [
             'id' => 1,
             //'survey' => 1325978,
-            //'respondentid' => '825478429.0',
+            'respondentid' => '825478429.0',
             'organization' => 269318,
             'statinternal_1' => 1,
             'statinternal_2' => 0,
@@ -143,7 +143,7 @@ class ExportRouteTest extends ExportRouteTestCase
         $entity = [
             'id' => 1,
             //'survey' => 'HF 4 - GfE Applicants/participants',
-            //'respondentid' => '825478429.0',
+            'respondentid' => '825478429.0',
             'organization' => 'GIZ - PMD FMD M&Q Tool',
             'statinternal_1 - E-Mail gesendet' => 'Ausgewählt',
             'statinternal_2 - Fragebogen gedruckt' => 'Nicht ausgewählt',
@@ -374,5 +374,23 @@ class ExportRouteTest extends ExportRouteTestCase
         ])
         ->assertStatus(422)
         ->assertJsonValidationErrors('table');
+    }
+
+    public function test_export_selected(): void
+    {
+        Excel::fake();
+
+        $ids = ['825478429', '825478569'];
+        $this->call('GET', route('entities.export'), [
+            'table' => 'wide',
+            'ids' => $ids,
+        ])->assertStatus(200);
+        
+        $export = new SxTableExport('entities', $ids);
+        Excel::assertDownloaded('entities.xlsx', function () use ($export, $ids) {
+            $ret = $export->collection();
+            $plucked = $ret->pluck(config('sx.primary'))->toArray();
+            return $ret->count() === count($ids) && $plucked == $ids;
+        });
     }
 }

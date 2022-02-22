@@ -31,6 +31,7 @@ abstract class ExportRouteTestCase extends BaseTestCase
     {
         $this->now = now()->format('Y-m-d H:i:s');
         Config::set('sx.namespace', __NAMESPACE__);
+        Config::set('sx.excludeFromExport', ['created_at', 'updated_at', 'survey']);
         SxApiService::shouldReceive('exportStructure')
             ->andReturn(new Response(
                 $status = 200,

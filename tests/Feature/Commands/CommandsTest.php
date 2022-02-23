@@ -9,7 +9,7 @@ class CommandsTest extends CommandsTestCase
 {
     public function test_init_command(): void
     {
-        //Artisan::call('sx:init'); gets called in setUp()
+        Artisan::call('sx:init');
         $this->assertTrue(Schema::hasTable('entities'));
         $this->assertTrue(Schema::hasTable('entities_long'));
         $this->assertTrue(Schema::hasTable('entity_labels'));
@@ -17,8 +17,17 @@ class CommandsTest extends CommandsTestCase
         $this->assertTrue(Schema::hasTable('entity_structure'));
     }
 
+    public function test_init_max(): void
+    {
+        Artisan::call('sx:drop');
+        Artisan::call('sx:init', ['--fresh' => true, '--max' => 2]);
+        $this->assertTrue(Schema::hasTable('entities'));
+        $this->assertDatabaseCount('entities', 2);
+    }
+
     public function test_drop_command(): void
     {
+        Artisan::call('sx:init');
         Artisan::call('sx:drop');
         $this->assertFalse(Schema::hasTable('entities'));
         $this->assertFalse(Schema::hasTable('entities_long'));
@@ -29,6 +38,7 @@ class CommandsTest extends CommandsTestCase
 
     public function test_import_command(): void
     {
+        Artisan::call('sx:init');
         $id = ['respondentid' => 841931211];
         $this->assertDatabaseCount('entities', 4);
         $this->assertDatabaseCount('dummies', 4);
@@ -41,6 +51,7 @@ class CommandsTest extends CommandsTestCase
 
     public function test_import_command_only_entities(): void
     {
+        Artisan::call('sx:init');
         $id = ['respondentid' => 841931211];
         $this->assertDatabaseCount('entities', 4);
         $this->assertDatabaseCount('dummies', 4);
@@ -53,6 +64,7 @@ class CommandsTest extends CommandsTestCase
 
     public function test_import_command_fresh(): void
     {
+        Artisan::call('sx:init');
         $this->assertDatabaseCount('entities', 4);
         Artisan::call('sx:import', ['--fresh' => true]);
         $this->assertDatabaseCount('entities', 1);

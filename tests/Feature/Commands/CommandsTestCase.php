@@ -15,7 +15,6 @@ abstract class CommandsTestCase extends BaseTestCase
     public function setUp(): void
     {
         parent::setUp();
-        Artisan::call('sx:init');
     }
 
     protected function getPackageProviders($app)

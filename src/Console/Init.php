@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class Init extends Command
 {
-    protected $signature = 'sx:init {classes?*} {--fresh}';
+    protected $signature = 'sx:init {classes?*} {--fresh} {--max=}';
     protected $description = 'Initialize SX tables';
 
     public function handle()
@@ -25,7 +25,7 @@ class Init extends Command
             if ($this->argument('classes') && !in_array($class::entityTableName(), $this->argument('classes'))) {
                 continue;
             }
-            $class::initTables($this->option('fresh'));
+            $class::initTables(force: $this->option('fresh'), labeled: false, max: $this->option('max'));
         }
     }
 }

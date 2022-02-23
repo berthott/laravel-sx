@@ -194,10 +194,10 @@ trait Sxable
     /**
      * Initialize the sxable tables.
      */
-    public static function initTables(bool $force = false, bool $labeled = false): Collection | ResourceCollection
+    public static function initTables(bool $force = false, bool $labeled = false, int $max = null): Collection | ResourceCollection
     {
         self::initStructureTable($force);
-        self::initEntityTable($force);
+        self::initEntityTable($force, $max);
         self::initLabelsTable($force);
         self::initQuestionsTable($force);
         return $labeled
@@ -266,7 +266,7 @@ trait Sxable
     /**
      * Initialize the entity table.
      */
-    public static function initEntityTable(bool $force = false): void
+    public static function initEntityTable(bool $force = false, int $max = null): void
     {
         self::initLongTable($force); // before entity because it will write to long
         
@@ -312,6 +312,10 @@ trait Sxable
                 $index++;
                 SxLog::log("[$index/$count] Creating respondent: ".$entity[config('sx.primary')]);
                 self::create($entity);
+                if ($max && $index >= $max) {
+                    SxLog::log("Maximum count of {$max} reached, aborting...");
+                    break;
+                }
             }
             SxLog::log("$table: Table filled.");
         }

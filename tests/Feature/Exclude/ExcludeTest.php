@@ -133,7 +133,7 @@ class ExcludeTest extends ExcludeTestCase
 
     public function test_store_with_excluded(): void
     {
-        $id = $this->post(route('entities.store'), [
+        $id = $this->post(route('entities.create_respondent'), [
             'form_params' => [
                     'email' => 'test@syspons.com',
                     's_2' => 3333

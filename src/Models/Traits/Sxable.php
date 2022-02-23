@@ -89,15 +89,6 @@ trait Sxable
     }
 
     /**
-     * Returns an array of route options.
-     * See Route::apiResource documentation.
-     */
-    public static function routeOptions(): array
-    {
-        return [];
-    }
-
-    /**
      * Returns the structure of the current entity.
      */
     public static function structure(): Collection

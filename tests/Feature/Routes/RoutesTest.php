@@ -11,13 +11,13 @@ class RoutesTest extends RoutesTestCase
         $expectedRoutes = [
             'entities.index',
             'entities.show',
-            'entities.store',
-            'entities.update',
+            'entities.create_respondent',
+            'entities.update_respondent',
             'entities.destroy',
             
-            'entities.respondent',
+            'entities.show_respondent',
             'entities.structure',
-            'entities.import',
+            'entities.sync',
             'entities.export',
         ];
         $registeredRoutes = array_keys(Route::getRoutes()->getRoutesByName());
@@ -78,7 +78,7 @@ class RoutesTest extends RoutesTestCase
         ];
 
         // create
-        $id = $this->post(route('entities.store'), [
+        $id = $this->post(route('entities.create_respondent'), [
             'form_params' => [
                     'email' => 'test@syspons.com', // string
                     's_2' => 3333, // double
@@ -115,7 +115,7 @@ class RoutesTest extends RoutesTestCase
         ]);
 
         // update
-        $this->put(route('entities.update', [
+        $this->put(route('entities.update_respondent', [
                 'entity' => $id,
                 'form_params' => [
                     's_2' => 4444,
@@ -161,7 +161,7 @@ class RoutesTest extends RoutesTestCase
     public function test_store_delete_many_route(): void
     {
         // create
-        $id1 = $this->post(route('entities.store'), [
+        $id1 = $this->post(route('entities.create_respondent'), [
             'form_params' => [
                     'email' => 'test@syspons.com', // string
                     's_2' => 3333, // double
@@ -171,7 +171,7 @@ class RoutesTest extends RoutesTestCase
             ])
             ->assertStatus(200)
             ->json()['id'];
-        $id2 = $this->post(route('entities.store'), [
+        $id2 = $this->post(route('entities.create_respondent'), [
             'form_params' => [
                     'email' => 'test@syspons.com', // string
                     's_2' => 3333, // double
@@ -207,14 +207,14 @@ class RoutesTest extends RoutesTestCase
 
     public function test_store_route_validation(): void
     {
-        $this->post(route('entities.store'))
+        $this->post(route('entities.create_respondent'))
             ->assertStatus(422)
             ->assertJsonValidationErrors('form_params.email');
     }
 
     public function test_respondent_route(): void
     {
-        $this->get(route('entities.respondent', ['entity' => 825478429]))
+        $this->get(route('entities.show_respondent', ['entity' => 825478429]))
             ->assertStatus(200)
             ->assertJson([
                 'id' => 825478429,

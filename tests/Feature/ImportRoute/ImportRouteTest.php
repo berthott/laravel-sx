@@ -12,7 +12,7 @@ class ImportRouteTest extends ImportRouteTestCase
         ];
         $this->assertDatabaseCount('entities', 4);
         $this->assertDatabaseMissing('entities', $id);
-        $this->post(route('entities.import'))
+        $this->post(route('entities.sync'))
             ->assertStatus(200)
             ->assertJson([$id]);
         $this->assertDatabaseCount('entities', 5);
@@ -21,7 +21,7 @@ class ImportRouteTest extends ImportRouteTestCase
     
     public function test_import_route_labeled(): void
     {
-        $this->post(route('entities.import', [ 'labeled' => true ]))
+        $this->post(route('entities.sync', [ 'labeled' => true ]))
             ->assertStatus(200)
             ->assertJson([
                 [
@@ -29,7 +29,7 @@ class ImportRouteTest extends ImportRouteTestCase
                     'statinternal_2 - Fragebogen gedruckt' => 'Nicht ausgewählt'
                 ]
             ]);
-        $this->post(route('entities.import', [
+        $this->post(route('entities.sync', [
             'labeled' => true,
             'force' => true
         ]))
@@ -45,25 +45,25 @@ class ImportRouteTest extends ImportRouteTestCase
     public function test_import_route_validation(): void
     {
         $this->assertDatabaseCount('entities', 4);
-        $this->post(route('entities.import'), ['fresh' => 'yes'])
+        $this->post(route('entities.sync'), ['fresh' => 'yes'])
             ->assertStatus(422)
             ->assertJsonValidationErrors('fresh');
         $this->assertDatabaseCount('entities', 4);
-        $this->post(route('entities.import'), ['fresh' => true]);
+        $this->post(route('entities.sync'), ['fresh' => true]);
         $this->assertDatabaseCount('entities', 1);
     }
 
     public function test_import_route_fresh(): void
     {
         $this->assertDatabaseCount('entities', 4);
-        $this->post(route('entities.import'), ['fresh' => true]);
+        $this->post(route('entities.sync'), ['fresh' => true]);
         $this->assertDatabaseCount('entities', 1);
     }
 
     public function test_import_route_update(): void
     {
         $this->assertDatabaseCount('entities', 4);
-        $this->post(route('entities.import'));
+        $this->post(route('entities.sync'));
         $this->assertDatabaseCount('entities', 5);
         $this->assertDatabaseHas('entities', [
             'respondentid' => 841931211,
@@ -74,7 +74,7 @@ class ImportRouteTest extends ImportRouteTestCase
             'variableName' => 's_2',
             'value_double' => 2020,
         ]);
-        $this->post(route('entities.import'));
+        $this->post(route('entities.sync'));
         $this->assertDatabaseCount('entities', 5);
         $this->assertDatabaseMissing('entities', [
             'respondentid' => 841931211,

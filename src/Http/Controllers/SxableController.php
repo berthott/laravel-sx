@@ -49,7 +49,7 @@ class SxableController implements Targetable
     /**
      * Store a resource.
      */
-    public function store(StoreRequest $request): Respondent
+    public function create_respondent(StoreRequest $request): Respondent
     {
         $a = $this->formParamsWithShortNames(array_merge_recursive(
             $request->all(),
@@ -78,9 +78,9 @@ class SxableController implements Targetable
     /**
      * update a resource.
      */
-    public function update(UpdateRequest $request, int $id): Respondent
+    public function update_respondent(UpdateRequest $request, int $id): Respondent
     {
-        $key = $this->respondent($id)->externalkey();
+        $key = $this->show_respondent($id)->externalkey();
         $respondent = (new SxRespondentService($key))->updateRespondentAnswers($this->formParamsWithShortNames(array_merge_recursive(
             $request->all(),
             Auth::user() ? [
@@ -125,15 +125,15 @@ class SxableController implements Targetable
     }
 
     /**
-     * Display the sx respondent data.
+     * Display the sx show_respondent data.
      */
-    public function respondent(int $id): Respondent
+    public function show_respondent(int $id): Respondent
     {
         return (new SxRespondentService($id))->getRespondent();
     }
 
     /**
-     * Display the sx respondent data.
+     * Display the structure.
      */
     public function structure(LabeledRequest $request): Collection | ResourceCollection
     {
@@ -159,7 +159,7 @@ class SxableController implements Targetable
     /**
      * Trigger sx import.
      */
-    public function import(ImportRequest $request): Collection | ResourceCollection
+    public function sync(ImportRequest $request): Collection | ResourceCollection
     {
         return $request->fresh
             ? $this->target::initTables(force: true, labeled: (bool) $request->labeled)
@@ -167,7 +167,7 @@ class SxableController implements Targetable
     }
 
     /**
-     * Trigger import.
+     * Trigger export.
      */
     public function export(ExportRequest $request): BinaryFileResponse
     {

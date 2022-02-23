@@ -11,7 +11,7 @@ class UserstampsTest extends UserstampsTestCase
         $this->actingAs($user1);
 
         // create
-        $id = $this->post(route('entities.store'), [
+        $id = $this->post(route('entities.create_respondent'), [
             'form_params' => [
                     'email' => 'test@syspons.com', // string
                     's_2' => 3333, // double
@@ -23,7 +23,7 @@ class UserstampsTest extends UserstampsTestCase
         ]);
         
         // import
-        $this->post(route('entities.import'));
+        $this->post(route('entities.sync'));
         $this->assertDatabaseHas('entities', [
             'respondentid' => $id,
             'created_by' => $user1->id,
@@ -32,7 +32,7 @@ class UserstampsTest extends UserstampsTestCase
 
         $this->actingAs($user2);
         // update
-        $this->put(route('entities.update', [
+        $this->put(route('entities.update_respondent', [
                 'entity' => $id,
                 'form_params' => [
                     's_2' => 4444,
@@ -41,7 +41,7 @@ class UserstampsTest extends UserstampsTestCase
             ->assertStatus(200);
         
         // import
-        $this->post(route('entities.import'));
+        $this->post(route('entities.sync'));
         $this->assertDatabaseHas('entities', [
             'respondentid' => $id,
             'created_by' => $user1->id,

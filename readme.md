@@ -22,7 +22,7 @@ $ composer require berthott/laravel-sx
   * post    yourmodels/ => create a new respondent inside SX
   * get     yourmodels/{yourmodel} => get respondent informations from inside SX
   * delete  yourmodels/{yourmodel} => delete a respondent inside SX and in our DB
-  * post    yourmodels/import => import all respondent answers to our DB
+  * post    yourmodels/sync => sync all respondent answers to our DB
 ## Options
 
 To change the default options use

@@ -2,9 +2,12 @@
 
 namespace berthott\SX\Helpers;
 
+use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class Helpers
 {
@@ -50,5 +53,22 @@ class Helpers
             }
         }
         return $ret;
+    }
+
+    /**
+     * Get a sorted columns for table.
+     */
+    public function getSortedColumns(string $tableName): array
+    {
+        try {
+            return collect(
+                DB::select(
+                    (new MySqlGrammar)->compileColumnListing().' order by ordinal_position',
+                    [DB::getDatabaseName(), $tableName]
+                )
+            )->pluck('column_name')->toArray();
+        } catch (Exception $e) {
+            return Schema::getColumnListing($tableName);
+        }
     }
 }

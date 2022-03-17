@@ -2,6 +2,7 @@
 
 namespace berthott\SX\Models\Traits;
 
+use berthott\SX\Facades\Helpers;
 use berthott\SX\Facades\SxLog;
 use berthott\SX\Models\Resources\SxableLabeledResource;
 use berthott\SX\Models\SxMode;
@@ -116,7 +117,7 @@ trait Sxable
     {
         $questions = DB::table(self::questionsTableName())->get()->keyBy('variableName');
         $ret = [];
-        foreach (Schema::getColumnListing(self::entityTableName()) as $variableName) {
+        foreach (Helpers::getSortedColumns(self::entityTableName()) as $variableName) {
             if ($questions->has($variableName) && $questions[$variableName]->subType === 'Multiple') {
                 $variableName = $variableName.' - '.$questions[$variableName]->choiceText;
             }

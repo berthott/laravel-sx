@@ -5,7 +5,7 @@ namespace berthott\SX\Tests\Feature\UniqueFields;
 use berthott\SX\Models\Traits\Sxable;
 use Illuminate\Database\Eloquent\Model;
 
-class Entity extends Model
+class UniqueEntity extends Model
 {
     use Sxable;
 
@@ -18,11 +18,10 @@ class Entity extends Model
     }
 
     /**
-     * Defines unique fields with 'field' => 'key'.
-     * The key defines a string that is appended by a number.
+     * The fields that should be unique.
      */
-    public static function generatedUniqueFields(): array
+    public static function uniqueFields(): array
     {
-        return ['generated_id' => 'GEN'];
+        return ['unique_id'];
     }
 }

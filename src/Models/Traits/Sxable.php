@@ -82,9 +82,9 @@ trait Sxable
     }
 
     /**
-     * The fields that should be processed.
+     * The fields that should be unique.
      */
-    public static function unique(): array
+    public static function uniqueFields(): array
     {
         return config('sx.defaultUnique');
     }
@@ -295,8 +295,8 @@ trait Sxable
                         $t = $table->dateTime($column->variableName);
                         break;
                 }
-                if (in_array($column->variableName, self::unique())) {
-                    $t->unique();
+                if (in_array($column->variableName, self::uniqueFields())) {
+                    $t->uniqueFields();
                 } else {
                     $t->nullable();
                 }

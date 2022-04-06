@@ -32,7 +32,12 @@ class SxTableExport implements FromCollection, WithHeadings, WithTitle, WithStri
     public function collection(): Collection
     {
         $query = DB::table($this->tableName)->select(...$this->headings());
-        return !empty($this->ids) ? $query->whereIn(config('sx.primary'), $this->ids)->get() : $query->get();
+        $collection = !empty($this->ids) ? $query->whereIn(config('sx.primary'), $this->ids)->get() : $query->get();
+        return !$collection->count() || !property_exists($collection->first(), 'variableName')
+            ? $collection
+            : $collection->filter(function ($element) {
+                return !in_array($element->variableName, config('sx.excludeFromExport'));
+            });
     }
 
     public function headings(): array

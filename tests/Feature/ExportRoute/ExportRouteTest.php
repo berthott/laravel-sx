@@ -349,7 +349,7 @@ class ExportRouteTest extends ExportRouteTestCase
         ])->assertStatus(200);
 
         $labels = [
-            ['variableName' => 'survey', 'value' => 1325978, 'label' => 'HF 4 - GfE Applicants/participants'],
+            //['variableName' => 'survey', 'value' => 1325978, 'label' => 'HF 4 - GfE Applicants/participants'],
             ['variableName' => 'digitaldistributionstatus', 'value' => 1, 'label' => '1'],
             ['variableName' => 's_5', 'value' => 3, 'label' => 'teilnehmend ohne Gründung'],
             ['variableName' => 's_11_1', 'value' => 1, 'label' => 'Ausgewählt'],
@@ -393,6 +393,123 @@ class ExportRouteTest extends ExportRouteTestCase
             $ret = $export->collection();
             $plucked = $ret->pluck(config('sx.primary'))->toArray();
             return $ret->count() === count($ids) && $plucked == $ids;
+        });
+    }
+
+    public function test_excluded_from_wide_export(): void
+    {
+        Excel::fake();
+
+        $this->call('GET', route('entities.export', [
+            'table' => 'wide'
+        ]))->assertStatus(200);
+        
+        $entity = [
+            'survey',
+            'created_at',
+            'updated_at',
+        ];
+        Excel::assertDownloaded('entities.xlsx', function (SxTableExport $export) use ($entity) {
+            $excelEntity = json_decode(json_encode($export->collection()[0]), true);
+            $headings = $export->headings();
+            $found = false;
+            foreach ($entity as $key) {
+                if (array_key_exists($key, $excelEntity) || array_key_exists($key, $headings)) {
+                    $found = true;
+                }
+            }
+            
+            return !$found;
+        });
+    }
+
+    public function test_excluded_from_wide_labeled_export(): void
+    {
+        Excel::fake();
+
+        $this->call('GET', route('entities.export', [
+            'table' => 'wide_labeled'
+        ]))->assertStatus(200);
+        
+        $entity = [
+            'survey',
+            'created_at',
+            'updated_at',
+        ];
+        Excel::assertDownloaded('entities_labeled.xlsx', function (SxLabeledExport $export) use ($entity) {
+            $excelEntity = json_decode(json_encode($export->collection()[0]), true);
+            $headings = $export->headings();
+            $found = false;
+            foreach ($entity as $key) {
+                if (array_key_exists($key, $excelEntity) || array_key_exists($key, $headings)) {
+                    $found = true;
+                }
+            }
+            
+            return !$found;
+        });
+    }
+
+    public function test_excluded_from_long_export(): void
+    {
+        Excel::fake();
+
+        $this->call('GET', route('entities.export', [
+            'table' => 'long'
+        ]))->assertStatus(200);
+        
+        $entity = [
+            'survey',
+            'created_at',
+            'updated_at',
+        ];
+        Excel::assertDownloaded('entities_long.xlsx', function (SxTableExport $export) use ($entity) {
+            $first = $export->collection()->first(function ($element) use ($entity) {
+                return in_array($element->variableName, $entity);
+            });
+            return !$first;
+        });
+    }
+
+    public function test_excluded_from_labels_export(): void
+    {
+        Excel::fake();
+
+        $this->call('GET', route('entities.export', [
+            'table' => 'labels'
+        ]))->assertStatus(200);
+        
+        $entity = [
+            'survey',
+            'created_at',
+            'updated_at',
+        ];
+        Excel::assertDownloaded('entity_labels.xlsx', function (SxTableExport $export) use ($entity) {
+            $first = $export->collection()->first(function ($element) use ($entity) {
+                return in_array($element->variableName, $entity);
+            });
+            return !$first;
+        });
+    }
+
+    public function test_excluded_from_questions_export(): void
+    {
+        Excel::fake();
+
+        $this->call('GET', route('entities.export', [
+            'table' => 'questions'
+        ]))->assertStatus(200);
+        
+        $entity = [
+            'survey',
+            'created_at',
+            'updated_at',
+        ];
+        Excel::assertDownloaded('entity_questions.xlsx', function (SxTableExport $export) use ($entity) {
+            $first = $export->collection()->first(function ($element) use ($entity) {
+                return in_array($element->variableName, $entity);
+            });
+            return !$first;
         });
     }
 }

@@ -161,9 +161,7 @@ class SxableController implements Targetable
      */
     public function sync(ImportRequest $request): Collection | ResourceCollection
     {
-        return $request->fresh
-            ? $this->target::initTables(force: true, labeled: (bool) $request->labeled)
-            : $this->target::import((bool) $request->labeled);
+        return $this->target::import((bool) $request->labeled, (bool) $request->fresh, $request->since);
     }
 
     /**

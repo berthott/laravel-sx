@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class Import extends Command
 {
-    protected $signature = 'sx:import {classes?*} {--fresh}';
+    protected $signature = 'sx:import {classes?*} {--fresh} {--since=}';
     protected $description = 'Import SX data';
 
     public function handle()
@@ -25,9 +25,7 @@ class Import extends Command
             if ($this->argument('classes') && !in_array($class::entityTableName(), $this->argument('classes'))) {
                 continue;
             }
-            $this->option('fresh')
-              ? $class::initTables(force: true)
-              : $class::import();
+            $class::import(true, $this->option('fresh'), $this->option('since'));
         }
     }
 }

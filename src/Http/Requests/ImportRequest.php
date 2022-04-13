@@ -13,6 +13,7 @@ class ImportRequest extends FormRequest
     {
         return [
           'fresh' => 'nullable|boolean',
+          'since' => 'nullable|string',
           'labeled' => 'nullable|boolean',
         ];
     }

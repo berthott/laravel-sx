@@ -62,11 +62,11 @@ class CommandsTest extends CommandsTestCase
         $this->assertDatabaseHas('entities', $id);
     }
 
-    public function test_import_command_fresh(): void
+    public function test_init_command_fresh(): void
     {
         Artisan::call('sx:init');
         $this->assertDatabaseCount('entities', 4);
-        Artisan::call('sx:import', ['--fresh' => true]);
+        Artisan::call('sx:init', ['--fresh' => true]);
         $this->assertDatabaseCount('entities', 1);
     }
 }

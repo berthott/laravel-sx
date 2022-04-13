@@ -11,6 +11,7 @@ use berthott\SX\Services\SxSurveyService;
 use Closure;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -483,10 +484,10 @@ trait Sxable
         });
     }
 
-    public static function import(bool $labeled = false): Collection | ResourceCollection
+    public static function import(bool $labeled = false, bool $fresh = false, string $since = null): Collection | ResourceCollection
     {
         SxLog::log(self::entityTableName().': Import triggered.');
-        $entries = self::entities(self::lastImport());
+        $entries = self::entities($fresh ? [] : self::lastImport($since));
         //self::upsert($entries->all(), [config('sx.primary')]);
         $count = count($entries);
         foreach ($entries as $index => $entry) {
@@ -511,18 +512,37 @@ trait Sxable
     /**
      * Return a last import as query array.
      */
-    private static function lastImport(): array
+    private static function lastImport(string $since = null): array
     {
         $lastImportArray = [];
-        $lastRespondent = self::latest()->first();
+        $lastRespondent = self::orderBy('modified', 'desc')->first();
         if (isset($lastRespondent)) {
-            $lastImport = date('Ymd_His', strtotime($lastRespondent->created_at));
-            SxLog::log("The last respondent import was $lastRespondent->created_at.");
-            $lastImportArray['modifiedSince'] = $lastImport;
+            $modified = (new Carbon($lastRespondent['modified']));
+            if ($since) {
+                if (self::isAbsoluteTime($since)) {
+                    $modified = new Carbon($since);
+                } else {
+                    $modified->sub($since);
+                }
+                SxLog::log("Import forced since $modified.");
+            } else {
+                SxLog::log("The last respondent import was modified at $modified.");
+            }
+            $lastImportArray['modifiedSince'] = $modified->format('Ymd_His');
         } else {
             SxLog::log('There were no previous respondents.');
         }
         return $lastImportArray;
+    }
+
+    private static function isAbsoluteTime($time_string)
+    {
+        $time_shift = time() + 60; // 1 min from now
+      
+        $time_normal = strtotime($time_string);
+        $time_shifted = strtotime($time_string, $time_shift);
+      
+        return $time_normal == $time_shifted;
     }
 
     /**

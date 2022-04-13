@@ -28,7 +28,8 @@
   "require-dev": {
     "orchestra/testbench": "^7.0",
     "phpunit/phpunit": "^9.5",
-    "doctrine/dbal": "^3.3"
+    "doctrine/dbal": "^3.3",
+    "brianium/paratest": "^6.4"
   },
   "require": {
     "caseyamcl/guzzle_retry_middleware": "^2.6",

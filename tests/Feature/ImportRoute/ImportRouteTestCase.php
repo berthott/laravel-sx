@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use ReflectionClass;
 
 abstract class ImportRouteTestCase extends BaseTestCase
 {
@@ -62,5 +63,14 @@ abstract class ImportRouteTestCase extends BaseTestCase
                 ),
             );
         SxApiService::makePartial();
+    }
+
+    protected function testMethod(string $class, string $name, ...$args)
+    {
+        $reflection = new ReflectionClass($class);
+        $instance = new $class();
+        $method = $reflection->getMethod($name);
+        $method->setAccessible(true);
+        return $method->invoke($instance, ...$args);
     }
 }

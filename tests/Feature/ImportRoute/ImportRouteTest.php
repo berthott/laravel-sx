@@ -50,14 +50,14 @@ class ImportRouteTest extends ImportRouteTestCase
             ->assertJsonValidationErrors('fresh');
         $this->assertDatabaseCount('entities', 4);
         $this->post(route('entities.sync'), ['fresh' => true]);
-        $this->assertDatabaseCount('entities', 1);
+        $this->assertDatabaseCount('entities', 5);
     }
 
     public function test_import_route_fresh(): void
     {
         $this->assertDatabaseCount('entities', 4);
         $this->post(route('entities.sync'), ['fresh' => true]);
-        $this->assertDatabaseCount('entities', 1);
+        $this->assertDatabaseCount('entities', 5);
     }
 
     public function test_import_route_update(): void
@@ -94,5 +94,20 @@ class ImportRouteTest extends ImportRouteTestCase
             'variableName' => 's_2',
             'value_double' => 2021,
         ]);
+    }
+
+    public function test_import_latest_from_database(): void
+    {
+        $this->assertEquals('20211018_164200', $this->testMethod(Entity::class, 'lastImport')['modifiedSince']);
+    }
+
+    public function test_import_latest_from_input_absolute(): void
+    {
+        $this->assertEquals('20210606_000000', $this->testMethod(Entity::class, 'lastImport', '2021-06-06 00:00:00')['modifiedSince']);
+    }
+
+    public function test_import_latest_from_input_relative(): void
+    {
+        $this->assertEquals('20211017_164200', $this->testMethod(Entity::class, 'lastImport', '1 day')['modifiedSince']);
     }
 }

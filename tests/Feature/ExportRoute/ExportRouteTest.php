@@ -303,7 +303,7 @@ class ExportRouteTest extends ExportRouteTestCase
             foreach ($entries as $entry) {
                 $exportEntry = $export->collection()->where('variableName', $entry['variableName'])->where('respondent_id', 825478429)->first();
                 $diff = array_diff(json_decode(json_encode($exportEntry), true), $entry);
-                if (count($diff) !== 1) { // id does not match, 3 if timestamps are not filtered
+                if (count($diff) !== 0) { // 2 if timestamps are not filtered
                     $correct = false;
                 }
             };

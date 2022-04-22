@@ -17,8 +17,25 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
+const MAX_SQL_PLACEHOLDERS = 60000;
+const LONG_TABLE_COLUMN_COUNT = 8;
+
 trait Sxable
 {
+    public function getKeyName(): string
+    {
+        return config('sx.primary');
+    }
+    
+    public function getKeyType(): string
+    {
+        return 'string';
+    }
+
+    public function getIncrementing(): bool
+    {
+        return false;
+    }
 
     /**
      * Bootstrap services.
@@ -272,11 +289,10 @@ trait Sxable
     {
         self::initLongTable($force); // before entity because it will write to long
         
-        $table = self::entityTableName();
-        self::initTable($table, function (Blueprint $table) {
+        $tableName = self::entityTableName();
+        self::initTable($tableName, function (Blueprint $table) {
             $entityStructure = self::structure();
             $t = null;
-            $table->bigIncrements('id');
             foreach ($entityStructure as $column) {
                 if (!in_array($column->variableName, self::fields())) {
                     continue;
@@ -290,14 +306,21 @@ trait Sxable
                         $t = $table->double($column->variableName);
                         break;
                     case 'String':
-                        $t = $table->text($column->variableName);
+                        $t = in_array($column->variableName, self::uniqueFields())
+                            ? $table->string($column->variableName)
+                            : $table->text($column->variableName);
                         break;
                     case 'Date':
                         $t = $table->dateTime($column->variableName);
                         break;
                 }
-                if (in_array($column->variableName, self::uniqueFields())) {
-                    $t->uniqueFields();
+                if ($column->variableName === config('sx.primary')) {
+                    $t->primary();
+                } elseif (
+                    in_array($column->variableName, self::uniqueFields()) ||
+                    in_array($column->variableName, config('sx.defaultUnique'))
+                ) {
+                    $t->unique();
                 } else {
                     $t->nullable();
                 }
@@ -306,20 +329,11 @@ trait Sxable
         }, $force);
 
         if (self::all()->isEmpty()) {
-            SxLog::log("$table: Filling table.");
-            //self::upsert(self::entities()->all(), [config('sx.primary')]);
-            $entities = self::entities()->all();
-            $count = count($entities);
-            foreach ($entities as $index => $entity) {
-                $index++;
-                SxLog::log("[$index/$count] Creating respondent: ".$entity[config('sx.primary')]);
-                self::create($entity);
-                if ($max && $index >= $max) {
-                    SxLog::log("Maximum count of {$max} reached, aborting...");
-                    break;
-                }
-            }
-            SxLog::log("$table: Table filled.");
+            SxLog::log("$tableName: Filling table.");
+            $entries = self::entities();
+            $entries = $max ? $entries->take($max) : $entries;
+            self::doUpsert($entries);
+            SxLog::log("$tableName: Table filled.");
         }
     }
 
@@ -328,9 +342,8 @@ trait Sxable
      */
     public static function initLongTable(bool $force = false): void
     {
-        $table = self::longTableName();
-        self::initTable($table, function (Blueprint $table) {
-            $table->bigIncrements('id');
+        self::initTable(self::longTableName(), function (Blueprint $table) {
+            $table->primary(['respondent_id', 'variableName'], self::longTableName().'_primary');
             $table->double('respondent_id');
             $table->string('variableName');
             $table->integer('value_single_multiple')->nullable();
@@ -488,18 +501,7 @@ trait Sxable
     {
         SxLog::log(self::entityTableName().': Import triggered.');
         $entries = self::entities($fresh ? [] : self::lastImport($since));
-        //self::upsert($entries->all(), [config('sx.primary')]);
-        $count = count($entries);
-        foreach ($entries as $index => $entry) {
-            $index++;
-            if ($model = self::where(config('sx.primary'), $entry[config('sx.primary')])->first()) {
-                SxLog::log("[$index/$count] Updating respondent: ".$entry[config('sx.primary')]);
-                $model->update($entry);
-            } else {
-                SxLog::log("[$index/$count] Creating respondent: ".$entry[config('sx.primary')]);
-                self::create($entry);
-            }
-        }
+        self::doUpsert($entries);
         SxLog::log(self::entityTableName().': Import finished.');
         
         // return the imported entries from our database
@@ -582,5 +584,74 @@ trait Sxable
             }
         }
         return $ret;
+    }
+
+    /**
+     * Dispatch an updated event for these models.
+     */
+    private static function doUpsert(Collection $entries)
+    {
+        $count = $entries->count();
+        SxLog::log(self::entityTableName().": Importing $count respondents...");
+        // wide table
+        $wideChunkSize = floor(MAX_SQL_PLACEHOLDERS / self::structure()->count());
+        $entries->chunk($wideChunkSize)->each(function (Collection $chunk) use ($count) {
+            self::upsert($chunk->all(), [config('sx.primary')]);
+        });
+
+        // long table
+        $longEntries = $entries->reduce(function ($reduced, $entry) {
+            array_push($reduced, ...self::makeLongEntries($entry));
+            return $reduced;
+        }, []);
+        $longChunkSize = floor(MAX_SQL_PLACEHOLDERS / LONG_TABLE_COLUMN_COUNT);
+        foreach (array_chunk($longEntries, $longChunkSize) as $chunk) {
+            DB::table(self::longTableName())->upsert($chunk, ['respondent_id', 'variableName']);
+        }
+
+        SxLog::log(self::entityTableName().": $count respondents imported (".$entries->pluck(config('sx.primary'))->join(', ').')');
+    }
+
+    /**
+     * Make long table entries for a single model.
+     */
+    public static function makeLongEntries(array $attributes): array
+    {
+        $entries = [];
+        $structure = DB::table(self::structureTableName())->get()->mapWithKeys(function ($entry) {
+            return [$entry->variableName => $entry->subType];
+        });
+        foreach ($attributes as $variableName => $value) {
+            if (in_array($variableName, ['id', config('sx.primary'), 'created_at', 'updated_at'])) {
+                continue;
+            }
+            $entry = [
+                'respondent_id' => $attributes[config('sx.primary')],
+                'variableName' => $variableName,
+                'value_single_multiple' => null,
+                'value_double' => null,
+                'value_string' => null,
+                'value_datetime' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+            switch ($structure[$variableName]) {
+                case 'Single':
+                case 'Multiple':
+                    $entry['value_single_multiple'] = $value;
+                    break;
+                case 'Double':
+                    $entry['value_double'] = $value;
+                    break;
+                case 'String':
+                    $entry['value_string'] = $value;
+                    break;
+                case 'Date':
+                    $entry['value_datetime'] = $value;
+                    break;
+            }
+            array_push($entries, $entry);
+        }
+        return $entries;
     }
 }

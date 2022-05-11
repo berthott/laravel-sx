@@ -587,7 +587,7 @@ trait Sxable
     }
 
     /**
-     * Dispatch an updated event for these models.
+     * Perform an upsert in chunks. Attention: No events will be emitted + updated_at will alway be updated.
      */
     private static function doUpsert(Collection $entries)
     {

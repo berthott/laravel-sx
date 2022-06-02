@@ -12,8 +12,6 @@ use Orchestra\Testbench\TestCase as BaseTestCase;
 
 abstract class RoutesTestCase extends BaseTestCase
 {
-    protected string $now;
-
     public function setUp(): void
     {
         parent::setUp();
@@ -29,48 +27,10 @@ abstract class RoutesTestCase extends BaseTestCase
 
     protected function getEnvironmentSetUp($app)
     {
-        $this->now = now()->format('Y-m-d H:i:s');
         Config::set('sx.namespace', __NAMESPACE__);
         Config::set('sx.auth', [
             'Syspons_API',
             'SySpons$$'
         ]);
-        SxApiService::shouldReceive('exportStructure')
-            ->andReturn(new Response(
-                $status = 200,
-                $headers = [],
-                File::get(__DIR__.'/../structure.csv'),
-            ));
-        SxApiService::shouldReceive('exportLabels')
-            ->andReturn(new Response(
-                $status = 200,
-                $headers = [],
-                File::get(__DIR__.'/../labels.csv'),
-            ));
-        SxApiService::shouldReceive('exportDataset')
-            ->andReturn(
-                new Response(
-                    $status = 200,
-                    $headers = [],
-                    File::get(__DIR__.'/../dataset.csv'),
-                ),
-                new Response(
-                    $status = 200,
-                    $headers = [],
-                    File::get(__DIR__.'/../import.csv'),
-                ),
-                new Response(
-                    $status = 200,
-                    $headers = [],
-                    File::get(__DIR__.'/../update.csv'),
-                ),
-            );
-        SxApiService::shouldReceive('get')
-            ->andReturn(new Response(
-                $status = 200,
-                $headers = [],
-                File::get(__DIR__.'/../825478429.xml'),
-            ));
-        SxApiService::makePartial();
     }
 }

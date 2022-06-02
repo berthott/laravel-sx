@@ -19,7 +19,7 @@ class ExportRouteTest extends ExportRouteTestCase
         $entity = [
             'id' => 1,
             //'survey' => 1325978,
-            'respondentid' => '825478429.0',
+            'respondentid' => 825478429,
             'organization' => 269318,
             'statinternal_1' => 1,
             'statinternal_2' => 0,
@@ -46,15 +46,15 @@ class ExportRouteTest extends ExportRouteTestCase
             'closetime' => '2021-09-02 18:52:40',
             'starttime' => '2021-09-02 18:50:24',
             'difftime' => 135.407,
-            'responsecollectsessions' => '2.0',
-            'numberofreturnedmail' => '0.0',
+            'responsecollectsessions' => 2,
+            'numberofreturnedmail' => 0,
             'importgroup' => null,
             'distributionschedule' => null,
             'email' => 'henrike.junge@syspons.com',
             'digitaldistributionstatus' => 1,
             'digitaldistributionerrormessage' => null,
             's_5' => 2,
-            's_2' => '2021.0',
+            's_2' => 2021,
             's_3' => 3,
             'name' => null,
             's_4' => 2,
@@ -128,8 +128,9 @@ class ExportRouteTest extends ExportRouteTestCase
         ];
         Excel::assertDownloaded('entities.xlsx', function (SxTableExport $export) use ($entity) {
             $excelEntity = json_decode(json_encode($export->collection()[0]), true);
-            return empty(array_diff($export->headings(), array_keys($entity))) &&
-                empty(array_diff($excelEntity, $entity));
+            $headings = array_diff($export->headings(), array_keys($entity));
+            $collection = array_diff($excelEntity, $entity);
+            return empty($headings) && empty($collection);
         });
     }
 
@@ -144,7 +145,7 @@ class ExportRouteTest extends ExportRouteTestCase
         $entity = [
             'id' => 1,
             //'survey' => 'HF 4 - GfE Applicants/participants',
-            'respondentid' => '825478429.0',
+            'respondentid' => 825478429,
             'organization' => 'GIZ - PMD FMD M&Q Tool',
             'statinternal_1 - E-Mail gesendet' => 'Ausgewählt',
             'statinternal_2 - Fragebogen gedruckt' => 'Nicht ausgewählt',
@@ -171,15 +172,15 @@ class ExportRouteTest extends ExportRouteTestCase
             'closetime' => '2021-09-02 18:52:40',
             'starttime' => '2021-09-02 18:50:24',
             'difftime' => 135.407,
-            'responsecollectsessions' => '2.0',
-            'numberofreturnedmail' => '0.0',
+            'responsecollectsessions' => 2,
+            'numberofreturnedmail' => 0,
             'importgroup' => null,
             'distributionschedule' => null,
             'email' => 'henrike.junge@syspons.com',
             'digitaldistributionstatus' => 1,
             'digitaldistributionerrormessage' => null,
             's_5' => 'abgelehnte Bewerbung',
-            's_2' => '2021.0',
+            's_2' => 2021,
             's_3' => 'GfE Klassik',
             'name' => null,
             's_4' => 'weiblich',
@@ -252,9 +253,10 @@ class ExportRouteTest extends ExportRouteTestCase
             //'updated_at' => $this->now,
         ];
         Excel::assertDownloaded('entities_labeled.xlsx', function (SxLabeledExport $export) use ($entity) {
-            $excelEntity = json_decode(json_encode($export->collection()[0]), true);
-            return empty(array_diff($export->headings(), array_keys($entity))) &&
-                empty(array_diff($excelEntity, $entity));
+            $excelEntity = json_decode(json_encode($export->collection()[0]), true);     
+            $headings = array_diff($export->headings(), array_keys($entity));
+            $collection = array_diff($excelEntity, $entity);
+            return empty($headings) && empty($collection);
         });
     }
 
@@ -268,28 +270,28 @@ class ExportRouteTest extends ExportRouteTestCase
 
         $entries = [
             [
-                'respondent_id' => '825478429.0',
+                'respondent_id' => 825478429,
                 'variableName' => 'generated_id',
                 'value_single_multiple' => null,
                 'value_string' => 'GEN001',
                 'value_double' => null,
                 'value_datetime' => null,
             ], [
-                'respondent_id' => '825478429.0',
+                'respondent_id' => 825478429,
                 'variableName' => 'statinternal_1',
                 'value_single_multiple' => 1,
                 'value_string' => null,
                 'value_double' => null,
                 'value_datetime' => null,
             ], [
-                'respondent_id' => '825478429.0',
+                'respondent_id' => 825478429,
                 'variableName' => 'difftime',
                 'value_single_multiple' => null,
                 'value_string' => null,
                 'value_double' => 135.407,
                 'value_datetime' => null,
             ], [
-                'respondent_id' => '825478429.0',
+                'respondent_id' => 825478429,
                 'variableName' => 'created',
                 'value_single_multiple' => null,
                 'value_string' => null,

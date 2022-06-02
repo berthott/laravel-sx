@@ -12,14 +12,14 @@ class BrackgroundVariablesTest extends BrackgroundVariablesTestCase
     public function test_background_variables(): void
     {
         // create
-        $id = $this->post(route('entities.create_respondent'), [
+        $id = intval($this->post(route('entities.create_respondent'), [
             'form_params' => [
                     'email' => 'test@syspons.com',
                     'gender_rel' => 'GG1',
                     's_5' => 'teilnehmend mit Gründung', // neccesary for gender_rel
                 ]
             ])
-            ->assertStatus(200)->json()['id'];
+            ->assertStatus(200)->json()['id']);
         $this->assertDatabaseHas('entities', [
             'respondentid' => $id,
             'gender_rel' => 2,
@@ -30,9 +30,9 @@ class BrackgroundVariablesTest extends BrackgroundVariablesTestCase
         $this->post(route('entities.sync'))
             ->assertStatus(200)
             ->assertJsonFragment([
-                'respondentid' => $id.'.0',
-                'gender_rel' => '2',
-                's_5' => '4',
+                'respondentid' => $id,
+                'gender_rel' => 2,
+                's_5' => 4,
             ]);
 
         // update
@@ -53,8 +53,8 @@ class BrackgroundVariablesTest extends BrackgroundVariablesTestCase
         $this->post(route('entities.sync'))
             ->assertStatus(200)
             ->assertJsonFragment([
-                'respondentid' => $id.'.0',
-                'gender_rel' => '3',
+                'respondentid' => $id,
+                'gender_rel' => 3,
             ]);
 
         // clean up

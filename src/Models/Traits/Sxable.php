@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 const MAX_SQL_PLACEHOLDERS = 60000;
+const MAX_MEMORY_CHUNK_SIZE = 100;
 const LONG_TABLE_COLUMN_COUNT = 8;
 
 trait Sxable
@@ -600,14 +601,15 @@ trait Sxable
         });
 
         // long table
-        $longEntries = $entries->reduce(function ($reduced, $entry) {
-            array_push($reduced, ...self::makeLongEntries($entry));
-            return $reduced;
-        }, []);
-        $longChunkSize = floor(MAX_SQL_PLACEHOLDERS / LONG_TABLE_COLUMN_COUNT);
-        foreach (array_chunk($longEntries, $longChunkSize) as $chunk) {
-            DB::table(self::longTableName())->upsert($chunk, ['respondent_id', 'variableName']);
-        }
+        $entries->chunk(MAX_MEMORY_CHUNK_SIZE)->each(function (Collection $memoryChunk) use ($count) {
+            $longEntries = $memoryChunk->reduce(function (Collection $reduced, $entry) {
+                return $reduced->push(...self::makeLongEntries($entry));
+            }, collect());
+            $longChunkSize = floor(MAX_SQL_PLACEHOLDERS / LONG_TABLE_COLUMN_COUNT);
+            $longEntries->chunk($longChunkSize)->each(function (Collection $chunk) use ($count) {
+                DB::table(self::longTableName())->upsert($chunk->toArray(), ['respondent_id', 'variableName']);
+            });
+        });
 
         SxLog::log(self::entityTableName().": $count respondents imported (".$entries->pluck(config('sx.primary'))->join(', ').')');
     }

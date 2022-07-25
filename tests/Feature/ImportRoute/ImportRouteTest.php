@@ -2,6 +2,9 @@
 
 namespace berthott\SX\Tests\Feature\ImportRoute;
 
+use berthott\SX\Events\RespondentsImported;
+use Illuminate\Support\Facades\Event;
+
 class ImportRouteTest extends ImportRouteTestCase
 {
     public function test_import_route(): void
@@ -109,5 +112,14 @@ class ImportRouteTest extends ImportRouteTestCase
     public function test_import_latest_from_input_relative(): void
     {
         $this->assertEquals('20211017_164200', $this->testMethod(Entity::class, 'lastImport', '1 day')['modifiedSince']);
+    }
+
+    public function test_respondents_imported_events(): void
+    {
+        Event::fake();
+        $this->post(route('entities.sync'), ['fresh' => true]);
+        Event::assertDispatched(RespondentsImported::class, function ($event) {
+            return $event->model === Entity::class;
+        });
     }
 }

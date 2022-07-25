@@ -2,6 +2,7 @@
 
 namespace berthott\SX\Models\Traits;
 
+use berthott\SX\Events\RespondentsImported;
 use berthott\SX\Facades\Helpers;
 use berthott\SX\Facades\SxLog;
 use berthott\SX\Models\Resources\SxableLabeledResource;
@@ -507,6 +508,11 @@ trait Sxable
         
         // return the imported entries from our database
         $imported = static::whereIn(config('sx.primary'), $entries->pluck(config('sx.primary'))->toArray())->get();
+
+        if ($imported->count()) {
+            event(new RespondentsImported(get_called_class()));
+        }
+
         return $labeled
             ? SxableLabeledResource::collection($imported)
             : $imported;

@@ -29,7 +29,8 @@ class ImportRouteTest extends ImportRouteTestCase
             ->assertJson([
                 [
                     'respondentid' => 841931211,
-                    'statinternal_2 - Fragebogen gedruckt' => 'Nicht ausgewählt'
+                    'statinternal_2 - Fragebogen gedruckt' => 'Nicht ausgewählt',
+                    'statinternal_6 - Es wurden einige Fragen beantwortet' => 'Ausgewählt' // checks for trimming the dot
                 ]
             ]);
         $this->post(route('entities.sync', [

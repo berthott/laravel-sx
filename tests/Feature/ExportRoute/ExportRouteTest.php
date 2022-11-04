@@ -152,7 +152,7 @@ class ExportRouteTest extends ExportRouteTestCase
             'statinternal_3 - Hintergrunddaten für Serienbrief exportiert' => 'Nicht ausgewählt',
             'statinternal_4 - Über Link verteilt' => 'Nicht ausgewählt',
             'statinternal_5 - Importierte Antworten' => 'Nicht ausgewählt',
-            'statinternal_6 - Es wurden einige Fragen beantwortet.' => 'Ausgewählt',
+            'statinternal_6 - Es wurden einige Fragen beantwortet' => 'Ausgewählt', // dot will be stripped
             'statinternal_7 - Letzte Seite, die dem Teilnehmer angezeigt wurde' => 'Ausgewählt',
             'statinternal_8 - Vom Administrator erstellt' => 'Ausgewählt',
             'statinternal_9 - Durch Import erstellt' => 'Nicht ausgewählt',

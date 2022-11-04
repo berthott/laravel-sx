@@ -28,7 +28,7 @@ trait Sxable
     {
         return config('sx.primary');
     }
-    
+
     public function getKeyType(): string
     {
         return 'string';
@@ -290,7 +290,7 @@ trait Sxable
     public static function initEntityTable(bool $force = false, int $max = null): void
     {
         self::initLongTable($force); // before entity because it will write to long
-        
+
         $tableName = self::entityTableName();
         self::initTable($tableName, function (Blueprint $table) {
             $entityStructure = self::structure();
@@ -458,7 +458,17 @@ trait Sxable
      */
     private static function questions(): Collection
     {
-        return self::filterByFields(self::controller()->getQuestions());
+        return self::trimMultipleChoiceLabelsForJavaScript(self::filterByFields(self::controller()->getQuestions()));
+    }
+    
+    private static function trimMultipleChoiceLabelsForJavaScript(Collection $collection): Collection
+    {
+        return $collection->map(function ($question) {
+            if ($question['subType'] === 'Multiple') {
+                $question['choiceText'] = rtrim($question['choiceText'], " \t\n\r\0\x0B,.:");
+            }
+            return $question;
+        });
     }
 
     /**
@@ -505,7 +515,7 @@ trait Sxable
         $entries = self::entities($fresh ? [] : self::lastImport($since));
         self::doUpsert($entries);
         SxLog::log(self::entityTableName().': Import finished.');
-        
+
         // return the imported entries from our database
         $imported = static::whereIn(config('sx.primary'), $entries->pluck(config('sx.primary'))->toArray())->get();
 
@@ -547,10 +557,10 @@ trait Sxable
     private static function isAbsoluteTime($time_string)
     {
         $time_shift = time() + 60; // 1 min from now
-      
+
         $time_normal = strtotime($time_string);
         $time_shifted = strtotime($time_string, $time_shift);
-      
+
         return $time_normal == $time_shifted;
     }
 

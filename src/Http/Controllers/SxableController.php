@@ -5,16 +5,15 @@ namespace berthott\SX\Http\Controllers;
 use berthott\SX\Exports\SxTableExport;
 use berthott\SX\Exports\SxLabeledExport;
 use berthott\SX\Exports\SxExportAll;
+use berthott\SX\Facades\Sxable;
 use berthott\SX\Http\Requests\DestroyManyRequest;
 use berthott\SX\Http\Requests\ExportRequest;
 use berthott\SX\Http\Requests\ImportRequest;
 use berthott\SX\Http\Requests\LabeledRequest;
 use berthott\SX\Http\Requests\StoreRequest;
 use berthott\SX\Http\Requests\UpdateRequest;
-use berthott\SX\Models\Contracts\Targetable;
 use berthott\SX\Models\Resources\SxableLabeledResource;
 use berthott\SX\Models\Respondent;
-use berthott\SX\Models\Traits\Targetable as TraitsTargetable;
 use berthott\SX\Services\SxRespondentService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\ResourceCollection;
@@ -24,10 +23,15 @@ use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Maatwebsite\Excel\Facades\Excel;
 
-class SxableController implements Targetable
+class SxableController
 {
-    use TraitsTargetable;
+    private string $target;
 
+    public function __construct()
+    {
+        $this->target = Sxable::getTarget();
+    }
+    
     /**
      * Display a listing of the resource.
      */

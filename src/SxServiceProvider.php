@@ -7,15 +7,17 @@ use berthott\SX\Console\Init;
 use berthott\SX\Console\Drop;
 use berthott\SX\Exceptions\Handler;
 use berthott\SX\Facades\Sxable;
+use berthott\SX\Facades\SxDistributable;
 use berthott\SX\Helpers\Helpers;
 use berthott\SX\Helpers\SxLog as HelpersSxLog;
 use berthott\SX\Http\Controllers\SxableController;
+use berthott\SX\Http\Controllers\SxDistributableController;
 use berthott\SX\Http\Middleware\ConvertLabelsToValues;
 use berthott\SX\Http\Middleware\ConvertStringBooleans;
-use berthott\SX\Models\Contracts\Targetable;
 use berthott\SX\Services\Http\SxApiService;
 use berthott\SX\Services\Http\SxEntityService;
 use berthott\SX\Services\SxableService;
+use berthott\SX\Services\SxDistributableService;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Routing\Router;
@@ -45,17 +47,15 @@ class SxServiceProvider extends ServiceProvider
         $this->app->singleton('Sxable', function () {
             return new SxableService();
         });
+        $this->app->singleton('SxDistributable', function () {
+            return new SxDistributableService();
+        });
 
         // bind exception singleton
         $this->app->singleton(ExceptionHandler::class, Handler::class);
 
         // add config
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'sx');
-
-        // init targetables
-        $this->app->afterResolving(Targetable::class, function (Targetable $targetable) {
-            $targetable->initTarget();
-        });
     }
 
     /**
@@ -96,6 +96,9 @@ class SxServiceProvider extends ServiceProvider
                 Route::post($sxable::entityTableName(), [SxableController::class, 'create_respondent'])->name($sxable::entityTableName().'.create_respondent');
                 Route::put("{$sxable::entityTableName()}/{{$sxable::singleName()}}", [SxableController::class, 'update_respondent'])->name($sxable::entityTableName().'.update_respondent');
                 Route::delete("{$sxable::entityTableName()}/{{$sxable::singleName()}}", [SxableController::class, 'destroy'])->name($sxable::entityTableName().'.destroy');
+            }
+            foreach (SxDistributable::getTargetableClasses() as $distributable) {
+                Route::get("{$distributable::entityTableName()}/{{$sxable::singleName()}}/sxcollect", [SxDistributableController::class, 'sxcollect'])->name($sxable::entityTableName().'.sxcollect');
             }
         });
 

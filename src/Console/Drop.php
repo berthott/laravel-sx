@@ -20,8 +20,8 @@ class Drop extends Command
                 $this->line($message);
                 Log::channel('surveyxact')->info($message);
             });
-    
-        foreach (Sxable::getSxableClasses() as $class) {
+
+        foreach (Sxable::getTargetableClasses() as $class) {
             if ($this->argument('classes') && !in_array($class::entityTableName(), $this->argument('classes'))) {
                 continue;
             }

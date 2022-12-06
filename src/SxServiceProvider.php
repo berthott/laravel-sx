@@ -82,7 +82,7 @@ class SxServiceProvider extends ServiceProvider
 
         // add routes
         Route::group($this->routeConfiguration(), function () {
-            foreach (Sxable::getSxableClasses() as $sxable) {
+            foreach (Sxable::getTargetableClasses() as $sxable) {
                 Route::post($sxable::entityTableName().'/sync', [SxableController::class, 'sync'])->name($sxable::entityTableName().'.sync');
                 Route::match(['get', 'post'], $sxable::entityTableName().'/export', [SxableController::class, 'export'])->name($sxable::entityTableName().'.export');
                 Route::get("{$sxable::entityTableName()}/structure", [SxableController::class, 'structure'])->name($sxable::entityTableName().'.structure');
@@ -90,7 +90,7 @@ class SxServiceProvider extends ServiceProvider
                 Route::delete("{$sxable::entityTableName()}/destroy_many", [SxableController::class, 'destroy_many'])->name($sxable::entityTableName().'.destroy_many');
                 Route::get("{$sxable::entityTableName()}/{{$sxable::singleName()}}/show_respondent", [SxableController::class, 'show_respondent'])->name($sxable::entityTableName().'.show_respondent');
                 //Route::apiResource($sxable::entityTableName(), SxableController::class, $sxable::routeOptions());
-                
+
                 Route::get($sxable::entityTableName(), [SxableController::class, 'index'])->name($sxable::entityTableName().'.index');
                 Route::get("{$sxable::entityTableName()}/{{$sxable::singleName()}}", [SxableController::class, 'show'])->name($sxable::entityTableName().'.show');
                 Route::post($sxable::entityTableName(), [SxableController::class, 'create_respondent'])->name($sxable::entityTableName().'.create_respondent');

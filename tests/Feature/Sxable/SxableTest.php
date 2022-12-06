@@ -11,10 +11,10 @@ class SxableTest extends SxableTestCase
 {
     public function test_sxable_found(): void
     {
-        $sxables = Sxable::getSxableClasses();
+        $sxables = Sxable::getTargetableClasses();
         $this->assertNotEmpty($sxables);
     }
-    
+
     public function test_entity_table_creation(): void
     {
         $this->assertTrue(Schema::hasTable('entities'));
@@ -38,7 +38,7 @@ class SxableTest extends SxableTestCase
             'variableName', 'subType',
         ]));
     }
-    
+
     public function test_structure_table_values(): void
     {
         $structure = [
@@ -155,7 +155,7 @@ class SxableTest extends SxableTestCase
             ]);
         }
     }
-    
+
     public function test_question_table_values(): void
     {
         $questions = [
@@ -297,7 +297,7 @@ class SxableTest extends SxableTestCase
         ];
         $this->assertDatabaseHas('entities', $entity);
     }
-    
+
     public function test_long_table_values(): void
     {
         $this->assertDatabaseCount('entities_long', 416); // 4 entries á 104
@@ -346,7 +346,7 @@ class SxableTest extends SxableTestCase
             'updated_at' => $this->now,
         ]);
     }
-    
+
     public function test_guess_full_variable_name(): void
     {
         $service = new SxSurveyService('mocked');
@@ -356,7 +356,7 @@ class SxableTest extends SxableTestCase
         $this->assertEquals('s_11_17', $service->guessFullVariableName('s_11_17'));
         $this->assertEquals('gender_rel', $service->guessFullVariableName('gender_r'));
     }
-    
+
     public function test_guess_short_variable_name(): void
     {
         $service = new SxSurveyService('mocked');

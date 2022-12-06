@@ -27,8 +27,8 @@ class Init extends Command
             DB::connection()->unsetEventDispatcher();
             DB::disableQueryLog();
         }
-    
-        foreach (Sxable::getSxableClasses() as $class) {
+
+        foreach (Sxable::getTargetableClasses() as $class) {
             if ($this->argument('classes') && !in_array($class::entityTableName(), $this->argument('classes'))) {
                 continue;
             }

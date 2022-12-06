@@ -36,6 +36,7 @@
     "guzzlehttp/guzzle": "^7.3",
     "haydenpierce/class-finder": "^0.4.3",
     "league/csv": "^9.7",
-    "maatwebsite/excel": "^3.0"
+    "maatwebsite/excel": "^3.0",
+    "berthott/laravel-targetable": "^2.0"
   }
 }

@@ -46,7 +46,7 @@ trait Sxable
     {
         parent::boot();
 
-        self::$unguarded = true;
+        static::$unguarded = true;
         // observe Sxable
         static::observe(SxableObserver::class);
     }
@@ -114,7 +114,7 @@ trait Sxable
      */
     public static function structure(): Collection
     {
-        return Schema::hasTable(self::structureTableName()) ? DB::table(self::structureTableName())->get() : collect();
+        return Schema::hasTable(static::structureTableName()) ? DB::table(static::structureTableName())->get() : collect();
     }
 
     /**
@@ -122,9 +122,9 @@ trait Sxable
      */
     public static function labeledStructure(): Collection
     {
-        return self::structure()->map(function ($entry) {
+        return static::structure()->map(function ($entry) {
             if ($entry->subType === 'Multiple') {
-                $entry->variableName = $entry->variableName.' - '.DB::table(self::questionsTableName())->where('variableName', $entry->variableName)->first()->choiceText;
+                $entry->variableName = $entry->variableName.' - '.DB::table(static::questionsTableName())->where('variableName', $entry->variableName)->first()->choiceText;
             }
             return $entry;
         });
@@ -135,9 +135,9 @@ trait Sxable
      */
     public static function labeledAttributes(): array
     {
-        $questions = DB::table(self::questionsTableName())->get()->keyBy('variableName');
+        $questions = DB::table(static::questionsTableName())->get()->keyBy('variableName');
         $ret = [];
-        foreach (Helpers::getSortedColumns(self::entityTableName()) as $variableName) {
+        foreach (Helpers::getSortedColumns(static::entityTableName()) as $variableName) {
             if ($questions->has($variableName) && $questions[$variableName]->subType === 'Multiple') {
                 $variableName = $variableName.' - '.$questions[$variableName]->choiceText;
             }
@@ -161,7 +161,8 @@ trait Sxable
      */
     public static function controller(): SxSurveyService
     {
-        return self::$_sxController ?: self::$_sxController = new SxSurveyService(self::surveyId());
+        $id = static::surveyId();
+        return static::$_sxController ?: static::$_sxController = new SxSurveyService(static::surveyId());
     }
 
     /**
@@ -185,7 +186,7 @@ trait Sxable
      */
     public static function structureTableName(): string
     {
-        return self::singleName().'_structure';
+        return static::singleName().'_structure';
     }
 
     /**
@@ -193,7 +194,7 @@ trait Sxable
      */
     public static function longTableName(): string
     {
-        return Str::plural(self::singleName()).'_long';
+        return Str::plural(static::singleName()).'_long';
     }
 
     /**
@@ -201,7 +202,7 @@ trait Sxable
      */
     public static function labelsTableName(): string
     {
-        return self::singleName().'_labels';
+        return static::singleName().'_labels';
     }
 
     /**
@@ -209,7 +210,7 @@ trait Sxable
      */
     public static function questionsTableName(): string
     {
-        return self::singleName().'_questions';
+        return static::singleName().'_questions';
     }
 
     /**
@@ -217,10 +218,10 @@ trait Sxable
      */
     public static function initTables(bool $force = false, bool $labeled = false, int $max = null): Collection | ResourceCollection
     {
-        self::initStructureTable($force);
-        self::initEntityTable($force, $max);
-        self::initLabelsTable($force);
-        self::initQuestionsTable($force);
+        static::initStructureTable($force);
+        static::initEntityTable($force, $max);
+        static::initLabelsTable($force);
+        static::initQuestionsTable($force);
         return $labeled
             ? SxableLabeledResource::collection(static::all())
             : static::all();
@@ -231,11 +232,11 @@ trait Sxable
      */
     public static function dropTables(): void
     {
-        self::dropTable(self::entityTableName());
-        self::dropTable(self::longTableName());
-        self::dropTable(self::structureTableName());
-        self::dropTable(self::labelsTableName());
-        self::dropTable(self::questionsTableName());
+        static::dropTable(static::entityTableName());
+        static::dropTable(static::longTableName());
+        static::dropTable(static::structureTableName());
+        static::dropTable(static::labelsTableName());
+        static::dropTable(static::questionsTableName());
     }
 
     /**
@@ -269,8 +270,8 @@ trait Sxable
      */
     public static function initStructureTable(bool $force = false): void
     {
-        $table = self::structureTableName();
-        self::initTable($table, function (Blueprint $table) {
+        $table = static::structureTableName();
+        static::initTable($table, function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('variableName');
             $table->string('subType');
@@ -279,7 +280,7 @@ trait Sxable
 
         if (DB::table($table)->get()->isEmpty()) {
             SxLog::log("$table: Filling table.");
-            DB::table($table)->insert(self::entityStructure()->all());
+            DB::table($table)->insert(static::entityStructure()->all());
             SxLog::log("$table: Table filled.");
         }
     }
@@ -289,14 +290,14 @@ trait Sxable
      */
     public static function initEntityTable(bool $force = false, int $max = null): void
     {
-        self::initLongTable($force); // before entity because it will write to long
+        static::initLongTable($force); // before entity because it will write to long
 
-        $tableName = self::entityTableName();
-        self::initTable($tableName, function (Blueprint $table) {
-            $entityStructure = self::structure();
+        $tableName = static::entityTableName();
+        static::initTable($tableName, function (Blueprint $table) {
+            $entityStructure = static::structure();
             $t = null;
             foreach ($entityStructure as $column) {
-                if (!in_array($column->variableName, self::fields())) {
+                if (!in_array($column->variableName, static::fields())) {
                     continue;
                 }
                 switch ($column->subType) {
@@ -308,7 +309,7 @@ trait Sxable
                         $t = $table->double($column->variableName);
                         break;
                     case 'String':
-                        $t = in_array($column->variableName, self::uniqueFields())
+                        $t = in_array($column->variableName, static::uniqueFields())
                             ? $table->string($column->variableName)
                             : $table->text($column->variableName);
                         break;
@@ -319,7 +320,7 @@ trait Sxable
                 if ($column->variableName === config('sx.primary')) {
                     $t->primary();
                 } elseif (
-                    in_array($column->variableName, self::uniqueFields()) ||
+                    in_array($column->variableName, static::uniqueFields()) ||
                     in_array($column->variableName, config('sx.defaultUnique'))
                 ) {
                     $t->unique();
@@ -330,11 +331,11 @@ trait Sxable
             $table->timestamps();
         }, $force);
 
-        if (self::all()->isEmpty()) {
+        if (static::all()->isEmpty()) {
             SxLog::log("$tableName: Filling table.");
-            $entries = self::entities();
+            $entries = static::entities();
             $entries = $max ? $entries->take($max) : $entries;
-            self::doUpsert($entries);
+            static::doUpsert($entries);
             SxLog::log("$tableName: Table filled.");
         }
     }
@@ -344,8 +345,8 @@ trait Sxable
      */
     public static function initLongTable(bool $force = false): void
     {
-        self::initTable(self::longTableName(), function (Blueprint $table) {
-            $table->primary(['respondent_id', 'variableName'], self::longTableName().'_primary');
+        static::initTable(static::longTableName(), function (Blueprint $table) {
+            $table->primary(['respondent_id', 'variableName'], static::longTableName().'_primary');
             $table->double('respondent_id');
             $table->string('variableName');
             $table->integer('value_single_multiple')->nullable();
@@ -361,8 +362,8 @@ trait Sxable
      */
     public static function initLabelsTable(bool $force = false): void
     {
-        $table = self::labelsTableName();
-        self::initTable($table, function (Blueprint $table) {
+        $table = static::labelsTableName();
+        static::initTable($table, function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('variableName');
             $table->integer('value');
@@ -372,7 +373,7 @@ trait Sxable
 
         if (DB::table($table)->get()->isEmpty()) {
             SxLog::log("$table: Filling table.");
-            DB::table($table)->insert(self::labels()->all());
+            DB::table($table)->insert(static::labels()->all());
             SxLog::log("$table: Table filled.");
         }
     }
@@ -382,8 +383,8 @@ trait Sxable
      */
     public static function initQuestionsTable(bool $force = false): void
     {
-        $table = self::questionsTableName();
-        self::initTable($table, function (Blueprint $table) {
+        $table = static::questionsTableName();
+        static::initTable($table, function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('questionName');
             $table->string('variableName');
@@ -396,7 +397,7 @@ trait Sxable
 
         if (DB::table($table)->get()->isEmpty()) {
             SxLog::log("$table: Filling table.");
-            DB::table($table)->insert(self::questions()->all());
+            DB::table($table)->insert(static::questions()->all());
             SxLog::log("$table: Table filled.");
         }
     }
@@ -406,7 +407,7 @@ trait Sxable
      */
     private static function fields(): array
     {
-        return isset(self::$_fields) ? self::$_fields : self::$_fields = self::buildFields();
+        return isset(static::$_fields) ? static::$_fields : static::$_fields = static::buildFields();
     }
 
     /**
@@ -414,12 +415,12 @@ trait Sxable
      */
     private static function buildFields(): array
     {
-        $allFields = self::controller()->getEntityStructure()->pluck('variableName')->all();
+        $allFields = static::controller()->getEntityStructure()->pluck('variableName')->all();
         $filteredFields = $allFields;
-        if (!empty(self::include())) {
-            $filteredFields = array_intersect($allFields, self::include());
-        } elseif (!empty(self::exclude())) {
-            $filteredFields = array_diff($allFields, self::exclude());
+        if (!empty(static::include())) {
+            $filteredFields = array_intersect($allFields, static::include());
+        } elseif (!empty(static::exclude())) {
+            $filteredFields = array_diff($allFields, static::exclude());
         }
         return array_filter($filteredFields, function ($field) {
             $doFiler = true;
@@ -439,7 +440,7 @@ trait Sxable
     public static function filterFormParams(array $formParams): array
     {
         return array_filter($formParams, function ($param) {
-            return in_array($param, self::fields());
+            return in_array($param, static::fields());
         }, ARRAY_FILTER_USE_KEY);
     }
 
@@ -448,8 +449,8 @@ trait Sxable
      */
     private static function entities(array $query = []): Collection
     {
-        return self::controller()->getEntities($query)->map(function ($entity) {
-            return array_intersect_key($entity, array_fill_keys(self::fields(), ''));
+        return static::controller()->getEntities($query)->map(function ($entity) {
+            return array_intersect_key($entity, array_fill_keys(static::fields(), ''));
         });
     }
 
@@ -458,7 +459,7 @@ trait Sxable
      */
     private static function questions(): Collection
     {
-        return self::trimMultipleChoiceLabelsForJavaScript(self::filterByFields(self::controller()->getQuestions()));
+        return static::trimMultipleChoiceLabelsForJavaScript(static::filterByFields(static::controller()->getQuestions()));
     }
     
     private static function trimMultipleChoiceLabelsForJavaScript(Collection $collection): Collection
@@ -476,7 +477,7 @@ trait Sxable
      */
     public static function labels(): Collection
     {
-        return self::filterByFields(self::controller()->getLabels());
+        return static::filterByFields(static::controller()->getLabels());
     }
 
     /**
@@ -484,8 +485,8 @@ trait Sxable
      */
     public static function labeledLabels(): Collection
     {
-        $questions = DB::table(self::questionsTableName())->get()->keyBy('variableName');
-        return self::labels()->map(function ($entry) use ($questions) {
+        $questions = DB::table(static::questionsTableName())->get()->keyBy('variableName');
+        return static::labels()->map(function ($entry) use ($questions) {
             $variableName = $entry['variableName'];
             if ($questions->has($variableName) && $questions[$variableName]->subType === 'Multiple') {
                 $entry['variableName'] = $variableName.' - '.$questions[$variableName]->choiceText;
@@ -499,22 +500,22 @@ trait Sxable
      */
     private static function entityStructure(): Collection
     {
-        return self::filterByFields(self::controller()->getEntityStructure());
+        return static::filterByFields(static::controller()->getEntityStructure());
     }
 
     private static function filterByFields(Collection $collection): Collection
     {
         return $collection->filter(function ($entry) {
-            return in_array($entry['variableName'], self::fields());
+            return in_array($entry['variableName'], static::fields());
         });
     }
 
     public static function import(bool $labeled = false, bool $fresh = false, string $since = null): Collection | ResourceCollection
     {
-        SxLog::log(self::entityTableName().': Import triggered.');
-        $entries = self::entities($fresh ? [] : self::lastImport($since));
-        self::doUpsert($entries);
-        SxLog::log(self::entityTableName().': Import finished.');
+        SxLog::log(static::entityTableName().': Import triggered.');
+        $entries = static::entities($fresh ? [] : static::lastImport($since));
+        static::doUpsert($entries);
+        SxLog::log(static::entityTableName().': Import finished.');
 
         // return the imported entries from our database
         $imported = static::whereIn(config('sx.primary'), $entries->pluck(config('sx.primary'))->toArray())->get();
@@ -534,11 +535,11 @@ trait Sxable
     private static function lastImport(string $since = null): array
     {
         $lastImportArray = [];
-        $lastRespondent = self::orderBy('modified', 'desc')->first();
+        $lastRespondent = static::orderBy('modified', 'desc')->first();
         if (isset($lastRespondent)) {
             $modified = (new Carbon($lastRespondent['modified']));
             if ($since) {
-                if (self::isAbsoluteTime($since)) {
+                if (static::isAbsoluteTime($since)) {
                     $modified = new Carbon($since);
                 } else {
                     $modified->sub($since);
@@ -571,7 +572,7 @@ trait Sxable
     {
         $ret = [];
         foreach ($fullNames as $name => $value) {
-            $ret[self::controller()->guessShortVariableName($name)] = $value;
+            $ret[static::controller()->guessShortVariableName($name)] = $value;
         }
         return $ret;
     }
@@ -581,11 +582,11 @@ trait Sxable
      */
     public static function generateUniqueValue(string $column): string
     {
-        if (!array_key_exists($column, self::generatedUniqueFields())) {
+        if (!array_key_exists($column, static::generatedUniqueFields())) {
             return '';
         }
-        $previousId = (int) filter_var(DB::table(self::entityTableName())->select($column)->orderBy($column)->get()->last()->$column, FILTER_SANITIZE_NUMBER_INT);
-        return self::generatedUniqueFields()[$column].Str::padLeft(++$previousId, 3, '0');
+        $previousId = (int) filter_var(DB::table(static::entityTableName())->select($column)->orderBy($column)->get()->last()->$column, FILTER_SANITIZE_NUMBER_INT);
+        return static::generatedUniqueFields()[$column].Str::padLeft(++$previousId, 3, '0');
     }
 
     /**
@@ -594,8 +595,8 @@ trait Sxable
     public static function generatedUniqueFieldsParams(): array
     {
         $ret = ['form_params' => []];
-        foreach (self::generatedUniqueFields() as $field => $val) {
-            $val = self::generateUniqueValue($field);
+        foreach (static::generatedUniqueFields() as $field => $val) {
+            $val = static::generateUniqueValue($field);
             if (!empty($val)) {
                 $ret['form_params'][$field] = $val;
             }
@@ -609,25 +610,25 @@ trait Sxable
     private static function doUpsert(Collection $entries)
     {
         $count = $entries->count();
-        SxLog::log(self::entityTableName().": Importing $count respondents...");
+        SxLog::log(static::entityTableName().": Importing $count respondents...");
         // wide table
-        $wideChunkSize = floor(MAX_SQL_PLACEHOLDERS / self::structure()->count());
+        $wideChunkSize = floor(MAX_SQL_PLACEHOLDERS / static::structure()->count());
         $entries->chunk($wideChunkSize)->each(function (Collection $chunk) use ($count) {
-            self::upsert($chunk->all(), [config('sx.primary')]);
+            static::upsert($chunk->all(), [config('sx.primary')]);
         });
 
         // long table
         $entries->chunk(MAX_MEMORY_CHUNK_SIZE)->each(function (Collection $memoryChunk) use ($count) {
             $longEntries = $memoryChunk->reduce(function (Collection $reduced, $entry) {
-                return $reduced->push(...self::makeLongEntries($entry));
+                return $reduced->push(...static::makeLongEntries($entry));
             }, collect());
             $longChunkSize = floor(MAX_SQL_PLACEHOLDERS / LONG_TABLE_COLUMN_COUNT);
             $longEntries->chunk($longChunkSize)->each(function (Collection $chunk) use ($count) {
-                DB::table(self::longTableName())->upsert($chunk->toArray(), ['respondent_id', 'variableName']);
+                DB::table(static::longTableName())->upsert($chunk->toArray(), ['respondent_id', 'variableName']);
             });
         });
 
-        SxLog::log(self::entityTableName().": $count respondents imported (".$entries->pluck(config('sx.primary'))->join(', ').')');
+        SxLog::log(static::entityTableName().": $count respondents imported (".$entries->pluck(config('sx.primary'))->join(', ').')');
     }
 
     /**
@@ -636,7 +637,7 @@ trait Sxable
     public static function makeLongEntries(array $attributes): array
     {
         $entries = [];
-        $structure = DB::table(self::structureTableName())->get()->mapWithKeys(function ($entry) {
+        $structure = DB::table(static::structureTableName())->get()->mapWithKeys(function ($entry) {
             return [$entry->variableName => $entry->subType];
         });
         foreach ($attributes as $variableName => $value) {

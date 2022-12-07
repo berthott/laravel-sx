@@ -47,6 +47,6 @@ trait SxDistributable
                 ['email' => 'monitoring@syspons.com'],
                 self::sxBackgroundVariables($this),
             )
-        ]);
+        ])->original;
     }
 }

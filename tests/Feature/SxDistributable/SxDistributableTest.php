@@ -16,7 +16,7 @@ class SxDistributableTest extends SxDistributableTestCase
     public function test_distributable_routes_exist(): void
     {
         $expectedRoutes = [
-            'entity_sxes.sxcollect',
+            'entities.sxcollect',
         ];
         $registeredRoutes = array_keys(Route::getRoutes()->getRoutesByName());
         foreach ($expectedRoutes as $route) {
@@ -27,7 +27,12 @@ class SxDistributableTest extends SxDistributableTestCase
     public function test_collect_route(): void
     {
         $entity = Entity::factory()->create();
-        $response = $this->get(route('entity_sxes.sxcollect', ['entity_sx' => $entity->id]))
+        $this->assertDatabaseMissing('entity_sxes', ['respondentid' => '841931211']);
+        $this->get(route('entities.sxcollect', ['entity' => $entity->id]))
             ->assertStatus(200);
+        $this->assertDatabaseHas('entity_sxes', [
+            'respondentid' => '841931211',
+            's_2' => 1999,
+        ]);
     }
 }

@@ -4,8 +4,57 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "397a0c91582f3c65438a8cc774c262b4",
+    "content-hash": "4a73f74bc13ba18e4f6f0d4b043c8870",
     "packages": [
+        {
+            "name": "berthott/laravel-internal-request",
+            "version": "2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/berthott/laravel-internal-request.git",
+                "reference": "50e67fed699733a8b22c34d2f21cf5e53918dbab"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/berthott/laravel-internal-request/zipball/50e67fed699733a8b22c34d2f21cf5e53918dbab",
+                "reference": "50e67fed699733a8b22c34d2f21cf5e53918dbab",
+                "shasum": ""
+            },
+            "require-dev": {
+                "doctrine/dbal": "^3.3",
+                "orchestra/testbench": "^7.0",
+                "phpunit/phpunit": "^9.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "berthott\\InternalRequest\\InternalRequestServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "berthott\\InternalRequest\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jan Bladt",
+                    "email": "berthott@web.de"
+                }
+            ],
+            "description": "Laravel Helper for running internal requests",
+            "support": {
+                "issues": "https://github.com/berthott/laravel-internal-request/issues",
+                "source": "https://github.com/berthott/laravel-internal-request/tree/2.0.1"
+            },
+            "time": "2022-12-07T13:42:46+00:00"
+        },
         {
             "name": "berthott/laravel-targetable",
             "version": "2.0.0",

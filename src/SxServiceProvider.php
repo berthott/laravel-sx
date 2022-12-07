@@ -81,7 +81,10 @@ class SxServiceProvider extends ServiceProvider
         $router->aliasMiddleware('sx.labels_to_values', ConvertLabelsToValues::class);
 
         // add routes
-        Route::group($this->routeConfiguration(), function () {
+        Route::group($this->routeConfiguration([
+            'sx.string_booleans',
+            'sx.labels_to_values'
+        ]), function () {
             foreach (Sxable::getTargetableClasses() as $sxable) {
                 Route::post($sxable::entityTableName().'/sync', [SxableController::class, 'sync'])->name($sxable::entityTableName().'.sync');
                 Route::match(['get', 'post'], $sxable::entityTableName().'/export', [SxableController::class, 'export'])->name($sxable::entityTableName().'.export');
@@ -97,8 +100,11 @@ class SxServiceProvider extends ServiceProvider
                 Route::put("{$sxable::entityTableName()}/{{$sxable::singleName()}}", [SxableController::class, 'update_respondent'])->name($sxable::entityTableName().'.update_respondent');
                 Route::delete("{$sxable::entityTableName()}/{{$sxable::singleName()}}", [SxableController::class, 'destroy'])->name($sxable::entityTableName().'.destroy');
             }
+        });
+
+        Route::group($this->routeConfiguration(), function () {
             foreach (SxDistributable::getTargetableClasses() as $distributable) {
-                Route::get("{$distributable::entityTableName()}/{{$sxable::singleName()}}/sxcollect", [SxDistributableController::class, 'sxcollect'])->name($sxable::entityTableName().'.sxcollect');
+                Route::get("{$distributable::entityTableName()}/{{$distributable::singleName()}}/sxcollect", [SxDistributableController::class, 'sxcollect'])->name($distributable::entityTableName().'.sxcollect');
             }
         });
 
@@ -115,10 +121,10 @@ class SxServiceProvider extends ServiceProvider
         JsonResource::withoutWrapping();
     }
 
-    protected function routeConfiguration(): array
+    protected function routeConfiguration(array $additionalMiddleware = []): array
     {
         return [
-            'middleware' => [...config('sx.middleware'), 'sx.string_booleans', 'sx.labels_to_values'],
+            'middleware' => [...config('sx.middleware'), ...$additionalMiddleware],
             'prefix' => config('sx.prefix'),
         ];
     }

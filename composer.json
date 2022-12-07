@@ -37,6 +37,7 @@
     "haydenpierce/class-finder": "^0.4.3",
     "league/csv": "^9.7",
     "maatwebsite/excel": "^3.0",
-    "berthott/laravel-targetable": "^2.0"
+    "berthott/laravel-targetable": "^2.0",
+    "berthott/laravel-internal-request": "^2.0"
   }
 }

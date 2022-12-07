@@ -2,6 +2,7 @@
 
 namespace berthott\SX\Tests\Feature\SxDistributable;
 
+use berthott\InternalRequest\InternalRequestServiceProvider;
 use berthott\SX\Facades\SxApiService;
 use berthott\SX\SxServiceProvider;
 use GuzzleHttp\Psr7\Response;
@@ -26,7 +27,8 @@ abstract class SxDistributableTestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [
-            SxServiceProvider::class
+            SxServiceProvider::class,
+            InternalRequestServiceProvider::class,
         ];
     }
 
@@ -54,9 +56,15 @@ abstract class SxDistributableTestCase extends BaseTestCase
                 $headers = [],
                 File::get(__DIR__.'/../dataset.csv'),
             ));
+        SxApiService::shouldReceive('create')
+            ->andReturn(new Response(
+                $status = 200,
+                $headers = [],
+                File::get(__DIR__.'/../841931211.xml'),
+            ));
         SxApiService::makePartial();
     }
-    
+
     private function setUpEntityTable(): void
     {
         Schema::create('entities', function (Blueprint $table) {

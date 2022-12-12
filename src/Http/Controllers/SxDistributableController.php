@@ -3,6 +3,7 @@
 namespace berthott\SX\Http\Controllers;
 
 use berthott\SX\Facades\SxDistributable;
+use Illuminate\Support\Facades\Redirect;
 
 class SxDistributableController
 {
@@ -12,12 +13,12 @@ class SxDistributableController
     {
         $this->target = SxDistributable::getTarget();
     }
-    
+
     /**
      * Collect the target.
      */
     public function sxcollect(mixed $id)
     {
-        return $this->target::findOrFail($id)->collect();
+        return Redirect::to($this->target::findOrFail($id)->collect()->collecturl());
     }
 }

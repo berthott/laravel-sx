@@ -43,11 +43,15 @@ trait SxDistributable
 
     public function collect(): Respondent
     {
-        return InternalRequest::skipMiddleware()->post(route(static::sxable()::entityTableName().'.create_respondent'), [
+        $response = InternalRequest::skipMiddleware()->post(route(static::sxable()::entityTableName().'.create_respondent'), [
             'form_params' => array_merge(
                 ['email' => 'monitoring@syspons.com'],
                 static::sxBackgroundVariables($this),
             )
-        ])->original;
+            ]);
+        if ($response->exception) {
+            throw $response->exception;
+        }
+        return $response->original;
     }
 }

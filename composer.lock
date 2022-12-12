@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "berthott/laravel-internal-request",
-            "version": "2.0.1",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/berthott/laravel-internal-request.git",
-                "reference": "50e67fed699733a8b22c34d2f21cf5e53918dbab"
+                "reference": "88afe896211f9fe538335faa9c5c8cf10ed4422b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/berthott/laravel-internal-request/zipball/50e67fed699733a8b22c34d2f21cf5e53918dbab",
-                "reference": "50e67fed699733a8b22c34d2f21cf5e53918dbab",
+                "url": "https://api.github.com/repos/berthott/laravel-internal-request/zipball/88afe896211f9fe538335faa9c5c8cf10ed4422b",
+                "reference": "88afe896211f9fe538335faa9c5c8cf10ed4422b",
                 "shasum": ""
             },
             "require-dev": {
@@ -51,9 +51,9 @@
             "description": "Laravel Helper for running internal requests",
             "support": {
                 "issues": "https://github.com/berthott/laravel-internal-request/issues",
-                "source": "https://github.com/berthott/laravel-internal-request/tree/2.0.1"
+                "source": "https://github.com/berthott/laravel-internal-request/tree/2.0.2"
             },
-            "time": "2022-12-07T13:42:46+00:00"
+            "time": "2022-12-12T13:36:48+00:00"
         },
         {
             "name": "berthott/laravel-targetable",

@@ -4,6 +4,7 @@ namespace berthott\SX\Models\Traits;
 
 use berthott\InternalRequest\Facades\InternalRequest;
 use berthott\SX\Models\Respondent;
+
 //use Illuminate\Support\Str;
 
 trait SxDistributable
@@ -35,18 +36,19 @@ trait SxDistributable
     /**
      * An array of background variables to push to sx
      */
-    public static function sxBackgroundVariables(self $distributable): array
+    public static function sxBackgroundVariables($distributable): array
     {
         return [];
     }
 
     public function collect(): Respondent
     {
-        return InternalRequest::post(route(self::sxable()::entityTableName().'.create_respondent'), [
+        $ret = InternalRequest::skipMiddleware()->post(route(static::sxable()::entityTableName().'.create_respondent'), [
             'form_params' => array_merge(
                 ['email' => 'monitoring@syspons.com'],
-                self::sxBackgroundVariables($this),
+                static::sxBackgroundVariables($this),
             )
-        ])->original;
+        ]);
+        return $ret->original;
     }
 }

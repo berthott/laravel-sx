@@ -12,6 +12,6 @@ class SxDistributableService extends TargetableService
      */
     public function __construct()
     {
-        parent::__construct(SxDistributable::class, 'sx');
+        parent::__construct(SxDistributable::class, 'sx-distribution');
     }
 }

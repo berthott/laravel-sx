@@ -56,6 +56,7 @@ class SxServiceProvider extends ServiceProvider
 
         // add config
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'sx');
+        $this->mergeConfigFrom(__DIR__.'/../config/distribution.php', 'sx-distribution');
     }
 
     /**
@@ -66,6 +67,7 @@ class SxServiceProvider extends ServiceProvider
         // publish config
         $this->publishes([
             __DIR__.'/../config/config.php' => config_path('sx.php'),
+            __DIR__.'/../config/distribution.php' => config_path('sx-distribution.php'),
         ], 'config');
 
         // register log channel
@@ -81,7 +83,7 @@ class SxServiceProvider extends ServiceProvider
         $router->aliasMiddleware('sx.labels_to_values', ConvertLabelsToValues::class);
 
         // add routes
-        Route::group($this->routeConfiguration([
+        Route::group($this->routeConfiguration('sx', [
             'sx.string_booleans',
             'sx.labels_to_values'
         ]), function () {
@@ -102,9 +104,9 @@ class SxServiceProvider extends ServiceProvider
             }
         });
 
-        Route::group($this->routeConfiguration(), function () {
-            foreach (SxDistributable::getTargetableClasses() as $distributable) {
-                Route::get("{$distributable::entityTableName()}/{{$distributable::singleName()}}/sxcollect", [SxDistributableController::class, 'sxcollect'])->name($distributable::entityTableName().'.sxcollect');
+        Route::group($this->routeConfiguration('sx-distribution'), function () {
+            foreach (SxDistributable::getTargetableClasses('sx-distribution') as $distributable) {
+                Route::get("{$distributable::entityTableName()}/{{$distributable::singleName()}}", [SxDistributableController::class, 'sxcollect'])->name($distributable::entityTableName().'.sxcollect');
             }
         });
 
@@ -121,11 +123,11 @@ class SxServiceProvider extends ServiceProvider
         JsonResource::withoutWrapping();
     }
 
-    protected function routeConfiguration(array $additionalMiddleware = []): array
+    protected function routeConfiguration(string $key, array $additionalMiddleware = []): array
     {
         return [
-            'middleware' => [...config('sx.middleware'), ...$additionalMiddleware],
-            'prefix' => config('sx.prefix'),
+            'middleware' => [...config("$key.middleware"), ...$additionalMiddleware],
+            'prefix' => config("$key.prefix"),
         ];
     }
 }

@@ -159,7 +159,7 @@ class SxSurveyService
         $this->initStructure();
         $entries = $this->structure->filter(function ($entry) use ($base) {
             return Str::startsWith(Str::lower($entry['questionName']), Str::lower($base));
-        })->sortBy('variableName', SORT_NATURAL);
+        })->sortBy('questionName', SORT_NATURAL);
         if ($entries->count() === 1) {
             return $entries->first()['variableName'];
         } elseif ($entries->count() > 1 && is_int($index)) {

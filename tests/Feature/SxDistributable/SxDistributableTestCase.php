@@ -38,6 +38,7 @@ abstract class SxDistributableTestCase extends BaseTestCase
         $this->now = now();
         Carbon::setTestNow($this->now);
         Config::set('sx.namespace', __NAMESPACE__);
+        Config::set('sx-distribution.namespace', __NAMESPACE__);
         SxApiService::shouldReceive('exportStructure')
             ->andReturn(new Response(
                 $status = 200,

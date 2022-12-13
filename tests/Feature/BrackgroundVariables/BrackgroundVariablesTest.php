@@ -2,11 +2,6 @@
 
 namespace berthott\SX\Tests\Feature\BrackgroundVariables;
 
-use berthott\SX\Exports\SxLabeledExport;
-use berthott\SX\Exports\SxTableExport;
-use Illuminate\Support\Facades\Route;
-use Maatwebsite\Excel\Facades\Excel;
-
 class BrackgroundVariablesTest extends BrackgroundVariablesTestCase
 {
     public function test_background_variables(): void

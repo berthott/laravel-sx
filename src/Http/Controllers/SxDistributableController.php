@@ -21,4 +21,12 @@ class SxDistributableController
     {
         return Redirect::to($this->target::findOrFail($id)->collect()->collecturl());
     }
+
+    /**
+     * Get the data for the sx survey from the target.
+     */
+    public function sxdata(mixed $id)
+    {
+        return $this->target::findOrFail($id)->sxData();
+    }
 }

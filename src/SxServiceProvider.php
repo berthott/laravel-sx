@@ -107,6 +107,7 @@ class SxServiceProvider extends ServiceProvider
         Route::group($this->routeConfiguration('sx-distribution'), function () {
             foreach (SxDistributable::getTargetableClasses('sx-distribution') as $distributable) {
                 Route::get("{$distributable::entityTableName()}/{{$distributable::singleName()}}", [SxDistributableController::class, 'sxcollect'])->name($distributable::entityTableName().'.sxcollect');
+                Route::get("{$distributable::entityTableName()}/{{$distributable::singleName()}}/sxdata", [SxDistributableController::class, 'sxdata'])->name($distributable::entityTableName().'.sxdata');
             }
         });
 

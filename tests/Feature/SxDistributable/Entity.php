@@ -46,6 +46,16 @@ class Entity extends Model
         ];
     }
 
+    /**
+     * Return the data for the sx survey.
+     */
+    public function sxData(): array
+    {
+        return [
+            'name' => $this->name,
+        ];
+    }
+
     protected static function newFactory()
     {
         return EntityFactory::new();

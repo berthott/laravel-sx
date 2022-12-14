@@ -17,6 +17,7 @@ class SxDistributableTest extends SxDistributableTestCase
     {
         $expectedRoutes = [
             'entities.sxcollect',
+            'entities.sxdata',
         ];
         $registeredRoutes = array_keys(Route::getRoutes()->getRoutesByName());
         foreach ($expectedRoutes as $route) {
@@ -34,5 +35,15 @@ class SxDistributableTest extends SxDistributableTestCase
             'respondentid' => '841931211',
             's_2' => 1999,
         ]);
+    }
+
+    public function test_data_route(): void
+    {
+        $entity = Entity::factory()->create();
+        $this->get(route('entities.sxdata', ['entity' => $entity->id]))
+            ->assertSuccessful()
+            ->assertExactJson([
+                'name' => $entity->name
+            ]);
     }
 }

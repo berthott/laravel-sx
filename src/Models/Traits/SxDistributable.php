@@ -41,6 +41,14 @@ trait SxDistributable
         return [];
     }
 
+    /**
+     * Return the data for the sx survey.
+     */
+    public function sxData(): array
+    {
+        return [];
+    }
+
     public function collect(): Respondent
     {
         $response = InternalRequest::skipMiddleware()->post(route(static::sxable()::entityTableName().'.create_respondent'), [

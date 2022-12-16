@@ -3,6 +3,7 @@
 namespace berthott\SX\Http\Controllers;
 
 use berthott\SX\Facades\SxDistributable;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
 class SxDistributableController
@@ -25,8 +26,9 @@ class SxDistributableController
     /**
      * Get the data for the sx survey from the target.
      */
-    public function sxdata(mixed $id)
+    public function sxdata(mixed $id, Request $request)
     {
-        return $this->target::findOrFail($id)->sxData();
+        $query = $request->query();
+        return $this->target::findOrFail($id)->sxData($query);
     }
 }

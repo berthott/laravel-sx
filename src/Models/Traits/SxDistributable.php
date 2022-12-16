@@ -44,7 +44,7 @@ trait SxDistributable
     /**
      * Return the data for the sx survey.
      */
-    public function sxData(): array
+    public function sxData(array $query): array
     {
         return [];
     }

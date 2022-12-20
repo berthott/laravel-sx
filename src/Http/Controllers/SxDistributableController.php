@@ -41,7 +41,7 @@ class SxDistributableController
         $instance = $this->target::findOrFail($id);
         $pdf->loadView('sx::pdf.qrcode', [
             'qrcode' => $instance->qrcode(),
-            $instance->sxPdfData(),
+            ...$instance->sxPdfData(),
         ]);
         return $pdf->stream();
     }

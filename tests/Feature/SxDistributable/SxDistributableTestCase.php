@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Barryvdh\DomPDF\ServiceProvider as DomPdfServiceProvider;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\TestResponse;
 
 abstract class SxDistributableTestCase extends BaseTestCase
 {
@@ -29,6 +33,7 @@ abstract class SxDistributableTestCase extends BaseTestCase
         return [
             SxServiceProvider::class,
             InternalRequestServiceProvider::class,
+            DomPdfServiceProvider::class,
         ];
     }
 
@@ -73,5 +78,32 @@ abstract class SxDistributableTestCase extends BaseTestCase
             $table->string('name');
             $table->timestamps();
         });
+    }
+    
+    protected function assertExpectedFileResponse(TestResponse $response, string $expectedPath, $format = '.pdf', bool $delete = true)
+    {
+        $storagePath = __FUNCTION__;
+        $expectedName = basename($expectedPath);
+        
+        // store response in storage
+        Storage::put($storagePath.'/'.$expectedName.'_actual'.$format, $response->getContent());
+
+        // store expected in storage
+        Storage::putFileAs($storagePath, new UploadedFile(
+            $expectedPath.$format,
+            $expectedName.$format,
+        ), $expectedName.'_expect'.$format);
+
+        $actualPath = Storage::path($storagePath.'/'.$expectedName.'_actual'.$format);
+        $expectedPath = Storage::path($storagePath.'/'.$expectedName.'_expect'.$format);
+
+        // The files deffer in their timestamps and ID
+        // $this->assertSame(file_get_contents($actualPath), file_get_contents($expectedPath));
+        $this->assertSame(filesize($actualPath), filesize($expectedPath));
+
+        if ($delete) {
+            Storage::delete($actualPath);
+            Storage::delete($expectedPath);
+        }
     }
 }

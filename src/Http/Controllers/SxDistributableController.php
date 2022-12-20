@@ -5,6 +5,7 @@ namespace berthott\SX\Http\Controllers;
 use berthott\SX\Facades\SxDistributable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SxDistributableController
 {
@@ -21,6 +22,28 @@ class SxDistributableController
     public function sxcollect(mixed $id)
     {
         return Redirect::to($this->target::findOrFail($id)->collect()->collecturl());
+    }
+
+    /**
+     * Get the QR Code for the collect url.
+     */
+    public function qrcode(mixed $id)
+    {
+        return ['data' => $this->target::findOrFail($id)->qrcode()];
+    }
+
+    /**
+     * Get the QR Code for the collect url.
+     */
+    public function pdf(mixed $id)
+    {
+        $pdf = Pdf::setPaper('a4');
+        $instance = $this->target::findOrFail($id);
+        $pdf->loadView('sx::pdf.qrcode', [
+            'qrcode' => $instance->qrcode(),
+            $instance->sxPdfData(),
+        ]);
+        return $pdf->stream();
     }
 
     /**

@@ -4,6 +4,7 @@ namespace berthott\SX\Models\Traits;
 
 use berthott\InternalRequest\Facades\InternalRequest;
 use berthott\SX\Models\Respondent;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 //use Illuminate\Support\Str;
 
@@ -42,6 +43,14 @@ trait SxDistributable
     }
 
     /**
+     * An array of variables to be used inside a custom qr code pdf
+     */
+    public function sxPdfData(): array
+    {
+        return [];
+    }
+
+    /**
      * Return the data for the sx survey.
      */
     public function sxData(array $query): array
@@ -61,5 +70,12 @@ trait SxDistributable
             throw $response->exception;
         }
         return $response->original;
+    }
+
+    public function qrCode(): string
+    {
+        $route = route(static::entityTableName().'.sxcollect', [ static::singleName() => $this->id ]);
+        $encoded = base64_encode(QrCode::errorCorrection('H')->format('png')->size(250)->generate($route));
+        return "data:image/png;base64,$encoded";
     }
 }

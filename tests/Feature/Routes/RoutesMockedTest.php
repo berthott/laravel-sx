@@ -15,6 +15,7 @@ class RoutesMockedTest extends RoutesMockedTestCase
             'entities.update_respondent',
             'entities.destroy',
             
+            'entities.report',
             'entities.show_respondent',
             'entities.structure',
             'entities.sync',

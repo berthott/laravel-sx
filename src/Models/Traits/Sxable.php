@@ -405,7 +405,7 @@ trait Sxable
     /**
      * The fields to be processed.
      */
-    private static function fields(): array
+    public static function fields(): array
     {
         return isset(static::$_fields) ? static::$_fields : static::$_fields = static::buildFields();
     }
@@ -457,9 +457,17 @@ trait Sxable
     /**
      * The questions mapped to the fields.
      */
-    private static function questions(): Collection
+    public static function questions(): Collection
     {
         return static::trimMultipleChoiceLabelsForJavaScript(static::filterByFields(static::controller()->getQuestions()));
+    }
+
+    /**
+     * All possible question names.
+     */
+    public static function questionNames(): array
+    {
+        return static::questions()->pluck('questionName')->unique()->values()->toArray();
     }
     
     private static function trimMultipleChoiceLabelsForJavaScript(Collection $collection): Collection
@@ -672,5 +680,15 @@ trait Sxable
             array_push($entries, $entry);
         }
         return $entries;
+    }
+
+    /**
+     * Returns an array of query builder options.
+     * See https://spatie.be/docs/laravel-query-builder/v3/introduction
+     * Options are: filter, fields.
+     */
+    public static function reportQueryOptions(): array
+    {
+        return [];
     }
 }

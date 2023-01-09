@@ -40,6 +40,7 @@
     "berthott/laravel-targetable": "^2.0",
     "berthott/laravel-internal-request": "^2.0",
     "simplesoftwareio/simple-qrcode": "^4.2",
-    "barryvdh/laravel-dompdf": "^2.0"
+    "barryvdh/laravel-dompdf": "^2.0",
+    "spatie/laravel-query-builder": "^5.1"
   }
 }

@@ -6,6 +6,7 @@ use berthott\SX\Exports\SxTableExport;
 use berthott\SX\Exports\SxLabeledExport;
 use berthott\SX\Exports\SxExportAll;
 use berthott\SX\Facades\Sxable;
+use berthott\SX\Facades\SxReport;
 use berthott\SX\Http\Requests\DestroyManyRequest;
 use berthott\SX\Http\Requests\ExportRequest;
 use berthott\SX\Http\Requests\ImportRequest;
@@ -194,6 +195,14 @@ class SxableController
         }
         $fileName = $tableName.'.'.strtolower(config('sx.exportFormat'));
         return Excel::download(new SxTableExport($tableName, $ids), $fileName);
+    }
+
+    /**
+     * Get report data.
+     */
+    public function report(): Collection
+    {
+        return SxReport::get($this->target);
     }
 
     /**

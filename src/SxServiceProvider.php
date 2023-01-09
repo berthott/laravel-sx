@@ -18,6 +18,7 @@ use berthott\SX\Services\Http\SxApiService;
 use berthott\SX\Services\Http\SxEntityService;
 use berthott\SX\Services\SxableService;
 use berthott\SX\Services\SxDistributableService;
+use berthott\SX\Services\SxReportService;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Routing\Router;
@@ -50,6 +51,9 @@ class SxServiceProvider extends ServiceProvider
         $this->app->singleton('SxDistributable', function () {
             return new SxDistributableService();
         });
+        $this->app->singleton('SxReport', function () {
+            return new SxReportService();
+        });
 
         // bind exception singleton
         $this->app->singleton(ExceptionHandler::class, Handler::class);
@@ -57,6 +61,7 @@ class SxServiceProvider extends ServiceProvider
         // add config
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'sx');
         $this->mergeConfigFrom(__DIR__.'/../config/distribution.php', 'sx-distribution');
+        $this->mergeConfigFrom(__DIR__.'/../config/query-builder.php', 'query-builder');
     }
 
     /**
@@ -102,6 +107,7 @@ class SxServiceProvider extends ServiceProvider
                 Route::get("{$sxable::entityTableName()}/labels", [SxableController::class, 'labels'])->name($sxable::entityTableName().'.labels');
                 Route::delete("{$sxable::entityTableName()}/destroy_many", [SxableController::class, 'destroy_many'])->name($sxable::entityTableName().'.destroy_many');
                 Route::get("{$sxable::entityTableName()}/{{$sxable::singleName()}}/show_respondent", [SxableController::class, 'show_respondent'])->name($sxable::entityTableName().'.show_respondent');
+                Route::get("{$sxable::entityTableName()}/report", [SxableController::class, 'report'])->name($sxable::entityTableName().'.report');
                 //Route::apiResource($sxable::entityTableName(), SxableController::class, $sxable::routeOptions());
 
                 Route::get($sxable::entityTableName(), [SxableController::class, 'index'])->name($sxable::entityTableName().'.index');

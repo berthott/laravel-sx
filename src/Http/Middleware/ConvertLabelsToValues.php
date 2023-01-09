@@ -23,11 +23,11 @@ class ConvertLabelsToValues extends TransformsRequest
             switch ($question->subType) {
                 case 'Single':
                 case 'Multiple':
-                    $value = DB::table($this->target::labelsTableName())
+                    $found = DB::table($this->target::labelsTableName())
                         ->where('variableName', $key)
                         ->where('label', $value)
-                        ->first()
-                        ->value;
+                        ->first();
+                    $value = $found ? $found->value : $value;
             }
         }
 

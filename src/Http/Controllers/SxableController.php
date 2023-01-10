@@ -200,7 +200,7 @@ class SxableController
     /**
      * Get report data.
      */
-    public function report(): Collection
+    public function report(): array
     {
         return SxReport::get($this->target);
     }

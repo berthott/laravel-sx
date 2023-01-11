@@ -3,7 +3,7 @@
 namespace berthott\SX\Services;
 
 use berthott\SX\Http\Requests\Filters\SxFilter;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -74,23 +74,16 @@ class SxReportService
         $possibleAnswers = $class::labels()->where('variableName', $question['variableName']);
         $answers = $data->pluck($question['variableName']);
         $validAnswers = $answers->filter(fn($answer) => $answer > 0);
-        $invalidAnswers = $answers->filter(fn($answer) => $answer <= 0);
         $validAnswersPercent = $possibleAnswers->pluck('value')->mapWithKeys(function($value) use ($validAnswers) {
             $count = $validAnswers->filter(fn($v) => $v == $value)->count();
             $percentage = $count ? round($count * 100 / $validAnswers->count(), 2) : 0;
             return [$value => $percentage];
         });
-        return [
-            'type' => $question['subType'],
-            'question' => $question['questionText'],
+        return $this->buildReport($answers, $validAnswers, $question, [
             'labels' => $possibleAnswers->mapWithKeys(fn($a) => [$a['value'] => $a['label']])->toArray(),
-            'answers' => $validAnswers->values()->toArray(),
             'answersPercent' => $validAnswersPercent->toArray(),
             'average' => $validAnswers->average(),
-            'num' => $answers->count(),
-            'numValid' => $validAnswers->count(),
-            'numInvalid' => $invalidAnswers->count(),
-        ];
+        ]);
     }
 
     private function reportMultiple(string $class, Collection $data, array $question): array
@@ -109,56 +102,49 @@ class SxReportService
         });
         $validAnswers = $answers->filter(fn($answer) => count($answer) > 0);
         $num = $answers->count();
-        $numValid = $validAnswers->count();
         $validAnswersFlat = $validAnswers->flatten();
         $validAnswersPercent = $possibleAnswers->pluck('choiceValue')->mapWithKeys(function($value) use ($validAnswersFlat, $num) {
             $count = $validAnswersFlat->filter(fn($v) => $v == $value)->count();
             $percentage = $num ? round($count * 100 / $num, 2) : 0;
             return [$value => $percentage];
         });
-        return [
-            'type' => $question['subType'],
-            'question' => $question['questionText'],
+        return $this->buildReport($answers, $validAnswers, $question, [
             'labels' => $possibleValues->toArray(),
-            'answers' => $validAnswers->values()->toArray(),
             'answersPercent' => $validAnswersPercent->toArray(),
-            'num' => $num,
-            'numValid' => $numValid,
-            'numInvalid' => $num - $numValid,
-        ];
+        ]);
     }
 
     private function reportDouble(string $class, Collection $data, array $question): array
     {
         $answers = $data->pluck($question['variableName']);
         $validAnswers = $answers->filter(fn($answer) => $answer != null);
-        $num = $answers->count();
-        $numValid = $validAnswers->count();
-        return [
-            'type' => $question['subType'],
-            'question' => $question['questionText'],
-            'answers' => $validAnswers->values()->toArray(),
+        return $this->buildReport($answers, $validAnswers, $question, [
             'average' => $validAnswers->average(),
-            'num' => $num,
-            'numValid' => $numValid,
-            'numInvalid' => $num - $numValid,
-        ];
+        ]);
     }
 
     private function reportString(string $class, Collection $data, array $question): array
     {
         $answers = $data->pluck($question['variableName']);
         $validAnswers = $answers->filter(fn($answer) => $answer != null);
+        return $this->buildReport($answers, $validAnswers, $question);
+    }
+
+    private function buildReport(Collection $answers, Collection $validAnswers, array $question, array $additional = []): array
+    {
         $num = $answers->count();
         $numValid = $validAnswers->count();
-        return [
-            'type' => $question['subType'],
-            'question' => $question['questionText'],
-            'answers' => $validAnswers->values()->toArray(),
-            'num' => $num,
-            'numValid' => $numValid,
-            'numInvalid' => $num - $numValid,
-        ];
+        return array_merge(
+            [
+                'type' => $question['subType'],
+                'question' => $question['questionText'],
+                'answers' => $validAnswers->values()->toArray(),
+                'num' => $num,
+                'numValid' => $numValid,
+                'numInvalid' => $num - $numValid,
+            ],
+            $additional,
+        );
     }
 
     /**

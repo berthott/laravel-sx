@@ -18,7 +18,7 @@ use berthott\SX\Services\Http\SxApiService;
 use berthott\SX\Services\Http\SxEntityService;
 use berthott\SX\Services\SxableService;
 use berthott\SX\Services\SxDistributableService;
-use berthott\SX\Services\SxReportService;
+use berthott\SX\Services\SxReportWideService;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Routing\Router;
@@ -52,7 +52,7 @@ class SxServiceProvider extends ServiceProvider
             return new SxDistributableService();
         });
         $this->app->singleton('SxReport', function () {
-            return new SxReportService();
+            return new SxReportWideService();
         });
 
         // bind exception singleton

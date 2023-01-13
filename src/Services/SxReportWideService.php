@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class SxReportService
+class SxReportWideService
 {
     private array $columns;
 

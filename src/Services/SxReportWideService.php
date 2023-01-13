@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Services;
 
-use berthott\SX\Http\Requests\Filters\SxFilter;
+use berthott\SX\Http\Requests\Filters\SxWideFilter;
 use Illuminate\Support\Collection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -27,7 +27,7 @@ class SxReportWideService
     {
         $filters = [];
         foreach ($this->columns as $filter) {
-            $filters[] = AllowedFilter::custom($filter, new SxFilter($class));
+            $filters[] = AllowedFilter::custom($filter, new SxWideFilter($class));
         }
         return QueryBuilder::for($class)
             ->allowedFilters($filters)

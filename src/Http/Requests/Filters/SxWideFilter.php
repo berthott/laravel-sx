@@ -5,7 +5,7 @@ namespace berthott\SX\Http\Requests\Filters;
 use Spatie\QueryBuilder\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
 
-class SxFilter implements Filter
+class SxWideFilter implements Filter
 {
     /**
      * Table to filter on.

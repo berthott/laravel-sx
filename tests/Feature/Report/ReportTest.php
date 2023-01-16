@@ -29,23 +29,24 @@ class ReportTest extends ReportTestCase
                 'numValid' => 2,
                 'numInvalid' => 2,
             ],
-            's_5' => [
+            'trainer_1' => [
                 'type' => 'Single',
-                'question' => 'status',
+                'question' => 'Trainer 1',
                 'labels' => [
-                    1 => 'laufende Bewerbung',
-                    2 => 'abgelehnte Bewerbung',
-                    3 => 'teilnehmend ohne Gründung',
-                    4 => 'teilnehmend mit Gründung',
+                    1 => 'gar nicht zufrieden',
+                    2 => 'kaum zufrieden',
+                    3 => 'teilweise zufrieden',
+                    4 => 'eher zufrieden',
+                    5 => 'sehr zufrieden',
                 ],
-                'answers' => [2, 3],
+                'answers' => [1, 2],
                 'answersPercent' => [
-                    1 => 0,
+                    1 => 50,
                     2 => 50,
-                    3 => 50,
+                    3 => 0,
                     4 => 0,
                 ],
-                'average' => 2.5,
+                'average' => 1.5,
                 'num' => 4,
                 'numValid' => 2,
                 'numInvalid' => 2,
@@ -160,17 +161,24 @@ class ReportTest extends ReportTestCase
                 'numValid' => 1,
                 'numInvalid' => 0,
             ],
-            's_5' => [
+            'trainer_1' => [
                 'type' => 'Single',
-                'question' => 'status',
-                'answers' => [2],
+                'question' => 'Trainer 1',
+                'labels' => [
+                    1 => 'gar nicht zufrieden',
+                    2 => 'kaum zufrieden',
+                    3 => 'teilweise zufrieden',
+                    4 => 'eher zufrieden',
+                    5 => 'sehr zufrieden',
+                ],
+                'answers' => [1],
                 'answersPercent' => [
-                    1 => 0,
-                    2 => 100,
+                    1 => 100,
+                    2 => 0,
                     3 => 0,
                     4 => 0,
                 ],
-                'average' => 2,
+                'average' => 1,
                 'num' => 1,
                 'numValid' => 1,
                 'numInvalid' => 0,
@@ -254,20 +262,20 @@ class ReportTest extends ReportTestCase
                 'numValid' => 2,
                 'numInvalid' => 0,
             ],
-            's_5' => [
+            'trainer_1' => [
                 'type' => 'Single',
-                'question' => 'status',
-                'answers' => [2, 3],
+                'question' => 'Trainer 1',
+                'answers' => [1],
                 'answersPercent' => [
-                    1 => 0,
-                    2 => 50,
-                    3 => 50,
+                    1 => 100,
+                    2 => 0,
+                    3 => 0,
                     4 => 0,
                 ],
-                'average' => 2.5,
+                'average' => 1,
                 'num' => 2,
-                'numValid' => 2,
-                'numInvalid' => 0,
+                'numValid' => 1,
+                'numInvalid' => 1,
             ],
             's_10' => [
                 'type' => 'String',
@@ -351,20 +359,20 @@ class ReportTest extends ReportTestCase
                 'numValid' => 2,
                 'numInvalid' => 0,
             ],
-            's_5' => [
+            'trainer_1' => [
                 'type' => 'Single',
-                'question' => 'status',
-                'answers' => [2, 3],
+                'question' => 'Trainer 1',
+                'answers' => [1],
                 'answersPercent' => [
-                    1 => 0,
-                    2 => 50,
-                    3 => 50,
+                    1 => 100,
+                    2 => 0,
+                    3 => 0,
                     4 => 0,
                 ],
-                'average' => 2.5,
+                'average' => 1,
                 'num' => 2,
-                'numValid' => 2,
-                'numInvalid' => 0,
+                'numValid' => 1,
+                'numInvalid' => 1,
             ],
             's_10' => [
                 'type' => 'String',
@@ -427,7 +435,6 @@ class ReportTest extends ReportTestCase
             ]
         ]))
         ->assertStatus(200)
-        ->assertStatus(200)
         ->assertJson([
             'startTime' => [
                 'type' => 'Date',
@@ -449,20 +456,20 @@ class ReportTest extends ReportTestCase
                 'numValid' => 2,
                 'numInvalid' => 1,
             ],
-            's_5' => [
+            'trainer_1' => [
                 'type' => 'Single',
-                'question' => 'status',
-                'answers' => [2, 3],
+                'question' => 'Trainer 1',
+                'answers' => [1],
                 'answersPercent' => [
-                    1 => 0,
-                    2 => 50,
-                    3 => 50,
+                    1 => 100,
+                    2 => 0,
+                    3 => 0,
                     4 => 0,
                 ],
-                'average' => 2.5,
+                'average' => 1,
                 'num' => 3,
-                'numValid' => 2,
-                'numInvalid' => 1,
+                'numValid' => 1,
+                'numInvalid' => 2,
             ],
             's_10' => [
                 'type' => 'String',

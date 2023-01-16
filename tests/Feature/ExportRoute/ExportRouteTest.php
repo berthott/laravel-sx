@@ -123,6 +123,9 @@ class ExportRouteTest extends ExportRouteTestCase
             'statoverall_3' => 0,
             'statoverall_4' => 1,
             'statoverall_5' => 0,
+            'trainer_1' => 1,
+            'trainer_2' => 4,
+            'trainer_3' => 5,
             //'created_at' => $this->now,
             //'updated_at' => $this->now,
         ];
@@ -249,6 +252,9 @@ class ExportRouteTest extends ExportRouteTestCase
             'statoverall_3 - Teilweise abgeschlossen' => 'Nicht ausgewählt',
             'statoverall_4 - Abgeschlossen' => 'Ausgewählt',
             'statoverall_5 - Abgelehnt' => 'Nicht ausgewählt',
+            'trainer_1' => 'gar nicht zufrieden',
+            'trainer_2' => 'eher zufrieden',
+            'trainer_3' => 'sehr zufrieden',
             //'created_at' => $this->now,
             //'updated_at' => $this->now,
         ];

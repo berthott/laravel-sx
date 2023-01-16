@@ -300,7 +300,7 @@ class SxableTest extends SxableTestCase
 
     public function test_long_table_values(): void
     {
-        $this->assertDatabaseCount('entities_long', 416); // 4 entries á 104
+        $this->assertDatabaseCount('entities_long', 428); // 4 entries á 104
         // value_single_multiple
         $this->assertDatabaseHas('entities_long', [
             'respondent_id' => 825478429,

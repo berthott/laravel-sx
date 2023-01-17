@@ -2,14 +2,16 @@
 
 namespace berthott\SX\Services;
 
+use berthott\SX\Http\Requests\SxReportRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Spatie\QueryBuilder\QueryBuilderRequest;
 
 class SxReportLongService
 {
     private array $columns;
+    private Collection $questions;
+    private Collection $labels;
 
     /**
      * Build a report for the given class.
@@ -17,6 +19,8 @@ class SxReportLongService
     public function get(string $class): array
     {
         $this->columns = $this->fromOptions($class, 'filter') ?: $class::questionNames();
+        $this->questions = $class::questions();
+        $this->labels = $class::labels();
         return $this->report($class, $this->getData($class));
     }
 
@@ -25,8 +29,18 @@ class SxReportLongService
      */
     private function getData(string $class): Collection
     {    
-        $request = QueryBuilderRequest::fromRequest(app(Request::class));
-        $respondents = DB::table($class::longTableName())->where(function ($query) use ($class, $request) {            
+        $request = SxReportRequest::fromRequest(app(Request::class));
+        $respondents = $this->filterRespondents($class, $request);
+        $data = $this->filterFields($class, $request, $respondents);
+        return $this->aggregateFields($request, $data);
+    }
+
+    /**
+     * Build a query to filter for the respondents requested.
+     */
+    private function filterRespondents(string $class, SxReportRequest $request): Collection
+    {    
+        return DB::table($class::longTableName())->where(function ($query) use ($class, $request) {            
             foreach($request->filters() as $property => $value) {
                 $questions = $class::questions()->where('questionName', $property);
                 $type = $questions->first()['subType'];
@@ -73,6 +87,13 @@ class SxReportLongService
                 });
             }
         })->get()->unique('respondent_id')->pluck('respondent_id');
+    }
+
+    /**
+     * Build a query to filter for the fields requested.
+     */
+    private function filterFields(string $class, SxReportRequest $request, Collection $respondents): Collection
+    {    
         return DB::table($class::longTableName())->where(function ($query) use ($respondents, $request) {
             $fields = $request->fields();
             if ($fields->count()) {
@@ -83,15 +104,52 @@ class SxReportLongService
     }
 
     /**
+     * Build a query to filter for the fields requested.
+     */
+    private function aggregateFields(SxReportRequest $request, Collection $data): Collection
+    {    
+        $aggregate = $request->aggregate();
+        if (!$aggregate->count()) {
+            return $data;
+        }
+        
+        foreach($aggregate as $replace => $search) {
+            // collumns 
+            array_push($this->columns, $replace);
+            $this->columns = array_diff($this->columns, $search);
+            // questions
+            $newQuestion = $this->questions->filter(fn($question) => in_array($question['variableName'], $search))->first();
+            $newQuestion['variableName'] = $replace;
+            $newQuestion['questionName'] = $replace;
+            $this->questions = $this->questions->filter(fn($question) => !in_array($question['variableName'], $search));
+            $this->questions->push($newQuestion);
+            // labels
+            $this->labels = $this->labels->map(function($label) use ($replace, $search) {
+                if (in_array($label['variableName'], $search)) {
+                    $label['variableName'] = $replace;
+                }
+                return $label;
+            });
+        }
+        return $data->map(function($entry) use ($aggregate) {
+            foreach($aggregate as $replace => $search) {
+                if (in_array($entry->variableName, $search)) {
+                    $entry->variableName = $replace;
+                }
+            }
+            return $entry;
+        });
+    }
+
+    /**
      * Gather report data.
      */
     private function report(string $class, Collection $data): array
     {
         $ret = [];
         if ($data->count()) {
-            $questions = $class::questions();
             foreach($this->columns as $column) {
-                $filteredQuestions = $questions->where('questionName', $column);
+                $filteredQuestions = $this->questions->where('questionName', $column);
                 $filteredData = $data->filter(function($entry) use ($filteredQuestions) {
                     return $filteredQuestions->contains(function($question) use ($entry) {
                         return $question['variableName'] === $entry->variableName;
@@ -126,7 +184,7 @@ class SxReportLongService
 
     private function reportSingle(string $class, Collection $data, array $question): array
     {
-        $possibleAnswers = $class::labels()->where('variableName', $question['variableName']);
+        $possibleAnswers = $this->labels->where('variableName', $question['variableName'])->unique();
         $answers = $data->where('variableName', $question['variableName'])->pluck('value_single_multiple')->values();
         $validAnswers = $answers->filter(fn($answer) => $answer > 0);
         $validAnswersPercent = $possibleAnswers->pluck('value')->mapWithKeys(function($value) use ($validAnswers) {
@@ -137,13 +195,13 @@ class SxReportLongService
         return $this->buildReport($answers, $validAnswers, $question, [
             'labels' => $possibleAnswers->mapWithKeys(fn($a) => [$a['value'] => $a['label']])->toArray(),
             'answersPercent' => $validAnswersPercent->toArray(),
-            'average' => $validAnswers->average(),
+            'average' => round($validAnswers->average(), 2),
         ]);
     }
 
     private function reportMultiple(string $class, Collection $data, array $question): array
     {
-        $possibleAnswers = $class::questions()->where('questionName', $question['questionName']);
+        $possibleAnswers = $this->questions->where('questionName', $question['questionName']);
         $possibleValues = $possibleAnswers->mapWithKeys(fn($a) => [$a['choiceValue'] => $a['choiceText']]);
         $answers = $data->groupBy('respondent_id')->map(function($group) use ($possibleAnswers) {
             return $group

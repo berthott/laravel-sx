@@ -522,4 +522,90 @@ class ReportTest extends ReportTestCase
             ['respondentid' => 825478569],
         ]); */
     }
+
+    public function test_no_aggregate(): void
+    {
+        $this->get(route('entities.report'))
+        ->assertStatus(200)
+        ->assertJson([
+            'trainer_1' => [
+                'type' => 'Single',
+                'question' => 'Trainer 1',
+                'answers' => [1, 2],
+                'answersPercent' => [
+                    1 => 50,
+                    2 => 50,
+                    3 => 0,
+                    4 => 0,
+                    5 => 0,
+                ],
+                'average' => 1.5,
+                'num' => 4,
+                'numValid' => 2,
+                'numInvalid' => 2,
+            ],
+            'trainer_2' => [
+                'type' => 'Single',
+                'question' => 'Trainer 2',
+                'answers' => [4, 5, 3, 4],
+                'answersPercent' => [
+                    1 => 0,
+                    2 => 0,
+                    3 => 25,
+                    4 => 50,
+                    5 => 25,
+                ],
+                'average' => 4,
+                'num' => 4,
+                'numValid' => 4,
+                'numInvalid' => 0,
+            ],
+            'trainer_3' => [
+                'type' => 'Single',
+                'question' => 'Trainer 3',
+                'answers' => [5, 5, 5],
+                'answersPercent' => [
+                    1 => 0,
+                    2 => 0,
+                    3 => 0,
+                    4 => 0,
+                    5 => 100,
+                ],
+                'average' => 5,
+                'num' => 4,
+                'numValid' => 3,
+                'numInvalid' => 1,
+            ],
+        ]);
+    }
+
+    public function test_aggregate(): void
+    {
+        $this->get(route('entities.report', [
+            'aggregate' => [
+                'trainer' => [
+                    'trainer_1',
+                    'trainer_2',
+                    'trainer_3',
+                ],
+            ]
+        ]))
+        ->assertStatus(200)
+        ->assertJson([
+            'trainer' => [
+                'answers' => [1, 4, 5, 2, 5, 5, 3, 5, 4],
+                'answersPercent' => [
+                    1 => 11.11,
+                    2 => 11.11,
+                    3 => 11.11,
+                    4 => 22.22,
+                    5 => 44.44,
+                ],
+                'average' => 3.78,
+                'num' => 12,
+                'numValid' => 9,
+                'numInvalid' => 3,
+            ],
+        ]);
+    }
 }

@@ -29,7 +29,7 @@ class SxDistributableController
      */
     public function qrcode(mixed $id)
     {
-        return ['data' => $this->target::findOrFail($id)->qrcode()];
+        return ['data' => $this->target::findOrFail($id)->qrCode()];
     }
 
     /**
@@ -40,7 +40,8 @@ class SxDistributableController
         $pdf = Pdf::setPaper('a4');
         $instance = $this->target::findOrFail($id);
         $pdf->loadView('sx::pdf.qrcode', [
-            'qrcode' => $instance->qrcode(),
+            'qrcode' => $instance->qrCode(),
+            'collecturl' => $instance->collectUrl(),
             ...$instance->sxPdfData(),
         ]);
         return $pdf->stream();

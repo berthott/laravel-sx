@@ -72,10 +72,14 @@ trait SxDistributable
         return $response->original;
     }
 
+    public function collectUrl(): string
+    {
+        return route(static::entityTableName().'.sxcollect', [ static::singleName() => $this->id ]);
+    }
+
     public function qrCode(): string
     {
-        $route = route(static::entityTableName().'.sxcollect', [ static::singleName() => $this->id ]);
-        $encoded = base64_encode(QrCode::errorCorrection('H')->format('png')->size(250)->generate($route));
+        $encoded = base64_encode(QrCode::errorCorrection('H')->format('png')->size(250)->generate($this->collectUrl()));
         return "data:image/png;base64,$encoded";
     }
 }

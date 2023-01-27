@@ -8,7 +8,7 @@ class ReportTest extends ReportTestCase
     {
         $this->get(route('entities.report'))
         ->assertStatus(200)
-        ->assertJson([
+        ->assertJsonFragment([
             'startTime' => [
                 'type' => 'Date',
                 'question' => 'Beginn',
@@ -20,6 +20,8 @@ class ReportTest extends ReportTestCase
                 'numValid' => 2,
                 'numInvalid' => 2,
             ],
+        ])
+        ->assertJsonFragment([
             's_2' => [
                 'type' => 'Double',
                 'question' => 'year',
@@ -29,10 +31,13 @@ class ReportTest extends ReportTestCase
                 'numValid' => 2,
                 'numInvalid' => 2,
             ],
+        ])
+        ->assertJsonFragment([
             'trainer_1' => [
                 'type' => 'Single',
                 'question' => 'Trainer 1',
                 'labels' => [
+                    // -7 => 'keine Angabe', // must be missing
                     1 => 'gar nicht zufrieden',
                     2 => 'kaum zufrieden',
                     3 => 'teilweise zufrieden',
@@ -41,16 +46,20 @@ class ReportTest extends ReportTestCase
                 ],
                 'answers' => [1, 2],
                 'answersPercent' => [
+                    // -7 => 0, // must be missing
                     1 => 50,
                     2 => 50,
                     3 => 0,
                     4 => 0,
+                    5 => 0,
                 ],
                 'average' => 1.5,
                 'num' => 4,
                 'numValid' => 2,
                 'numInvalid' => 2,
             ],
+        ])
+        ->assertJsonFragment([
             's_10' => [
                 'type' => 'String',
                 'question' => 'business_idea_description',
@@ -62,6 +71,8 @@ class ReportTest extends ReportTestCase
                 'numValid' => 2,
                 'numInvalid' => 2,
             ],
+        ])
+        ->assertJsonFragment([
             's_11' => [
                 'type' => 'Multiple',
                 'question' => 'SDG',
@@ -91,7 +102,7 @@ class ReportTest extends ReportTestCase
                 'answersPercent' => [
                     1 => 0,
                     2 => 0,
-                    3 => 25, // TODO: Clarify if this should be of all or of valid answers
+                    3 => 25,
                     4 => 0,
                     5 => 25,
                     6 => 25,

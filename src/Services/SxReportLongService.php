@@ -184,7 +184,7 @@ class SxReportLongService
 
     private function reportSingle(string $class, Collection $data, array $question): array
     {
-        $possibleAnswers = $this->labels->where('variableName', $question['variableName'])->unique();
+        $possibleAnswers = $this->labels->where('variableName', $question['variableName'])->unique()->filter(fn($a) => $a['value'] > 0);
         $answers = $data->where('variableName', $question['variableName'])->pluck('value_single_multiple')->values();
         $validAnswers = $answers->filter(fn($answer) => $answer > 0);
         $validAnswersPercent = $possibleAnswers->pluck('value')->mapWithKeys(function($value) use ($validAnswers) {
@@ -206,7 +206,7 @@ class SxReportLongService
         $answers = $data->groupBy('respondent_id')->map(function($group) use ($possibleAnswers) {
             return $group
                 ->filter(fn($entry) => $entry->value_single_multiple === 1)
-                ->map(fn($entry) => $possibleAnswers->firstWhere('variableName', $entry->variableName)['choiceValue'])
+                ->map(fn($entry) => +$possibleAnswers->firstWhere('variableName', $entry->variableName)['choiceValue'])
                 ->sort()->values()->toArray();
         });
         $num = $answers->count();

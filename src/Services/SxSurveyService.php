@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Services;
 
-use berthott\SX\Facades\Helpers;
+use berthott\SX\Facades\SxHelpers;
 use berthott\SX\Facades\SxHttpService;
 use GuzzleHttp\Psr7\Response;
 use League\Csv\Reader;
@@ -81,7 +81,7 @@ class SxSurveyService
     public function getEntityStructure(): Collection
     {
         $this->initStructure();
-        return $this->mapToFullVariableName(Helpers::pluckFromCollection($this->structure, 'variableName', 'subType'));
+        return $this->mapToFullVariableName(SxHelpers::pluckFromCollection($this->structure, 'variableName', 'subType'));
     }
 
     /**
@@ -104,7 +104,7 @@ class SxSurveyService
     public function getQuestions(): Collection
     {
         $this->initStructure();
-        return $this->mapToFullVariableName(Helpers::pluckFromCollection($this->structure, 'questionName', 'variableName', 'questionText', 'subType', 'choiceValue', 'choiceText'));
+        return $this->mapToFullVariableName(SxHelpers::pluckFromCollection($this->structure, 'questionName', 'variableName', 'questionText', 'subType', 'choiceValue', 'choiceText'));
     }
 
     /**

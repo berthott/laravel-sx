@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Models\Resources;
 
-use berthott\SX\Facades\Helpers;
+use berthott\SX\Facades\SxHelpers;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class SxableLabeledExportResource extends JsonResource
@@ -15,6 +15,6 @@ class SxableLabeledExportResource extends JsonResource
      */
     public function toArray($request)
     {
-        return Helpers::getLabeledResource($this->resource, excludeFromExport: true);
+        return SxHelpers::getLabeledResource($this->resource, excludeFromExport: true);
     }
 }

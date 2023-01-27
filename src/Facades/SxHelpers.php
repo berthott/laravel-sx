@@ -4,10 +4,10 @@ namespace berthott\SX\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class Helpers extends Facade
+class SxHelpers extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return 'Helpers';
+        return 'SxHelpers';
     }
 }

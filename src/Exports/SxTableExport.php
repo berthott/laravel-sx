@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Exports;
 
-use berthott\SX\Facades\Helpers;
+use berthott\SX\Facades\SxHelpers;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -42,7 +42,7 @@ class SxTableExport implements FromCollection, WithHeadings, WithTitle, WithStri
 
     public function headings(): array
     {
-        return array_filter(Helpers::getSortedColumns($this->tableName), function ($column) {
+        return array_filter(SxHelpers::getSortedColumns($this->tableName), function ($column) {
             return !in_array($column, config('sx.excludeFromExport'));
         });
     }

@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-class Helpers
+class SxHelpers
 {
     /**
      * Get the values for the values table.

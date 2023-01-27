@@ -17,6 +17,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Faker\Factory as FakerFactory;
+use Faker\Generator as Faker;
 
 const MAX_SQL_PLACEHOLDERS = 60000;
 const MAX_MEMORY_CHUNK_SIZE = 100;
@@ -690,5 +692,73 @@ trait Sxable
     public static function reportQueryOptions(): array
     {
         return [];
+    }
+
+    /**
+     * Seed dummy data for the model
+     */
+    public static function truncateData()
+    {
+        $tableName = static::entityTableName();
+        SxLog::log("$tableName: Truncate wide + long table.");
+        DB::table($tableName)->truncate();
+        DB::table(static::longTableName())->truncate();
+    }
+
+    /**
+     * Seed dummy data for the model
+     */
+    public static function seedDummyData(int $count, array $override = [], $truncate = true)
+    {
+        if ($truncate) {
+            static::truncateData();
+        }
+        $tableName = static::entityTableName();
+        SxLog::log("$tableName: Filling table with $count dummy entries...");
+        $faker = FakerFactory::create();
+        $labels = static::labels();
+        $entries = collect();
+        foreach(range(1, $count) as $index) {
+            $entries->push(static::generateDummyEntry($faker, $labels, $override));
+        }
+        static::doUpsert($entries);
+        SxLog::log("$tableName: Table filled.");
+    }
+
+    /**
+     * Seed dummy data for the model
+     */
+    private static function generateDummyEntry(Faker $faker, Collection $labels, array $override): array
+    {
+        $entry = [
+            config('sx.primary') => $faker->randomNumber(9),
+        ];
+        foreach(static::questions() as $question) {
+            if (array_key_exists($question['variableName'], $override)) {
+                $entry[$question['variableName']] = $override[$question['variableName']];
+                continue;
+            }
+            if ($question['variableName'] === config('sx.primary')) {
+                continue;
+            }
+            switch ($question['subType']) {
+                case 'Single':
+                case 'Multiple':
+                    $entry[$question['variableName']] = $faker->randomElement($labels->where('variableName', $question['variableName'])->unique()->pluck('value')->toArray());
+                    break;
+                case 'Double':
+                    $entry[$question['variableName']] = $faker->randomNumber(2);
+                    break;
+                case 'Date':
+                    $entry[$question['variableName']] = $faker->date();
+                    break;
+                case 'String':
+                default:
+                    $entry[$question['variableName']] = $faker->sentence();
+                    break;
+            }
+            
+        }
+        return $entry;
     }
 }

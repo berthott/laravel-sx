@@ -94,10 +94,10 @@ class SxReportLongService
      */
     private function filterFields(string $class, SxReportRequest $request, Collection $respondents): Collection
     {    
-        return DB::table($class::longTableName())->where(function ($query) use ($respondents, $request) {
+        return DB::table($class::longTableName())->where(function ($query) use ($respondents, $request, $class) {
             $fields = $request->fields();
             if ($fields->count()) {
-                $query = $query->whereIn('variableName', $fields);
+                $query = $query->whereIn('variableName', $fields[$class::entityTableName()]);
             }
             return $query->whereIn('respondent_id', $respondents);
         })->get();

@@ -187,13 +187,16 @@ class SxReportLongService
         $possibleAnswers = $this->labels->where('variableName', $question['variableName'])->unique()->filter(fn($a) => $a['value'] > 0);
         $answers = $data->where('variableName', $question['variableName'])->pluck('value_single_multiple')->values();
         $validAnswers = $answers->filter(fn($answer) => $answer > 0);
-        $validAnswersPercent = $possibleAnswers->pluck('value')->mapWithKeys(function($value) use ($validAnswers) {
-            $count = $validAnswers->filter(fn($v) => $v == $value)->count();
-            $percentage = $count ? round($count * 100 / $validAnswers->count(), 2) : 0;
-            return [$value => $percentage];
+        $validAnswersCount = $possibleAnswers->pluck('value')->mapWithKeys(function($value) use ($validAnswers) {
+            $count = +$validAnswers->filter(fn($v) => $v == $value)->count();
+            return [$value => $count];
+        });
+        $validAnswersPercent = $validAnswersCount->map(function($count) use ($validAnswers) {
+            return $count ? round($count * 100 / $validAnswers->count(), 2) : 0;
         });
         return $this->buildReport($answers, $validAnswers, $question, [
             'labels' => $possibleAnswers->mapWithKeys(fn($a) => [$a['value'] => $a['label']])->toArray(),
+            'answersCount' => $validAnswersCount->toArray(),
             'answersPercent' => $validAnswersPercent->toArray(),
             'average' => round($validAnswers->average(), 2),
         ]);
@@ -212,13 +215,16 @@ class SxReportLongService
         $num = $answers->count();
         $validAnswers = $answers->filter(fn($answer) => count($answer) > 0);
         $validAnswersFlat = $validAnswers->flatten();
-        $validAnswersPercent = $possibleAnswers->pluck('choiceValue')->mapWithKeys(function($value) use ($validAnswersFlat, $num) {
-            $count = $validAnswersFlat->filter(fn($v) => $v == $value)->count();
-            $percentage = $num ? round($count * 100 / $num, 2) : 0;
-            return [$value => $percentage];
+        $validAnswersCount = $possibleAnswers->pluck('choiceValue')->mapWithKeys(function($value) use ($validAnswersFlat, $num) {
+            $count = +$validAnswersFlat->filter(fn($v) => $v == $value)->count();
+            return [$value => $count];
+        });
+        $validAnswersPercent = $validAnswersCount->map(function($count) use ($num) {
+            return $num ? round($count * 100 / $num, 2) : 0;
         });
         return $this->buildReport($answers, $validAnswers, $question, [
             'labels' => $possibleValues->toArray(),
+            'answersCount' => $validAnswersCount->toArray(),
             'answersPercent' => $validAnswersPercent->toArray(),
         ]);
     }

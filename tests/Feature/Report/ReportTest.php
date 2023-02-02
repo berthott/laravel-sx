@@ -152,6 +152,35 @@ class ReportTest extends ReportTestCase
         ]);
     }
 
+    public function test_filter_empty(): void
+    {
+        $this->get(route('entities.report'))
+        ->assertStatus(200)
+        ->assertJsonMissingExact([
+            's_4' => [
+                'type' => 'Single',
+                'question' => 'sex',
+                'labels' => [
+                    1 => 'männlich',
+                    2 => 'weiblich',
+                ],
+                'answers' => [],
+                'answersCount' => [
+                    1 => 0,
+                    2 => 0,
+                ],
+                'answersPercent' => [
+                    1 => 0,
+                    2 => 0,
+                ],
+                'average' => 0,
+                'num' => 4,
+                'numValid' => 0,
+                'numInvalid' => 4,
+            ],
+        ]);
+    }
+
     public function test_report_select_field(): void
     {
         $this->get(route('entities.report', [

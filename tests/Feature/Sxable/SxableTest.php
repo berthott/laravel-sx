@@ -227,7 +227,7 @@ class SxableTest extends SxableTestCase
             's_2' => 2021,
             's_3' => 3,
             'name' => null,
-            's_4' => 2,
+            's_4' => 0,
             's_1' => null,
             's_6' => null,
             's_7' => 1,

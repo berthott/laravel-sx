@@ -161,23 +161,10 @@ class SxReportLongService
                     continue;
                 }
                 $question = $filteredQuestions->first();
-                switch ($question['subType']) {
-                    case 'Single':
-                        $ret[$column] = $this->reportSingle($class, $filteredData, $question);
-                        break;
-                    case 'Multiple':
-                        $ret[$column] = $this->reportMultiple($class, $filteredData, $question);
-                        break;
-                    case 'Double':
-                        $ret[$column] = $this->reportDouble($class, $filteredData, $question);
-                        break;
-                    case 'Date':
-                        $ret[$column] = $this->reportDate($class, $filteredData, $question);
-                        break;
-                    case 'String':
-                    default:
-                        $ret[$column] = $this->reportString($class, $filteredData, $question);
-                        break;
+                $method = 'report'.$question['subType'];
+                $d = $this->$method($class, $filteredData, $question);
+                if ($d['numValid']) {
+                    $ret[$column] = $d;
                 }
             }
         }

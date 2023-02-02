@@ -102,7 +102,7 @@ class ImportRouteTest extends ImportRouteTestCase
 
     public function test_import_latest_from_database(): void
     {
-        $this->assertEquals('20211018_164200', $this->testMethod(Entity::class, 'lastImport')['modifiedSince']);
+        $this->assertEquals('20210806_000000', $this->testMethod(Entity::class, 'lastImport')['modifiedSince']);
     }
 
     public function test_import_latest_from_input_absolute(): void
@@ -112,7 +112,7 @@ class ImportRouteTest extends ImportRouteTestCase
 
     public function test_import_latest_from_input_relative(): void
     {
-        $this->assertEquals('20211017_164200', $this->testMethod(Entity::class, 'lastImport', '1 day')['modifiedSince']);
+        $this->assertEquals('20210805_000000', $this->testMethod(Entity::class, 'lastImport', '1 day')['modifiedSince']);
     }
 
     public function test_respondents_imported_events(): void

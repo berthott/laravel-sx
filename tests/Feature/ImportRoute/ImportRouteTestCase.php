@@ -5,6 +5,7 @@ namespace berthott\SX\Tests\Feature\ImportRoute;
 use berthott\SX\Facades\SxApiService;
 use berthott\SX\SxServiceProvider;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
@@ -30,7 +31,7 @@ abstract class ImportRouteTestCase extends BaseTestCase
 
     protected function getEnvironmentSetUp($app)
     {
-        $this->now = now()->format('Y-m-d H:i:s');
+        Carbon::setTestNow('2021-08-06 00:00:00');
         Config::set('sx.namespace', __NAMESPACE__);
         SxApiService::shouldReceive('exportStructure')
             ->andReturn(new Response(

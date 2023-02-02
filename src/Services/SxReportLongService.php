@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
+const REPORT_DECIMALS = 1;
+
 class SxReportLongService
 {
     private array $columns;
@@ -192,13 +194,13 @@ class SxReportLongService
             return [$value => $count];
         });
         $validAnswersPercent = $validAnswersCount->map(function($count) use ($validAnswers) {
-            return $count ? round($count * 100 / $validAnswers->count(), 2) : 0;
+            return $count ? round($count * 100 / $validAnswers->count(), REPORT_DECIMALS) : 0;
         });
         return $this->buildReport($answers, $validAnswers, $question, [
             'labels' => $possibleAnswers->mapWithKeys(fn($a) => [$a['value'] => $a['label']])->toArray(),
             'answersCount' => $validAnswersCount->toArray(),
             'answersPercent' => $validAnswersPercent->toArray(),
-            'average' => round($validAnswers->average(), 2),
+            'average' => round($validAnswers->average(), REPORT_DECIMALS),
         ]);
     }
 
@@ -220,7 +222,7 @@ class SxReportLongService
             return [$value => $count];
         });
         $validAnswersPercent = $validAnswersCount->map(function($count) use ($num) {
-            return $num ? round($count * 100 / $num, 2) : 0;
+            return $num ? round($count * 100 / $num, REPORT_DECIMALS) : 0;
         });
         return $this->buildReport($answers, $validAnswers, $question, [
             'labels' => $possibleValues->toArray(),

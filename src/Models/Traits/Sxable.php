@@ -547,7 +547,7 @@ trait Sxable
         $lastImportArray = [];
         $lastRespondent = static::orderBy('updated_at', 'desc')->first();
         if (isset($lastRespondent)) {
-            $modified = (new Carbon($lastRespondent['modified']));
+            $modified = (new Carbon($lastRespondent['updated_at']));
             if ($since) {
                 if (static::isAbsoluteTime($since)) {
                     $modified = new Carbon($since);

@@ -545,7 +545,7 @@ trait Sxable
     private static function lastImport(string $since = null): array
     {
         $lastImportArray = [];
-        $lastRespondent = static::orderBy('modified', 'desc')->first();
+        $lastRespondent = static::orderBy('updated_at', 'desc')->first();
         if (isset($lastRespondent)) {
             $modified = (new Carbon($lastRespondent['modified']));
             if ($since) {

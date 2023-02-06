@@ -32,13 +32,13 @@ abstract class IncludeTestCase extends BaseTestCase
             ->andReturn(new Response(
                 $status = 200,
                 $headers = [],
-                File::get(__DIR__.'/../structure.csv'),
+                File::get(__DIR__.'/../structure_de.csv'),
             ));
         SxApiService::shouldReceive('exportLabels')
             ->andReturn(new Response(
                 $status = 200,
                 $headers = [],
-                File::get(__DIR__.'/../labels.csv'),
+                File::get(__DIR__.'/../labels_de.csv'),
             ));
         SxApiService::shouldReceive('exportDataset')
             ->andReturn(new Response(

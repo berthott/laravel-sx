@@ -138,37 +138,37 @@ class RoutesMockedTest extends RoutesMockedTestCase
             ->assertStatus(200)
             ->assertJsonFragment([
                 'variableName' => 'survey',
-                'value' => '1325978',
+                'value' => 1325978,
                 'label' => 'HF 4 - GfE Applicants/participants',
             ])
             ->assertJsonFragment([
                 'variableName' => 'statinternal_1',
-                'value' => '0',
+                'value' => 0,
                 'label' => 'Nicht ausgewählt',
             ])
             ->assertJsonFragment([
                 'variableName' => 'statinternal_1',
-                'value' => '1',
+                'value' => 1,
                 'label' => 'Ausgewählt',
             ])
             ->assertJsonFragment([
                 'variableName' => 's_5',
-                'value' => '1',
+                'value' => 1,
                 'label' => 'laufende Bewerbung',
             ])
             ->assertJsonFragment([
                 'variableName' => 's_5',
-                'value' => '2',
+                'value' => 2,
                 'label' => 'abgelehnte Bewerbung',
             ])
             ->assertJsonFragment([
                 'variableName' => 's_5',
-                'value' => '3',
+                'value' => 3,
                 'label' => 'teilnehmend ohne Gründung',
             ])
             ->assertJsonFragment([
                 'variableName' => 's_5',
-                'value' => '4',
+                'value' => 4,
                 'label' => 'teilnehmend mit Gründung',
             ]);
     }
@@ -179,7 +179,7 @@ class RoutesMockedTest extends RoutesMockedTestCase
             ->assertStatus(200)
             ->assertJsonFragment([
                 'variableName' => 'statinternal_1 - E-Mail gesendet',
-                'value' => '0',
+                'value' => 0,
                 'label' => 'Nicht ausgewählt',
             ]);
     }

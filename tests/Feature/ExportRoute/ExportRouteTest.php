@@ -358,16 +358,20 @@ class ExportRouteTest extends ExportRouteTestCase
 
         $labels = [
             //['variableName' => 'survey', 'value' => 1325978, 'label' => 'HF 4 - GfE Applicants/participants'],
-            ['variableName' => 'digitaldistributionstatus', 'value' => 1, 'label' => '1'],
-            ['variableName' => 's_5', 'value' => 3, 'label' => 'teilnehmend ohne Gründung'],
-            ['variableName' => 's_11_1', 'value' => 1, 'label' => 'Ausgewählt'],
-            ['variableName' => 's_12', 'value' => 2, 'label' => 'Demokratie, Zivilgesellschaft und öffentliche Verwaltung'],
+            ['variableName' => 'digitaldistributionstatus', 'value' => 1, 'label' => '1', 'language' => 'de'],
+            ['variableName' => 's_5', 'value' => 3, 'label' => 'teilnehmend ohne Gründung', 'language' => 'de'],
+            ['variableName' => 's_11_1', 'value' => 1, 'label' => 'Ausgewählt', 'language' => 'de'],
+            ['variableName' => 's_12', 'value' => 2, 'label' => 'Demokratie, Zivilgesellschaft und öffentliche Verwaltung', 'language' => 'de'],
         ];
 
         Excel::assertDownloaded('entity_labels.xlsx', function (SxTableExport $export) use ($labels) {
             $correct = true;
             foreach ($labels as $label) {
-                $exportLabel = $export->collection()->where('variableName', $label['variableName'])->where('value', $label['value'])->first();
+                $exportLabel = $export->collection()
+                    ->where('variableName', $label['variableName'])
+                    ->where('value', $label['value'])
+                    ->where('language', $label['language'])
+                    ->first();
                 $diff = array_diff(json_decode(json_encode($exportLabel), true), $label);
                 if (count($diff) !== 1) { // id does not match, 2 if timestamps are not filtered
                     $correct = false;

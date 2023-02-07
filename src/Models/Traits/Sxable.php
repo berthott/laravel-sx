@@ -62,6 +62,14 @@ trait Sxable
     }
 
     /**
+     * The default languages of the survey.
+     */
+    public static function defaultSurveyLanguage(): string
+    {
+        return static::surveyLanguages()[0];
+    }
+
+    /**
      * The Survey Id that should be connected to this Model.
      */
     public static function surveyId(): string
@@ -377,12 +385,19 @@ trait Sxable
             $table->string('variableName');
             $table->integer('value');
             $table->string('label');
+            $table->string('language');
             $table->timestamp('created_at')->useCurrent();
         }, $force);
 
         if (DB::table($table)->get()->isEmpty()) {
             SxLog::log("$table: Filling table.");
-            DB::table($table)->insert(static::labels()->all());
+            foreach(static::surveyLanguages() as $language) {
+                $labels = static::filterByFields(static::controller()->getLabels($language))->map(function($label) use ($language) {
+                    $label['language'] = $language;
+                    return $label;
+                })->all();
+                DB::table($table)->insert($labels);
+            }
             SxLog::log("$table: Table filled.");
         }
     }
@@ -494,7 +509,7 @@ trait Sxable
      */
     public static function labels(string $language = null): Collection
     {
-        return static::filterByFields(static::controller()->getLabels($language));
+        return DB::table(static::labelsTableName())->where('language', $language ?: static::defaultSurveyLanguage())->get()->map(fn($labels) => (array) $labels);
     }
 
     /**

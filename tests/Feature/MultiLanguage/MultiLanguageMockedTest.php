@@ -20,21 +20,21 @@ class MultiLanguageMockedTest extends MultiLanguageMockedTestCase
             ->assertSuccessful()
             ->assertJsonFragment([
                 'variableName' => 's_5',
-                'value' => '1',
+                'value' => 1,
                 'label' => 'laufende Bewerbung',
             ]);
         $this->get(route('entities.labels', ['lang' => 'de']))
             ->assertSuccessful()
             ->assertJsonFragment([
                 'variableName' => 's_5',
-                'value' => '1',
+                'value' => 1,
                 'label' => 'laufende Bewerbung',
             ]);
         $this->get(route('entities.labels', ['lang' => 'en']))
             ->assertSuccessful()
             ->assertJsonFragment([
                 'variableName' => 's_5',
-                'value' => '1',
+                'value' => 1,
                 'label' => 'running application',
             ]);
     }

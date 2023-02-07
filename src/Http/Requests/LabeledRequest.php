@@ -2,10 +2,19 @@
 
 namespace berthott\SX\Http\Requests;
 
+use berthott\SX\Facades\Sxable;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class LabeledRequest extends FormRequest
 {
+  private string $target;
+
+  public function __construct()
+  {
+      $this->target = Sxable::getTarget();
+  }
+
     /**
      * Get the validation rules that apply to the request.
      */
@@ -13,6 +22,11 @@ class LabeledRequest extends FormRequest
     {
         return [
           'labeled' => 'nullable|boolean',
+          'lang' => [
+            'nullable',
+            'string',
+            Rule::in($this->target::surveyLanguages()),
+          ],
         ];
     }
 }

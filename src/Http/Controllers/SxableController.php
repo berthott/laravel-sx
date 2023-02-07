@@ -156,8 +156,8 @@ class SxableController
     public function labels(LabeledRequest $request): Collection
     {
         return $request->labeled
-            ? $this->target::labeledLabels()
-            : $this->target::labels();
+            ? $this->target::labeledLabels($request->lang)
+            : $this->target::labels($request->lang);
     }
 
 

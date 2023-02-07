@@ -183,4 +183,12 @@ class RoutesMockedTest extends RoutesMockedTestCase
                 'label' => 'Nicht ausgewählt',
             ]);
     }
+
+    public function test_labels_route_validation(): void
+    {
+        $this->get(route('entities.labels', [ 'lang' => 'de' ]))
+            ->assertSuccessful();
+        $this->get(route('entities.labels', [ 'lang' => 'fr' ]))
+            ->assertJsonValidationErrorFor('lang');
+    }
 }

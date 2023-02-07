@@ -54,6 +54,14 @@ trait Sxable
     }
 
     /**
+     * The languages the survey covers. First one is the default language.
+     */
+    public static function surveyLanguages(): array
+    {
+        return ['de'];
+    }
+
+    /**
      * The Survey Id that should be connected to this Model.
      */
     public static function surveyId(): string
@@ -163,8 +171,7 @@ trait Sxable
      */
     public static function controller(): SxSurveyService
     {
-        $id = static::surveyId();
-        return static::$_sxController ?: static::$_sxController = new SxSurveyService(static::surveyId());
+        return static::$_sxController ?: static::$_sxController = new SxSurveyService(static::surveyId(), static::surveyLanguages());
     }
 
     /**

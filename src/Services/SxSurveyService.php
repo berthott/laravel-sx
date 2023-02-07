@@ -19,16 +19,33 @@ class SxSurveyService
     private Collection $structure;
 
     /**
+     * The sx labels.
+     */
+    private Collection $labels;
+
+    /**
      * The Survey Id.
      */
     private string $survey_id;
 
     /**
+     * The surveys languages.
+     */
+    private Collection $languages;
+
+    /**
+     * The surveys default languages.
+     */
+    private string $defaultLanguage;
+
+    /**
      * The Constructor.
      */
-    public function __construct(string $survey_id)
+    public function __construct(string $survey_id, array $languages, string $defaultLanguage = null)
     {
         $this->survey_id = $survey_id;
+        $this->languages = collect($languages);
+        $this->defaultLanguage = $defaultLanguage ?: $languages[0];
     }
 
     /**
@@ -37,12 +54,14 @@ class SxSurveyService
     private function initStructure()
     {
         if (!isset($this->structure)) {
-            $this->structure = $this->extractCsv(SxHttpService::surveys()->exportStructure([
+            $this->structure = $this->languages->mapWithKeys(fn($lang) => [
+                $lang => $this->extractCsv(SxHttpService::surveys()->exportStructure([
                 'survey' => $this->survey_id,
                 'query' => [
                     'format' => 'INTL_US',
+                    'lang' => $lang,
                 ],
-            ]));
+            ]))]);
         }
     }
 
@@ -78,10 +97,11 @@ class SxSurveyService
     /**
      * Get the structure for the entity table.
      */
-    public function getEntityStructure(): Collection
+    public function getEntityStructure(string $language = null): Collection
     {
         $this->initStructure();
-        return $this->mapToFullVariableName(SxHelpers::pluckFromCollection($this->structure, 'variableName', 'subType'));
+        $entityStructure = $this->structure->map(fn($structure) => $this->mapToFullVariableName(SxHelpers::pluckFromCollection($structure, 'variableName', 'subType')));
+        return $entityStructure[$language ?: $this->defaultLanguage];
     }
 
     /**
@@ -101,23 +121,37 @@ class SxSurveyService
     /**
      * Get the questions for the questions table.
      */
-    public function getQuestions(): Collection
+    public function getQuestions(string $language = null): Collection
     {
         $this->initStructure();
-        return $this->mapToFullVariableName(SxHelpers::pluckFromCollection($this->structure, 'questionName', 'variableName', 'questionText', 'subType', 'choiceValue', 'choiceText'));
+        $questions = $this->structure->map(fn($structure) => $this->mapToFullVariableName(SxHelpers::pluckFromCollection($structure, 'questionName', 'variableName', 'questionText', 'subType', 'choiceValue', 'choiceText')));
+        return $questions[$language ?: $this->defaultLanguage];
+    }
+
+    /**
+     * Initialize the labels.
+     */
+    private function initLabels()
+    {
+        if (!isset($this->labels)) {
+            $this->labels = $this->languages->mapWithKeys(fn($lang) => [
+                $lang => $this->mapToFullVariableName($this->extractCsv(SxHttpService::surveys()->exportLabels([
+                    'survey' => $this->survey_id,
+                    'query' => [
+                        'format' => 'INTL_US',
+                    ],
+                ]), ['variableName', 'value', 'label'])),
+            ]);
+        }
     }
 
     /**
      * Get the values for the values table.
      */
-    public function getLabels(): Collection
+    public function getLabels(string $language = null): Collection
     {
-        return $this->mapToFullVariableName($this->extractCsv(SxHttpService::surveys()->exportLabels([
-            'survey' => $this->survey_id,
-            'query' => [
-                'format' => 'INTL_US',
-            ],
-        ]), ['variableName', 'value', 'label']));
+        $this->initLabels();
+        return $this->labels[$language ?: $this->defaultLanguage];
     }
 
     /**
@@ -126,13 +160,14 @@ class SxSurveyService
     public function guessFullVariableName(string $shortName): string
     {
         $this->initStructure();
-        $entry = $this->structure->firstWhere('variableName', $shortName);
+        $structure = $this->structure->first();
+        $entry = $structure->firstWhere('variableName', $shortName);
         if (!$entry) {
             return $shortName;
         }
         $base = Str::lower($entry['questionName']);
         if ($entry['choiceValue']) {
-            $questionNameEntries = $this->structure->where('questionName', $entry['questionName'])->values();
+            $questionNameEntries = $structure->where('questionName', $entry['questionName'])->values();
             $index = $questionNameEntries->search(function ($entity) use ($shortName) {
                 return $entity['variableName'] === $shortName;
             });
@@ -157,7 +192,8 @@ class SxSurveyService
             $base = join('_', $fullNameArray);
         }
         $this->initStructure();
-        $entries = $this->structure->filter(function ($entry) use ($base) {
+        $structure = $this->structure->first();
+        $entries = $structure->filter(function ($entry) use ($base) {
             return Str::startsWith(Str::lower($entry['questionName']), Str::lower($base));
         })->sortBy('questionName', SORT_NATURAL);
         if ($entries->count() === 1) {

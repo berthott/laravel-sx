@@ -349,7 +349,7 @@ class SxableTest extends SxableTestCase
 
     public function test_guess_full_variable_name(): void
     {
-        $service = new SxSurveyService('mocked');
+        $service = new SxSurveyService('mocked', ['de']);
         $this->assertEquals('responsecollectsessions', $service->guessFullVariableName('response'));
         $this->assertEquals('statcreation_2', $service->guessFullVariableName('statc_5'));
         $this->assertEquals('statdistribution_1', $service->guessFullVariableName('statd_1'));
@@ -359,7 +359,7 @@ class SxableTest extends SxableTestCase
 
     public function test_guess_short_variable_name(): void
     {
-        $service = new SxSurveyService('mocked');
+        $service = new SxSurveyService('mocked', ['de']);
         $this->assertEquals('response', $service->guessShortVariableName('responsecollectsessions'));
         $this->assertEquals('statc_5', $service->guessShortVariableName('statcreation_2'));
         $this->assertEquals('statd_1', $service->guessShortVariableName('statdistribution_1'));

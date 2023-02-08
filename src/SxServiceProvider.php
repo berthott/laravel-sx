@@ -19,7 +19,6 @@ use berthott\SX\Services\Http\SxEntityService;
 use berthott\SX\Services\SxableService;
 use berthott\SX\Services\SxDistributableService;
 use berthott\SX\Services\SxReportLongService;
-use berthott\SX\Services\SxReportWideService;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Routing\Router;

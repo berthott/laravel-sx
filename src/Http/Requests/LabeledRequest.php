@@ -8,12 +8,12 @@ use Illuminate\Validation\Rule;
 
 class LabeledRequest extends FormRequest
 {
-  private string $target;
+    private string $target;
 
-  public function __construct()
-  {
-      $this->target = Sxable::getTarget();
-  }
+    public function __construct()
+    {
+        $this->target = Sxable::getTarget();
+    }
 
     /**
      * Get the validation rules that apply to the request.

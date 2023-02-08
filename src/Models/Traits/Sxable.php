@@ -416,12 +416,19 @@ trait Sxable
             $table->string('subType');
             $table->integer('choiceValue')->nullable();
             $table->string('choiceText')->nullable();
+            $table->string('language');
             $table->timestamp('created_at')->useCurrent();
         }, $force);
 
         if (DB::table($table)->get()->isEmpty()) {
             SxLog::log("$table: Filling table.");
-            DB::table($table)->insert(static::questions()->all());
+            foreach(static::surveyLanguages() as $language) {
+                $questions = static::trimMultipleChoiceLabelsForJavaScript(static::filterByFields(static::controller()->getQuestions($language)))->map(function($question) use ($language) {
+                    $question['language'] = $language;
+                    return $question;
+                })->all();
+                DB::table($table)->insert($questions);
+            }
             SxLog::log("$table: Table filled.");
         }
     }
@@ -481,17 +488,17 @@ trait Sxable
     /**
      * The questions mapped to the fields.
      */
-    public static function questions(): Collection
+    public static function questions(string $language = null): Collection
     {
-        return static::trimMultipleChoiceLabelsForJavaScript(static::filterByFields(static::controller()->getQuestions()));
+        return DB::table(static::questionsTableName())->where('language', $language ?: static::defaultSurveyLanguage())->get()->map(fn($questions) => (array) $questions);
     }
 
     /**
      * All possible question names.
      */
-    public static function questionNames(): array
+    public static function questionNames(string $language = null): array
     {
-        return static::questions()->pluck('questionName')->unique()->values()->toArray();
+        return static::questions($language)->pluck('questionName')->unique()->values()->toArray();
     }
     
     private static function trimMultipleChoiceLabelsForJavaScript(Collection $collection): Collection

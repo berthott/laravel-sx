@@ -328,17 +328,20 @@ class ExportRouteTest extends ExportRouteTestCase
         ])->assertStatus(200);
 
         $questions = [
-            ['questionName' => 'statinternal', 'variableName' => 'statinternal_19', 'subType' => 'Multiple', 'questionText' => 'Basisstatus', 'choiceValue' => 19, 'choiceText' => 'Abgelehnt durch zurückgesendete Mail'],
-            ['questionName' => 'modified', 'variableName' => 'modified', 'subType' => 'Date', 'questionText' => 'Geändert', 'choiceValue' => null, 'choiceText' => null],
-            ['questionName' => 's_10', 'variableName' => 's_10', 'subType' => 'String', 'questionText' => 'business_idea_description', 'choiceValue' => null, 'choiceText' => null],
-            ['questionName' => 'number_jobs', 'variableName' => 'number_jobs', 'subType' => 'Double', 'questionText' => 'number_jobs', 'choiceValue' => null, 'choiceText' => null],
-            ['questionName' => 'lang', 'variableName' => 'lang', 'subType' => 'Single', 'questionText' => 'Sprache', 'choiceValue' => null, 'choiceText' => null],
+            ['questionName' => 'statinternal', 'variableName' => 'statinternal_19', 'subType' => 'Multiple', 'questionText' => 'Basisstatus', 'choiceValue' => 19, 'choiceText' => 'Abgelehnt durch zurückgesendete Mail', 'language' => 'de'],
+            ['questionName' => 'modified', 'variableName' => 'modified', 'subType' => 'Date', 'questionText' => 'Geändert', 'choiceValue' => null, 'choiceText' => null, 'language' => 'de'],
+            ['questionName' => 's_10', 'variableName' => 's_10', 'subType' => 'String', 'questionText' => 'business_idea_description', 'choiceValue' => null, 'choiceText' => null, 'language' => 'de'],
+            ['questionName' => 'number_jobs', 'variableName' => 'number_jobs', 'subType' => 'Double', 'questionText' => 'number_jobs', 'choiceValue' => null, 'choiceText' => null, 'language' => 'de'],
+            ['questionName' => 'lang', 'variableName' => 'lang', 'subType' => 'Single', 'questionText' => 'Sprache', 'choiceValue' => null, 'choiceText' => null, 'language' => 'de'],
         ];
 
         Excel::assertDownloaded('entity_questions.xlsx', function (SxTableExport $export) use ($questions) {
             $correct = true;
             foreach ($questions as $question) {
-                $exportQuestion = $export->collection()->firstWhere('variableName', $question['variableName']);
+                $exportQuestion = $export->collection()
+                    ->where('variableName', $question['variableName'])
+                    ->where('language', $question['language'])
+                    ->first();
                 $diff = array_diff(json_decode(json_encode($exportQuestion), true), $question);
                 if (count($diff) !== 1) { // id does not match, 2 if timestamps are not filtered
                     $correct = false;

@@ -14,14 +14,16 @@ class SxReportLongService
     private array $columns;
     private Collection $questions;
     private Collection $labels;
+    private SxReportRequest $request;
 
     /**
      * Build a report for the given class.
      */
     public function get(string $class): array
     {
+        $this->request = SxReportRequest::fromRequest(app(Request::class));
         $this->columns = $this->fromOptions($class, 'filter') ?: $class::questionNames();
-        $this->questions = $class::questions();
+        $this->questions = $class::questions($this->request->lang);
         $this->labels = $class::labels();
         return $this->report($class, $this->getData($class));
     }
@@ -31,10 +33,9 @@ class SxReportLongService
      */
     private function getData(string $class): Collection
     {    
-        $request = SxReportRequest::fromRequest(app(Request::class));
-        $respondents = $this->filterRespondents($class, $request);
-        $data = $this->filterFields($class, $request, $respondents);
-        return $this->aggregateFields($request, $data);
+        $respondents = $this->filterRespondents($class, $this->request);
+        $data = $this->filterFields($class, $this->request, $respondents);
+        return $this->aggregateFields($this->request, $data);
     }
 
     /**
@@ -44,7 +45,7 @@ class SxReportLongService
     {    
         return DB::table($class::longTableName())->where(function ($query) use ($class, $request) {            
             foreach($request->filters() as $property => $value) {
-                $questions = $class::questions()->where('questionName', $property);
+                $questions = $this->questions->where('questionName', $property);
                 $type = $questions->first()['subType'];
                 $column = '';
                 switch($type) {
@@ -72,7 +73,7 @@ class SxReportLongService
                         $query = $query->where(function($query) use ($value, $questions, $column) {
                             foreach ($value as $v) {
                                 foreach ($questions as $question) {
-                                    if ($question['choiceValue'] === $v) {
+                                    if ($question['choiceValue'] === (int) $v) {
                                         $query = $query->orwhere(function($query) use ($question, $column) {
                                             return $query->where('variableName', $question['variableName'])->where($column, 1);
                                         });
@@ -177,7 +178,7 @@ class SxReportLongService
         $answers = $data->where('variableName', $question['variableName'])->pluck('value_single_multiple')->values();
         $validAnswers = $answers->filter(fn($answer) => $answer > 0);
         $validAnswersCount = $possibleAnswers->pluck('value')->mapWithKeys(function($value) use ($validAnswers) {
-            $count = +$validAnswers->filter(fn($v) => $v == $value)->count();
+            $count = $validAnswers->filter(fn($v) => $v == $value)->count();
             return [$value => $count];
         });
         $validAnswersPercent = $validAnswersCount->map(function($count) use ($validAnswers) {
@@ -198,14 +199,14 @@ class SxReportLongService
         $answers = $data->groupBy('respondent_id')->map(function($group) use ($possibleAnswers) {
             return $group
                 ->filter(fn($entry) => $entry->value_single_multiple === 1)
-                ->map(fn($entry) => +$possibleAnswers->firstWhere('variableName', $entry->variableName)['choiceValue'])
+                ->map(fn($entry) => $possibleAnswers->firstWhere('variableName', $entry->variableName)['choiceValue'])
                 ->sort()->values()->toArray();
         });
         $num = $answers->count();
         $validAnswers = $answers->filter(fn($answer) => count($answer) > 0);
         $validAnswersFlat = $validAnswers->flatten();
         $validAnswersCount = $possibleAnswers->pluck('choiceValue')->mapWithKeys(function($value) use ($validAnswersFlat, $num) {
-            $count = +$validAnswersFlat->filter(fn($v) => $v == $value)->count();
+            $count = $validAnswersFlat->filter(fn($v) => $v == $value)->count();
             return [$value => $count];
         });
         $validAnswersPercent = $validAnswersCount->map(function($count) use ($num) {

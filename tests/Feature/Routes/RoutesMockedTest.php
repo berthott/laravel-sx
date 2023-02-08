@@ -16,6 +16,7 @@ class RoutesMockedTest extends RoutesMockedTestCase
             'entities.destroy',
             
             'entities.report',
+            'entities.languages',
             'entities.show_respondent',
             'entities.structure',
             'entities.sync',
@@ -190,5 +191,15 @@ class RoutesMockedTest extends RoutesMockedTestCase
             ->assertSuccessful();
         $this->get(route('entities.labels', [ 'lang' => 'fr' ]))
             ->assertJsonValidationErrorFor('lang');
+    }
+
+    public function test_languages_route(): void
+    {
+        $this->get(route('entities.languages'))
+            ->assertSuccessful()
+            ->assertExactJson([
+                'languages' => ['de'],
+                'defaultLanguage' => 'de',
+            ]);
     }
 }

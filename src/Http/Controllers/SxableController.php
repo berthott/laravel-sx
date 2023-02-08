@@ -206,6 +206,17 @@ class SxableController
     }
 
     /**
+     * Get survey languages.
+     */
+    public function languages(): array
+    {
+        return [
+            'languages' => $this->target::surveyLanguages(),
+            'defaultLanguage' => $this->target::defaultSurveyLanguage(),
+        ];
+    }
+
+    /**
      * Map to params to short names
      */
     private function formParamsWithShortNames(array $all): array

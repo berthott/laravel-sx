@@ -524,11 +524,11 @@ trait Sxable
      */
     public static function labeledLabels(string $language = null): Collection
     {
-        $questions = DB::table(static::questionsTableName())->get()->keyBy('variableName');
+        $questions = static::questions($language)->keyBy('variableName');
         return static::labels($language)->map(function ($entry) use ($questions) {
             $variableName = $entry['variableName'];
-            if ($questions->has($variableName) && $questions[$variableName]->subType === 'Multiple') {
-                $entry['variableName'] = $variableName.' - '.$questions[$variableName]->choiceText;
+            if ($questions->has($variableName) && $questions[$variableName]['subType'] === 'Multiple') {
+                $entry['variableName'] = $variableName.' - '.$questions[$variableName]['choiceText'];
             }
             return $entry;
         });

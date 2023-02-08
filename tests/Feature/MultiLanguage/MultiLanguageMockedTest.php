@@ -38,4 +38,29 @@ class MultiLanguageMockedTest extends MultiLanguageMockedTestCase
                 'label' => 'running application',
             ]);
     }
+
+    public function test_labels_route_labeled(): void
+    {
+        $this->get(route('entities.labels', [ 'labeled' => true ]))
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'variableName' => 'statinternal_1 - E-Mail gesendet',
+                'value' => 0,
+                'label' => 'Nicht ausgewählt',
+            ]);
+        $this->get(route('entities.labels', [ 'labeled' => true, 'lang' => 'de' ]))
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'variableName' => 'statinternal_1 - E-Mail gesendet',
+                'value' => 0,
+                'label' => 'Nicht ausgewählt',
+            ]);
+        $this->get(route('entities.labels', [ 'labeled' => true, 'lang' => 'en' ]))
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                'variableName' => 'statinternal_1 - email sent',
+                'value' => 0,
+                'label' => 'Not selected',
+            ]);
+    }
 }

@@ -97,11 +97,10 @@ class SxSurveyService
     /**
      * Get the structure for the entity table.
      */
-    public function getEntityStructure(string $language = null): Collection
+    public function getEntityStructure(): Collection
     {
         $this->initStructure();
-        $entityStructure = $this->structure->map(fn($structure) => $this->mapToFullVariableName(SxHelpers::pluckFromCollection($structure, 'variableName', 'subType')));
-        return $entityStructure[$language ?: $this->defaultLanguage];
+        return $this->mapToFullVariableName(SxHelpers::pluckFromCollection($this->structure[$this->defaultLanguage], 'variableName', 'subType'));
     }
 
     /**

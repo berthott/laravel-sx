@@ -143,7 +143,7 @@ class SxableController
     public function structure(LabeledRequest $request): Collection | ResourceCollection
     {
         $structure = $request->labeled
-            ? $this->target::labeledStructure()
+            ? $this->target::labeledStructure($request->lang)
             : $this->target::structure();
         return $structure->filter(function ($entry) {
             return !in_array($entry->variableName, $this->target::excludeFromStructureRoute());

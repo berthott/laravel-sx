@@ -63,4 +63,43 @@ class MultiLanguageMockedTest extends MultiLanguageMockedTestCase
                 'label' => 'Not selected',
             ]);
     }
+    public function test_structure_route_validation(): void
+    {
+        $this->get(route('entities.structure', [ 'lang' => 'de' ]))
+            ->assertSuccessful();
+        $this->get(route('entities.structure', [ 'lang' => 'en' ]))
+            ->assertSuccessful();
+        $this->get(route('entities.structure', [ 'lang' => 'fr' ]))
+            ->assertJsonValidationErrorFor('lang');
+    }
+    
+    public function test_structure_route_labeled(): void
+    {
+        $this->get(route('entities.structure', [
+            'labeled' => true
+        ]))
+            ->assertSuccessful()
+            ->assertJsonFragment(['variableName' => 'survey', 'subType' => 'Single'])
+            ->assertJsonFragment(['variableName' => 'respondentid', 'subType' => 'Double'])
+            ->assertJsonFragment(['variableName' => 'statinternal_1 - E-Mail gesendet', 'subType' => 'Multiple'])
+            ->assertJsonFragment(['variableName' => 'created', 'subType' => 'Date']);
+        $this->get(route('entities.structure', [
+            'labeled' => true,
+            'lang' => 'de',
+        ]))
+            ->assertSuccessful()
+            ->assertJsonFragment(['variableName' => 'survey', 'subType' => 'Single'])
+            ->assertJsonFragment(['variableName' => 'respondentid', 'subType' => 'Double'])
+            ->assertJsonFragment(['variableName' => 'statinternal_1 - E-Mail gesendet', 'subType' => 'Multiple'])
+            ->assertJsonFragment(['variableName' => 'created', 'subType' => 'Date']);
+        $this->get(route('entities.structure', [
+            'labeled' => true,
+            'lang' => 'en',
+        ]))
+            ->assertSuccessful()
+            ->assertJsonFragment(['variableName' => 'survey', 'subType' => 'Single'])
+            ->assertJsonFragment(['variableName' => 'respondentid', 'subType' => 'Double'])
+            ->assertJsonFragment(['variableName' => 'statinternal_1 - email sent', 'subType' => 'Multiple'])
+            ->assertJsonFragment(['variableName' => 'created', 'subType' => 'Date']);
+    }
 }

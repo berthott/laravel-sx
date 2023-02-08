@@ -138,11 +138,11 @@ trait Sxable
     /**
      * Returns the labeled structure.
      */
-    public static function labeledStructure(): Collection
+    public static function labeledStructure(string $language = null): Collection
     {
-        return static::structure()->map(function ($entry) {
+        return static::structure()->map(function ($entry) use ($language) {
             if ($entry->subType === 'Multiple') {
-                $entry->variableName = $entry->variableName.' - '.DB::table(static::questionsTableName())->where('variableName', $entry->variableName)->first()->choiceText;
+                $entry->variableName = $entry->variableName.' - '.static::questions($language)->where('variableName', $entry->variableName)->first()['choiceText'];
             }
             return $entry;
         });

@@ -24,7 +24,7 @@ class ReportTest extends ReportTestCase
         ->assertJsonFragment([
             's_2' => [
                 'type' => 'Double',
-                'question' => 'year',
+                'question' => 'Jahr',
                 'answers' => [2021, 2020],
                 'average' => 2020.5,
                 'num' => 4,
@@ -221,7 +221,7 @@ class ReportTest extends ReportTestCase
             ],
             's_2' => [
                 'type' => 'Double',
-                'question' => 'year',
+                'question' => 'Jahr',
                 'answers' => [2021],
                 'average' => 2021,
                 'num' => 1,
@@ -347,7 +347,7 @@ class ReportTest extends ReportTestCase
             ],
             's_2' => [
                 'type' => 'Double',
-                'question' => 'year',
+                'question' => 'Jahr',
                 'answers' => [2021, 2020],
                 'average' => 2020.5,
                 'num' => 2,
@@ -469,7 +469,7 @@ class ReportTest extends ReportTestCase
             ],
             's_2' => [
                 'type' => 'Double',
-                'question' => 'year',
+                'question' => 'Jahr',
                 'answers' => [2021, 2020],
                 'average' => 2020.5,
                 'num' => 2,
@@ -591,7 +591,7 @@ class ReportTest extends ReportTestCase
             ],
             's_2' => [
                 'type' => 'Double',
-                'question' => 'year',
+                'question' => 'Jahr',
                 'answers' => [2021, 2020],
                 'average' => 2020.5,
                 'num' => 3,

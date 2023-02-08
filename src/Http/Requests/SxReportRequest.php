@@ -9,28 +9,6 @@ use Spatie\QueryBuilder\QueryBuilderRequest;
 
 class SxReportRequest extends QueryBuilderRequest
 {
-    private string $target;
-
-    public function __construct()
-    {
-        $this->target = Sxable::getTarget();
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     */
-    public function rules(): array
-    {
-        return [
-            ...parent::rules(),
-            'lang' => [
-                'nullable',
-                'string',
-            Rule::in($this->target::surveyLanguages()),
-          ],
-        ];
-    }
-
     /**
      * Get the validation rules that apply to the request.
      */

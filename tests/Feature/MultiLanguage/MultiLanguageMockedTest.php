@@ -63,6 +63,7 @@ class MultiLanguageMockedTest extends MultiLanguageMockedTestCase
                 'label' => 'Not selected',
             ]);
     }
+
     public function test_structure_route_validation(): void
     {
         $this->get(route('entities.structure', [ 'lang' => 'de' ]))
@@ -101,5 +102,58 @@ class MultiLanguageMockedTest extends MultiLanguageMockedTestCase
             ->assertJsonFragment(['variableName' => 'respondentid', 'subType' => 'Double'])
             ->assertJsonFragment(['variableName' => 'statinternal_1 - email sent', 'subType' => 'Multiple'])
             ->assertJsonFragment(['variableName' => 'created', 'subType' => 'Date']);
+    }
+
+    public function test_report_route_validation(): void
+    {
+        $this->get(route('entities.report', [ 'lang' => 'de' ]))
+            ->assertSuccessful();
+        $this->get(route('entities.report', [ 'lang' => 'en' ]))
+            ->assertSuccessful();
+        $this->get(route('entities.report', [ 'lang' => 'fr' ]))
+            ->assertJsonValidationErrorFor('lang');
+    }
+
+    public function test_report_route(): void
+    {
+        $this->get(route('entities.report'))
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                's_2' => [
+                    'type' => 'Double',
+                    'question' => 'Jahr',
+                    'answers' => [2021, 2020],
+                    'average' => 2020.5,
+                    'num' => 4,
+                    'numValid' => 2,
+                    'numInvalid' => 2,
+                ],
+            ]);
+        $this->get(route('entities.report', [ 'lang' => 'de' ]))
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                's_2' => [
+                    'type' => 'Double',
+                    'question' => 'Jahr',
+                    'answers' => [2021, 2020],
+                    'average' => 2020.5,
+                    'num' => 4,
+                    'numValid' => 2,
+                    'numInvalid' => 2,
+                ],
+            ]);
+        $this->get(route('entities.report', [ 'lang' => 'en' ]))
+            ->assertSuccessful()
+            ->assertJsonFragment([
+                's_2' => [
+                    'type' => 'Double',
+                    'question' => 'year',
+                    'answers' => [2021, 2020],
+                    'average' => 2020.5,
+                    'num' => 4,
+                    'numValid' => 2,
+                    'numInvalid' => 2,
+                ],
+            ]);
     }
 }

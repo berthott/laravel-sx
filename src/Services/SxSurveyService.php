@@ -138,6 +138,7 @@ class SxSurveyService
                     'survey' => $this->survey_id,
                     'query' => [
                         'format' => 'INTL_US',
+                        'lang' => $lang,
                     ],
                 ]), ['variableName', 'value', 'label'])),
             ]);

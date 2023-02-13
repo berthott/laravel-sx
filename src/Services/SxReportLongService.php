@@ -24,7 +24,7 @@ class SxReportLongService
         $this->request = SxReportRequest::fromRequest(app(Request::class));
         $this->columns = $this->fromOptions($class, 'filter') ?: $class::questionNames();
         $this->questions = $class::questions($this->request->lang);
-        $this->labels = $class::labels();
+        $this->labels = $class::labels($this->request->lang);
         return $this->report($class, $this->getData($class));
     }
 

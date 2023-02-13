@@ -114,7 +114,7 @@ class MultiLanguageMockedTest extends MultiLanguageMockedTestCase
             ->assertJsonValidationErrorFor('lang');
     }
 
-    public function test_report_route(): void
+    public function test_report_route_double(): void
     {
         $this->get(route('entities.report'))
             ->assertSuccessful()
@@ -153,6 +153,52 @@ class MultiLanguageMockedTest extends MultiLanguageMockedTestCase
                     'num' => 4,
                     'numValid' => 2,
                     'numInvalid' => 2,
+                ],
+            ]);
+    }
+
+    public function test_report_route_single(): void
+    {
+        $this->get(route('entities.report'))
+            ->assertSuccessful()
+            ->assertJson([
+                's_5' => [
+                    'type' => 'Single',
+                    'question' => 'Status',
+                    'labels' => [
+                        1 => 'laufende Bewerbung',
+                        2 => 'abgelehnte Bewerbung',
+                        3 => 'teilnehmend ohne Gründung',
+                        4 => 'teilnehmend mit Gründung',
+                    ],
+                ],
+            ]);
+        $this->get(route('entities.report', [ 'lang' => 'de' ]))
+            ->assertSuccessful()
+            ->assertJson([
+                's_5' => [
+                    'type' => 'Single',
+                    'question' => 'Status',
+                    'labels' => [
+                        1 => 'laufende Bewerbung',
+                        2 => 'abgelehnte Bewerbung',
+                        3 => 'teilnehmend ohne Gründung',
+                        4 => 'teilnehmend mit Gründung',
+                    ],
+                ],
+            ]);
+        $this->get(route('entities.report', [ 'lang' => 'en' ]))
+            ->assertSuccessful()
+            ->assertJson([
+                's_5' => [
+                    'type' => 'Single',
+                    'question' => 'state',
+                    'labels' => [
+                        1 => 'running application',
+                        2 => 'refused application',
+                        3 => 'participating without start-up',
+                        4 => 'participating with start-up',
+                    ],
                 ],
             ]);
     }

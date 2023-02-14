@@ -19,10 +19,12 @@ use berthott\SX\Services\SxRespondentService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SxableController
 {
@@ -32,7 +34,7 @@ class SxableController
     {
         $this->target = Sxable::getTarget();
     }
-    
+
     /**
      * Display a listing of the resource.
      */
@@ -212,5 +214,15 @@ class SxableController
     {
         $all['form_params'] = $this->target::mapToShortNames($all['form_params']);
         return $all;
+    }
+
+    public function report_pdf(mixed $id, Request $request)
+    {
+        $data = $request->json()->all();
+        $pdf =
+            Pdf::setPaper('a4')
+            ->loadView('sx::pdf.reportPDF', ['data' => $data])
+            ->stream();
+        return $pdf;
     }
 }

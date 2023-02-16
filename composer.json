@@ -26,10 +26,10 @@
       }
   },
   "require-dev": {
-    "orchestra/testbench": "^7.0",
-    "phpunit/phpunit": "^9.5",
+    "orchestra/testbench": "^8.0",
+    "phpunit/phpunit": "^10.0",
     "doctrine/dbal": "^3.3",
-    "brianium/paratest": "^6.4"
+    "brianium/paratest": "^7.0"
   },
   "require": {
     "caseyamcl/guzzle_retry_middleware": "^2.6",
@@ -37,8 +37,8 @@
     "haydenpierce/class-finder": "^0.4.3",
     "league/csv": "^9.7",
     "maatwebsite/excel": "^3.0",
-    "berthott/laravel-targetable": "^2.0",
-    "berthott/laravel-internal-request": "^2.0",
+    "berthott/laravel-targetable": "^3.0",
+    "berthott/laravel-internal-request": "^3.0",
     "simplesoftwareio/simple-qrcode": "^4.2",
     "barryvdh/laravel-dompdf": "^2.0",
     "spatie/laravel-query-builder": "^5.1"

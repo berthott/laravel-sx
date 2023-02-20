@@ -28,9 +28,8 @@
   </head>
   <body>
     <div style="width:100%">
-      @foreach ($data as $layoutGroup)
-          <h1>{!! $layoutGroup['title'] !!}</h1>
-          @foreach ($layoutGroup['images'] as $src)
+      @foreach ($data as $page)
+          @foreach ($page['images'] as $src)
             <img src="{!! $src !!}" />
           @endforeach
           <div class="page-break"></div>

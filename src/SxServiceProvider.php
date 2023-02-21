@@ -109,6 +109,7 @@ class SxServiceProvider extends ServiceProvider
                 Route::get("{$sxable::entityTableName()}/{{$sxable::singleName()}}/show_respondent", [SxableController::class, 'show_respondent'])->name($sxable::entityTableName().'.show_respondent');
                 Route::get("{$sxable::entityTableName()}/report", [SxableController::class, 'report'])->name($sxable::entityTableName().'.report');
                 Route::get("{$sxable::entityTableName()}/languages", [SxableController::class, 'languages'])->name($sxable::entityTableName().'.languages');
+                Route::post("{$sxable::entityTableName()}/{{$sxable::singleName()}}/report_pdf", [SxableController::class, 'report_pdf'])->name($sxable::entityTableName().'.report_pdf');
                 //Route::apiResource($sxable::entityTableName(), SxableController::class, $sxable::routeOptions());
 
                 Route::get($sxable::entityTableName(), [SxableController::class, 'index'])->name($sxable::entityTableName().'.index');

@@ -14,6 +14,10 @@
         page-break-after: always;
       }
 
+      img {
+        margin-top: 15px;
+      }
+
       .debug {
         margin: 0 auto;
         max-width: 100%;
@@ -32,7 +36,11 @@
           @foreach ($page['images'] as $src)
             <img src="{!! $src !!}" />
           @endforeach
-          <div class="page-break"></div>
+          @if ($loop->last)
+            <!-- Last page -->
+          @else
+            <div class="page-break"></div>
+          @endif
       @endforeach
     </div>
   </body>

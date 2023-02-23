@@ -32,7 +32,7 @@
   </head>
   <body>
     <div style="width:100%">
-      @foreach ($data as $page)
+      @foreach ($pages as $page)
           @foreach ($page['images'] as $src)
             <img src="{!! $src !!}" />
           @endforeach

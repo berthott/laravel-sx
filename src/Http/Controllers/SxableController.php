@@ -232,7 +232,7 @@ class SxableController
         $data = $request->json()->all();
         $pdf =
             Pdf::setPaper('a4')
-            ->loadView('sx::pdf.reportPDF', ['data' => $data])
+            ->loadView('sx::pdf.reportPDF', ['pages' => $data['pages']])
             ->stream();
         return $pdf;
     }

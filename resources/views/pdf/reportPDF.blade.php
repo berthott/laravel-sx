@@ -1,7 +1,6 @@
 <!doctype html>
 <html>
   <head>
-    <title>QR Code</title>
     <style>
       html, 
       body, 

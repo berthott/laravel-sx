@@ -101,22 +101,23 @@ class SxServiceProvider extends ServiceProvider
             'sx.labels_to_values'
         ]), function () {
             foreach (Sxable::getTargetableClasses() as $sxable) {
-                Route::post($sxable::entityTableName().'/sync', [SxableController::class, 'sync'])->name($sxable::entityTableName().'.sync');
-                Route::match(['get', 'post'], $sxable::entityTableName().'/export', [SxableController::class, 'export'])->name($sxable::entityTableName().'.export');
-                Route::get("{$sxable::entityTableName()}/structure", [SxableController::class, 'structure'])->name($sxable::entityTableName().'.structure');
-                Route::get("{$sxable::entityTableName()}/labels", [SxableController::class, 'labels'])->name($sxable::entityTableName().'.labels');
-                Route::delete("{$sxable::entityTableName()}/destroy_many", [SxableController::class, 'destroy_many'])->name($sxable::entityTableName().'.destroy_many');
-                Route::get("{$sxable::entityTableName()}/{{$sxable::singleName()}}/show_respondent", [SxableController::class, 'show_respondent'])->name($sxable::entityTableName().'.show_respondent');
-                Route::get("{$sxable::entityTableName()}/report", [SxableController::class, 'report'])->name($sxable::entityTableName().'.report');
-                Route::get("{$sxable::entityTableName()}/languages", [SxableController::class, 'languages'])->name($sxable::entityTableName().'.languages');
-                Route::post("{$sxable::entityTableName()}/{{$sxable::singleName()}}/report_pdf", [SxableController::class, 'report_pdf'])->name($sxable::entityTableName().'.report_pdf');
+                $crudRoutes = $this->getCrudRoutes($sxable::routeOptions());
+                if (in_array('sync', $crudRoutes)) Route::post($sxable::entityTableName().'/sync', [SxableController::class, 'sync'])->name($sxable::entityTableName().'.sync');
+                if (in_array('export', $crudRoutes)) Route::match(['get', 'post'], $sxable::entityTableName().'/export', [SxableController::class, 'export'])->name($sxable::entityTableName().'.export');
+                if (in_array('structure', $crudRoutes)) Route::get("{$sxable::entityTableName()}/structure", [SxableController::class, 'structure'])->name($sxable::entityTableName().'.structure');
+                if (in_array('labels', $crudRoutes)) Route::get("{$sxable::entityTableName()}/labels", [SxableController::class, 'labels'])->name($sxable::entityTableName().'.labels');
+                if (in_array('destroy_many', $crudRoutes)) Route::delete("{$sxable::entityTableName()}/destroy_many", [SxableController::class, 'destroy_many'])->name($sxable::entityTableName().'.destroy_many');
+                if (in_array('show_respondent', $crudRoutes)) Route::get("{$sxable::entityTableName()}/{{$sxable::singleName()}}/show_respondent", [SxableController::class, 'show_respondent'])->name($sxable::entityTableName().'.show_respondent');
+                if (in_array('report', $crudRoutes)) Route::get("{$sxable::entityTableName()}/report", [SxableController::class, 'report'])->name($sxable::entityTableName().'.report');
+                if (in_array('languages', $crudRoutes)) Route::get("{$sxable::entityTableName()}/languages", [SxableController::class, 'languages'])->name($sxable::entityTableName().'.languages');
+                if (in_array('report_pdf', $crudRoutes)) Route::post("{$sxable::entityTableName()}/{{$sxable::singleName()}}/report_pdf", [SxableController::class, 'report_pdf'])->name($sxable::entityTableName().'.report_pdf');
                 //Route::apiResource($sxable::entityTableName(), SxableController::class, $sxable::routeOptions());
 
-                Route::get($sxable::entityTableName(), [SxableController::class, 'index'])->name($sxable::entityTableName().'.index');
-                Route::get("{$sxable::entityTableName()}/{{$sxable::singleName()}}", [SxableController::class, 'show'])->name($sxable::entityTableName().'.show');
-                Route::post($sxable::entityTableName(), [SxableController::class, 'create_respondent'])->name($sxable::entityTableName().'.create_respondent');
-                Route::put("{$sxable::entityTableName()}/{{$sxable::singleName()}}", [SxableController::class, 'update_respondent'])->name($sxable::entityTableName().'.update_respondent');
-                Route::delete("{$sxable::entityTableName()}/{{$sxable::singleName()}}", [SxableController::class, 'destroy'])->name($sxable::entityTableName().'.destroy');
+                if (in_array('index', $crudRoutes)) Route::get($sxable::entityTableName(), [SxableController::class, 'index'])->name($sxable::entityTableName().'.index');
+                if (in_array('show', $crudRoutes)) Route::get("{$sxable::entityTableName()}/{{$sxable::singleName()}}", [SxableController::class, 'show'])->name($sxable::entityTableName().'.show');
+                if (in_array('create_respondent', $crudRoutes)) Route::post($sxable::entityTableName(), [SxableController::class, 'create_respondent'])->name($sxable::entityTableName().'.create_respondent');
+                if (in_array('update_respondent', $crudRoutes)) Route::put("{$sxable::entityTableName()}/{{$sxable::singleName()}}", [SxableController::class, 'update_respondent'])->name($sxable::entityTableName().'.update_respondent');
+                if (in_array('destroy', $crudRoutes)) Route::delete("{$sxable::entityTableName()}/{{$sxable::singleName()}}", [SxableController::class, 'destroy'])->name($sxable::entityTableName().'.destroy');
             }
         });
 
@@ -148,5 +149,38 @@ class SxServiceProvider extends ServiceProvider
             'middleware' => [...config("$key.middleware"), ...$additionalMiddleware],
             'prefix' => config("$key.prefix"),
         ];
+    }
+
+    /**
+     * Get the applicable resource methods.
+     */
+    protected function getCrudRoutes(array $options): array
+    {
+        $methods = [
+            'index', 
+            'show', 
+            'show_respondent',
+            'create_respondent', 
+            'update_respondent', 
+            'destroy', 
+            'destroy_many', 
+            'structure', 
+            'sync', 
+            'export', 
+            'labels', 
+            'report', 
+            'report_pdf', 
+            'languages',
+        ];
+
+        if (isset($options['only'])) {
+            $methods = array_intersect($methods, (array) $options['only']);
+        }
+
+        if (isset($options['except'])) {
+            $methods = array_diff($methods, (array) $options['except']);
+        }
+
+        return $methods;
     }
 }

@@ -54,6 +54,15 @@ trait Sxable
     }
 
     /**
+     * Returns an array of route options.
+     * See Route::apiResource documentation.
+     */
+    public static function routeOptions(): array
+    {
+        return [];
+    }
+
+    /**
      * The languages the survey covers. First one is the default language.
      */
     public static function surveyLanguages(): array

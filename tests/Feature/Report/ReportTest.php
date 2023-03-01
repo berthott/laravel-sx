@@ -803,4 +803,44 @@ class ReportTest extends ReportTestCase
             ],
         ]);
     }
+
+    public function test_aggregate_field_combination(): void
+    {
+        $this->get(route('entities.report', [
+            'fields' => [
+                'entities' => 'trainer'
+            ],
+            'aggregate' => [
+                'trainer' => [
+                    'trainer_1',
+                    'trainer_2',
+                    'trainer_3',
+                ],
+            ]
+        ]))
+        ->assertStatus(200)
+        ->assertJson([
+            'trainer' => [
+                'answers' => [1, 4, 5, 2, 5, 5, 3, 5, 4],
+                'answersCount' => [
+                    1 => 1,
+                    2 => 1,
+                    3 => 1,
+                    4 => 2,
+                    5 => 4,
+                ],
+                'answersPercent' => [
+                    1 => 11.1,
+                    2 => 11.1,
+                    3 => 11.1,
+                    4 => 22.2,
+                    5 => 44.4,
+                ],
+                'average' => 3.8,
+                'num' => 12,
+                'numValid' => 9,
+                'numInvalid' => 3,
+            ],
+        ]);
+    }
 }

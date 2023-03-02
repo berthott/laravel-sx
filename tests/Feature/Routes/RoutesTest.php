@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Tests\Feature\Routes;
 
-use Illuminate\Support\Facades\Route;
+use berthott\SX\Services\SxRespondentService;
 
 class RoutesTest extends RoutesTestCase
 {
@@ -121,6 +121,71 @@ class RoutesTest extends RoutesTestCase
         $this->assertDatabaseHas('entities', ['respondentid' => $id2]);
 
         // delete_many
+        $this->delete(route('entities.destroy_many'), ['ids' => [$id1, $id2]])
+            ->assertStatus(200)
+            ->assertJson([
+                $id1 => 'Success',
+                $id2 => 'Success',
+            ]);
+        $this->assertDatabaseMissing('entities', ['respondentid' => $id1]);
+        $this->assertDatabaseMissing('entities', ['respondentid' => $id2]);
+    }
+
+    public function test_sync_route(): void
+    {
+        // create first
+        $id1 = $this->post(route('entities.create_respondent'), [
+            'form_params' => [
+                    'email' => 'test@syspons.com', // string
+                    's_2' => 3333, // double
+                    's_5' => 'laufende Bewerbung', // single
+                    's_7' => 'Georgien' // multiple
+                ]
+            ])
+            ->assertStatus(200)
+            ->json()['id'];
+
+        // update respondent manually without touching our database
+        $key1 = (new SxRespondentService($id1))->getRespondent()->externalkey();
+        (new SxRespondentService($key1))->updateRespondentAnswers(['form_params' => ['s_2' => 4444]]);
+
+        // create second
+        $id2 = $this->post(route('entities.create_respondent'), [
+            'form_params' => [
+                    'email' => 'test@syspons.com', // string
+                    's_2' => 3333, // double
+                    's_5' => 'laufende Bewerbung', // single
+                    's_7' => 'Georgien' // multiple
+                ]
+            ])
+            ->assertStatus(200)
+            ->json()['id'];
+        
+        // update respondent manually without touching our database
+        $key2 = (new SxRespondentService($id2))->getRespondent()->externalkey();
+        (new SxRespondentService($key2))->updateRespondentAnswers(['form_params' => ['s_2' => 4444]]);
+
+        $this->assertDatabaseHas('entities', [
+            'respondentid' => $id1,
+            'statinternal_1' => null,
+        ]);
+        $this->assertDatabaseHas('entities', [
+            'respondentid' => $id2,
+            'statinternal_1' => null,
+        ]);
+
+        // sync
+        $this->post(route('entities.sync'));
+        $this->assertDatabaseHas('entities', [
+            'respondentid' => $id1,
+            'statinternal_1' => 0,
+        ]);
+        $this->assertDatabaseHas('entities', [
+            'respondentid' => $id2,
+            'statinternal_1' => 0,
+        ]);
+
+        // clean up
         $this->delete(route('entities.destroy_many'), ['ids' => [$id1, $id2]])
             ->assertStatus(200)
             ->assertJson([

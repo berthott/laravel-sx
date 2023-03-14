@@ -32,14 +32,22 @@
   <body>
     <div style="width:100%">
       @foreach ($pages as $page)
-          @foreach ($page['images'] as $src)
-            <img src="{!! $src !!}" />
+          @foreach ($page['data'] as $src)
+          
+            @if($src['type'] === 'base64')
+              <img src="{!! $src['result'] !!}" />
+            @else
+              <p>{!! $src['result'] !!}</p>
+            @endif
+
           @endforeach
+
           @if ($loop->last)
             <!-- Last page -->
           @else
             <div class="page-break"></div>
           @endif
+
       @endforeach
     </div>
   </body>

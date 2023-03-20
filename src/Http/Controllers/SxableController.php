@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Dompdf\Adapter\CPDF;
 
 class SxableController
 {
@@ -231,11 +232,70 @@ class SxableController
 
     public function report_pdf(mixed $id, Request $request)
     {
+        $size = 'a4';
+        $orientation = 'portrait';
+
         $data = $request->json()->all();
+        $pages = $data['pages'];
+        // $pagesCount = 0;
+        // foreach ($pages as $page) {
+        //     if (key_exists('pageHeight', $page)) {
+        //         $pagesCount += 3508 + $page['pageHeight'];
+        //     }
+        // }
+        // $pagesCount = $pagesCount / 3508;
+        $pageLimit = 0;
+        if (array_key_exists('pageLimit', $data)) {
+            $pageLimit = $data['pageLimit'];
+        }
         $pdf =
-            Pdf::setPaper('a4')
-            ->loadView('sx::pdf.reportPDF', ['pages' => $data['pages']])
-            ->stream();
-        return $pdf;
+            Pdf::setPaper($size, $orientation)
+            ->setOption(['isPhpEnabled' => true])
+            ->loadView(
+                'sx::pdf.reportPDF',
+                [   'pages' => $pages,
+                    // 'pageLimit' => $pageLimit
+                ]
+            );
+
+        $pdf->render();
+        $dompdf = $pdf->getDomPDF();
+        // $dompdf->render();
+        $canvas = $dompdf->getCanvas();
+        // $finalPageCount = 0;
+
+        // $newCanvas = new CPDF($size, $orientation, $dompdf);
+
+        // $foot = $newCanvas->open_object();
+        // $newCanvas->text(0, 0, '?!@#!!', null, 12, array(255,0,0));
+        // $newCanvas->close_object();
+        // $newCanvas->add_object($foot, "add");
+
+        // $dompdf->setCanvas($newCanvas);
+        $canvas->page_script(function ($pageNumber, $pageCount, $cpdf, $fontMetrics) {
+            $text = __(":pageNum/:pageCount", ["pageNum" => $pageNumber, "pageCount" => $pageCount]);
+            $font = null;
+            $size = 9;
+            $color = array(0,0,0);
+            $word_space = 0.0;  //  default
+            $char_space = 0.0;  //  default
+            $angle = 0.0;   //  default
+
+            // Compute text width to center correctly
+            $textWidth = $fontMetrics->getTextWidth($text, $font, $size);
+
+            $x = ($cpdf->get_width() - $textWidth) / 2;
+            $y = $cpdf->get_height() - 35;
+
+            $cpdf->text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
+        });
+
+        if ($pageLimit > 0) {
+            if ($canvas->get_page_count() <= $pageLimit) {
+                return $pdf->stream();
+            }
+            return json_encode('sx.snackbar.pdf_file_exceeds');
+        }
+        return $pdf->stream();
     }
 }

@@ -7,7 +7,6 @@
       img, 
       h1 {
         width: 100%;
-        font-family: Arial, Helvetica, sans-serif;
       }
 
       .page-break {

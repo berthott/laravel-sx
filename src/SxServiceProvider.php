@@ -114,7 +114,7 @@ class SxServiceProvider extends ServiceProvider
                 if (in_array('show_respondent', $crudRoutes)) Route::get("{$sxable::entityTableName()}/{{$sxable::singleName()}}/show_respondent", [SxableController::class, 'show_respondent'])->name($sxable::entityTableName().'.show_respondent');
                 if (in_array('report', $crudRoutes)) Route::get("{$sxable::entityTableName()}/report", [SxableController::class, 'report'])->name($sxable::entityTableName().'.report');
                 if (in_array('languages', $crudRoutes)) Route::get("{$sxable::entityTableName()}/languages", [SxableController::class, 'languages'])->name($sxable::entityTableName().'.languages');
-                if (in_array('report_pdf', $crudRoutes)) Route::post("{$sxable::entityTableName()}/{{$sxable::singleName()}}/report_pdf", [SxableController::class, 'report_pdf'])->name($sxable::entityTableName().'.report_pdf');
+                if (in_array('report_pdf', $crudRoutes)) Route::post("{$sxable::entityTableName()}/report_pdf", [SxableController::class, 'report_pdf'])->name($sxable::entityTableName().'.report_pdf');
                 //Route::apiResource($sxable::entityTableName(), SxableController::class, $sxable::routeOptions());
 
                 if (in_array('index', $crudRoutes)) Route::get($sxable::entityTableName(), [SxableController::class, 'index'])->name($sxable::entityTableName().'.index');

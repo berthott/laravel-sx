@@ -10,11 +10,16 @@ use Illuminate\Support\Facades\Log;
 
 class Import extends Command
 {
-    protected $signature = 'sx:import {classes?*} {--fresh} {--since=}';
+    protected $signature = 'sx:import {classes?*} {--fresh} {--since=} {--memory=}';
     protected $description = 'Import SX data';
 
     public function handle()
     {
+        // set memory limit
+        if ($this->option('memory')) {
+            ini_set('memory_limit', $this->option('memory'));
+        }
+
         // intercept logging and additionally output to console
         SxLog::shouldReceive('log')
             ->andReturnUsing(function ($message) {

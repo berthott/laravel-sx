@@ -9,11 +9,16 @@ use Illuminate\Support\Facades\Log;
 
 class Drop extends Command
 {
-    protected $signature = 'sx:drop {classes?*}';
+    protected $signature = 'sx:drop {classes?*} {--memory=}';
     protected $description = 'Drop SX tables';
 
     public function handle()
     {
+        // set memory limit
+        if ($this->option('memory')) {
+            ini_set('memory_limit', $this->option('memory'));
+        }
+        
         // intercept logging and additionally output to console
         SxLog::shouldReceive('log')
             ->andReturnUsing(function ($message) {

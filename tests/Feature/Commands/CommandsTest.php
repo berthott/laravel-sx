@@ -69,4 +69,15 @@ class CommandsTest extends CommandsTestCase
         Artisan::call('sx:init', ['--fresh' => true]);
         $this->assertDatabaseCount('entities', 1);
     }
+
+    public function test_memory_limit(): void
+    {
+        $limit = ini_get('memory_limit');
+        Artisan::call('sx:init', ['--memory' => -1]);
+        $this->assertEquals(ini_get('memory_limit'), -1);
+        Artisan::call('sx:import', ['--memory' => $limit]);
+        $this->assertEquals(ini_get('memory_limit'), $limit);
+        Artisan::call('sx:import', ['--memory' => -1]);
+        $this->assertEquals(ini_get('memory_limit'), -1);
+    }
 }

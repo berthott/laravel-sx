@@ -27,6 +27,8 @@ abstract class RoutesTestCase extends BaseTestCase
 
     protected function getEnvironmentSetUp($app)
     {
+        date_default_timezone_set('Europe/Berlin');
+        Config::set('app.timezone', 'Europe/Berlin');
         Config::set('sx.namespace', __NAMESPACE__);
         Config::set('sx.auth', [
             'Syspons_API',

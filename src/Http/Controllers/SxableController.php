@@ -67,8 +67,9 @@ class SxableController implements Targetable
             [
                 config('sx.primary') => $respondent->id(),
                 'survey' => $this->target::surveyId(),
-                'created' => $respondent->createts(),
-                'modified' => $respondent->modifyts(),
+                // only fill with sync
+                /* 'created' => $respondent->createts(),
+                'modified' => $respondent->modifyts(), */
             ],
             $this->target::filterFormParams($request->form_params)
         ));
@@ -91,10 +92,11 @@ class SxableController implements Targetable
         )));
         if ($model = $this->target::where([config('sx.primary') => $id])->first()) {
             $model->update(array_merge(
-                [
+                // only fill with sync
+                /* [
                     'created' => $respondent->createts(),
                     'modified' => $respondent->modifyts(),
-                ],
+                ], */
                 $this->target::filterFormParams($request->form_params)
             ));
         }

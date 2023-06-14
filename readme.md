@@ -41,9 +41,9 @@ $ php artisan vendor:publish --provider="berthott\SX\SxServiceProvider" --tag="c
   * `defaultUnique`: An array of unique columns inside the SX database. Can be extended per entity with {@see \berthott\SX\Models\Traits\Sxable::uniqueFields()}. Defaults to `['respondentid']`.
   * `primary`: Defines the primary column inside the SX database. Defaults to SXs internal ID `respondentid`.
   * `filters`: Defines an array of prefixes that will be filtered during SX import automatically. Defaults to `['x_']`.
-  * `api`: Defines the a JSON representation of the SX API. See {@link https://documenter.getpostman.com/view/1760772/S1a33ni6}
+  * `api`: Defines the a JSON representation of the SX API. See the [SX API Documentation](https://documenter.getpostman.com/view/1760772/S1a33ni6).
 * Export options
-  * `exportFormat`: Defines the export format. Possible values are: `XLSX`, `CSV`, `TSV`, `ODS`, `XLS`, `HTML`, `MPDF`, `DOMPDF`, `TCPDF`. See {@link https://docs.laravel-excel.com/3.1/exports/export-formats.html}. Defaults to `XLSX`.
+  * `exportFormat`: Defines the export format. Possible values are: `XLSX`, `CSV`, `TSV`, `ODS`, `XLS`, `HTML`, `MPDF`, `DOMPDF`, `TCPDF`. See the [Laravel-Excel Documentation](https://docs.laravel-excel.com/3.1/exports/export-formats.html). Defaults to `XLSX`.
   * `excludeFromExport`: Defines an array of columns to be excluded from the export. Defaults to  `['created_at', 'updated_at', 'survey', 'respondentid']`.
 
 ## Compatibility

@@ -1,5 +1,7 @@
 <?php
 
+use HaydenPierce\ClassFinder\ClassFinder;
+
 $baseUrl = env('SX_BASE_URL', 'https://www.survey-xact.dk').'/rest';
 
 return [
@@ -9,7 +11,7 @@ return [
     | Route Middleware Configuration
     |--------------------------------------------------------------------------
     |
-    | Configurations for the route.
+    | An array of all middlewares to be applied to all of the generated routes.
     |
     */
 
@@ -20,7 +22,8 @@ return [
     | Model Namespace Configuration
     |--------------------------------------------------------------------------
     |
-    | Defines one or multiple model namespaces.
+    | String or array with one ore multiple namespaces that should be monitored 
+    | for the configured trait.
     |
     */
 
@@ -28,10 +31,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | API Prefix
+    | Model Namespace Search Option
     |--------------------------------------------------------------------------
     |
-    | Defines the api prefix.
+    | Defines the search mode for the namespaces. ClassFinder::STANDARD_MODE
+    | will only find the exact matching namespace, ClassFinder::RECURSIVE_MODE
+    | will find all subnamespaces.
+    | 
+    | Beware: ClassFinder::RECURSIVE_MODE might cause some testing issues.
+    |
+    */
+
+    'namespace_mode' => ClassFinder::STANDARD_MODE,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Route Prefix
+    |--------------------------------------------------------------------------
+    |
+    | Defines the route prefix.
     |
     */
 
@@ -56,7 +74,8 @@ return [
     | SX default unique columns
     |--------------------------------------------------------------------------
     |
-    | Defines the SX default unique columns.
+    | An array of unique columns inside the SX database. Can be extended per entity with 
+    | {@see \berthott\SX\Models\Traits\Sxable::uniqueFields()}.
     |
     */
 
@@ -66,32 +85,10 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | exportFormat
-    |--------------------------------------------------------------------------
-    |
-    | Defines the export format.
-    | Possible values:
-    | 'XLSX', 'CSV', 'TSV', 'ODS', 'XLS', 'HTML', 'MPDF', 'DOMPDF', 'TCPDF'
-    |
-    */
-    'exportFormat' => 'XLSX',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Exclude from export
-    |--------------------------------------------------------------------------
-    |
-    | Exclude a field from the export
-    |
-    */
-    'excludeFromExport' => ['created_at', 'updated_at', 'survey', 'respondentid'],
-
-    /*
-    |--------------------------------------------------------------------------
     | SX default primary
     |--------------------------------------------------------------------------
     |
-    | Defines the primary column.
+    | Defines the primary column inside the SX database. Defaults to SXs internal ID.
     |
     */
 
@@ -102,7 +99,8 @@ return [
     | SX import filters
     |--------------------------------------------------------------------------
     |
-    | Defines an array of prefixes that will be filtered automatically
+    | Defines an array of prefixes that will be filtered during SX import 
+    | automatically.
     |
     */
 
@@ -113,7 +111,7 @@ return [
     | API definitions
     |--------------------------------------------------------------------------
     |
-    | Defines the SX API. See
+    | Defines the a JSON representation of the SX API. See
     | https://documenter.getpostman.com/view/1760772/S1a33ni6
     |
     */
@@ -252,5 +250,27 @@ return [
             ],
         ],
 
-    ]
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | exportFormat
+    |--------------------------------------------------------------------------
+    |
+    | Defines the export format. Possible values are:
+    | 'XLSX', 'CSV', 'TSV', 'ODS', 'XLS', 'HTML', 'MPDF', 'DOMPDF', 'TCPDF'
+    | See https://docs.laravel-excel.com/3.1/exports/export-formats.html
+    |
+    */
+    'exportFormat' => 'XLSX',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Exclude from export
+    |--------------------------------------------------------------------------
+    |
+    | Defines an array of columns to be excluded from the export.
+    |
+    */
+    'excludeFromExport' => ['created_at', 'updated_at', 'survey', 'respondentid'],
 ];

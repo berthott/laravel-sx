@@ -15,7 +15,7 @@ use berthott\SX\Http\Controllers\SxDistributableController;
 use berthott\SX\Http\Middleware\ConvertLabelsToValues;
 use berthott\SX\Http\Middleware\ConvertStringBooleans;
 use berthott\SX\Services\Http\SxApiService;
-use berthott\SX\Services\Http\SxEntityService;
+use berthott\SX\Services\Http\SxHttpService;
 use berthott\SX\Services\SxableService;
 use berthott\SX\Services\SxDistributableService;
 use berthott\SX\Services\SxReportLongService;
@@ -41,7 +41,7 @@ class SxServiceProvider extends ServiceProvider
             return new HelpersSxLog();
         });
         $this->app->singleton('SxHttpService', function () {
-            return new SxEntityService();
+            return new SxHttpService();
         });
         $this->app->bind('SxApiService', function () {
             return new SxApiService();

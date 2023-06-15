@@ -4,7 +4,7 @@ namespace berthott\SX\Services\Http;
 
 use berthott\SX\Facades\SxApiService;
 
-class SxEntityService
+class SxHttpService
 {
     public function __call(string $name, array $arguments): mixed
     {

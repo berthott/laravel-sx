@@ -11,6 +11,29 @@ use Illuminate\Support\Collection;
 use League\Csv\Statement;
 use Illuminate\Support\Str;
 
+/**
+ * Service to interact with a SX Surveys data.
+ * 
+ * A survey has various data that is mapped in this service as follows:
+ * 
+ * | SxSurveyService    | SX            |
+ * | ---                | ---           |
+ * | structure          | structure     |
+ * | questions          | structure     |
+ * | entities           | dataset       |
+ * | labels             | labels        |
+ * | /                  | questionnaire |
+ * | /                  | variables     |
+ * 
+ * Data is requested as CSV, and parsed.
+ * 
+ * SX uses short variable names for export by default. While the SX API
+ * gives us the option to export also long names, when interacting with
+ * respondents, it requires short names. Therefore we export the short
+ * names and use the returned structure to guess the short and full names
+ * however we need them ({@see \berthott\SX\Services\SxSurveyService::guessShortVariableName()}, 
+ * {@see \berthott\SX\Services\SxSurveyService::guessFullVariableName()}).
+ */
 class SxSurveyService
 {
     /**
@@ -24,7 +47,7 @@ class SxSurveyService
     private Collection $labels;
 
     /**
-     * The Survey Id.
+     * The survey ID.
      */
     private string $survey_id;
 
@@ -49,7 +72,49 @@ class SxSurveyService
     }
 
     /**
-     * Initialize the structure.
+     * Get the structure for the entity table.
+     */
+    public function getEntityStructure(): Collection
+    {
+        $this->initStructure();
+        return $this->mapToFullVariableName(SxHelpers::pluckFromCollection($this->structure[$this->defaultLanguage], 'variableName', 'subType'));
+    }
+
+    /**
+     * Get the entities from SX.
+     */
+    public function getEntities(array $query = []): Collection
+    {
+        return $this->extractCsv(SxHttpService::surveys()->exportDataset([
+            'survey' => $this->survey_id,
+            'query' => array_merge(
+                ['format' => 'INTL_US'],
+                $query,
+            ),
+        ]), null, true);
+    }
+
+    /**
+     * Get the questions for the questions table.
+     */
+    public function getQuestions(string $language = null): Collection
+    {
+        $this->initStructure();
+        $questions = $this->structure->map(fn($structure) => $this->mapToFullVariableName(SxHelpers::pluckFromCollection($structure, 'questionName', 'variableName', 'questionText', 'subType', 'choiceValue', 'choiceText')));
+        return $questions[$language ?: $this->defaultLanguage];
+    }
+
+    /**
+     * Get the values for the values table.
+     */
+    public function getLabels(string $language = null): Collection
+    {
+        $this->initLabels();
+        return $this->labels[$language ?: $this->defaultLanguage];
+    }
+
+    /**
+     * Initialize the structure from SX.
      */
     private function initStructure()
     {
@@ -66,7 +131,25 @@ class SxSurveyService
     }
 
     /**
-     * Initialize the Structure.
+     * Initialize the labels.
+     */
+    private function initLabels()
+    {
+        if (!isset($this->labels)) {
+            $this->labels = $this->languages->mapWithKeys(fn($lang) => [
+                $lang => $this->mapToFullVariableName($this->extractCsv(SxHttpService::surveys()->exportLabels([
+                    'survey' => $this->survey_id,
+                    'query' => [
+                        'format' => 'INTL_US',
+                        'lang' => $lang,
+                    ],
+                ]), ['variableName', 'value', 'label'])),
+            ]);
+        }
+    }
+
+    /**
+     * Extract a CSV response.
      */
     private function extractCsv(Response $response, array $header = null, bool $fullNameHeaders = false): Collection
     {
@@ -95,67 +178,9 @@ class SxSurveyService
     }
 
     /**
-     * Get the structure for the entity table.
-     */
-    public function getEntityStructure(): Collection
-    {
-        $this->initStructure();
-        return $this->mapToFullVariableName(SxHelpers::pluckFromCollection($this->structure[$this->defaultLanguage], 'variableName', 'subType'));
-    }
-
-    /**
-     * Get the entities.
-     */
-    public function getEntities(array $query = []): Collection
-    {
-        return $this->extractCsv(SxHttpService::surveys()->exportDataset([
-            'survey' => $this->survey_id,
-            'query' => array_merge(
-                ['format' => 'INTL_US'],
-                $query,
-            ),
-        ]), null, true);
-    }
-
-    /**
-     * Get the questions for the questions table.
-     */
-    public function getQuestions(string $language = null): Collection
-    {
-        $this->initStructure();
-        $questions = $this->structure->map(fn($structure) => $this->mapToFullVariableName(SxHelpers::pluckFromCollection($structure, 'questionName', 'variableName', 'questionText', 'subType', 'choiceValue', 'choiceText')));
-        return $questions[$language ?: $this->defaultLanguage];
-    }
-
-    /**
-     * Initialize the labels.
-     */
-    private function initLabels()
-    {
-        if (!isset($this->labels)) {
-            $this->labels = $this->languages->mapWithKeys(fn($lang) => [
-                $lang => $this->mapToFullVariableName($this->extractCsv(SxHttpService::surveys()->exportLabels([
-                    'survey' => $this->survey_id,
-                    'query' => [
-                        'format' => 'INTL_US',
-                        'lang' => $lang,
-                    ],
-                ]), ['variableName', 'value', 'label'])),
-            ]);
-        }
-    }
-
-    /**
-     * Get the values for the values table.
-     */
-    public function getLabels(string $language = null): Collection
-    {
-        $this->initLabels();
-        return $this->labels[$language ?: $this->defaultLanguage];
-    }
-
-    /**
-     * Return a last import as query array.
+     * Guess the full SX variable name from it's short name.
+     * 
+     * This is done by looking up the SX structure.
      */
     public function guessFullVariableName(string $shortName): string
     {
@@ -177,7 +202,12 @@ class SxSurveyService
     }
 
     /**
-     * Return a last import as query array.
+     * Guess the short SX variable name from its full name.
+     * 
+     * Guessing the short name is no simple mapping, because the short 
+     * names are numbered by short name and not by the long name. This
+     * means if two long names begin in the same way, they'll get the
+     * same short name, and the short name will be counted accordingly.
      */
     public function guessShortVariableName(string $fullName): string
     {
@@ -205,6 +235,12 @@ class SxSurveyService
         }
     }
 
+    /**
+     * Guess the full variable name for each element of a collection.
+     * 
+     * If a variableName exists on an item of the given collection, guess 
+     * its full name.
+     */
     private function mapToFullVariableName(Collection $collection): Collection
     {
         return $collection->map(function ($entry) {

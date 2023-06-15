@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\DB;
 
 const REPORT_DECIMALS = 1;
 
+/**
+ * Service for generating report data.
+ * 
+ * @link https://docs.syspons-dev.com/ngs-core/modules/_syspons_ngs_sx_report.html @syspons/ngs-sx-report
+ */
 class SxReportLongService
 {
     private array $columns;
@@ -29,7 +34,7 @@ class SxReportLongService
     }
 
     /**
-     * Build a query builder query.
+     * Gather report data.
      */
     private function getData(string $class): Collection
     {    
@@ -107,7 +112,7 @@ class SxReportLongService
     }
 
     /**
-     * Build a query to filter for the fields requested.
+     * Aggregate the requested fields.
      */
     private function aggregateFields(SxReportRequest $request, Collection $data): Collection
     {    
@@ -145,7 +150,9 @@ class SxReportLongService
     }
 
     /**
-     * Gather report data.
+     * Build the report from the gathered data.
+     * 
+     * This is done for each data type individually.
      */
     private function report(string $class, Collection $data): array
     {

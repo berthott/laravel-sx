@@ -8,15 +8,23 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\TransferStats;
 use GuzzleRetry\GuzzleRetryMiddleware;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Log;
 
+/*
+ * Service actually calling the SX API endpoints.
+ * 
+ * @see \berthott\SX\Services\Http\SxHttpService
+ * @see file://config/config.php
+ */
 class SxApiService
 {
     /*
-    * The API to call
+    * The API to call.
     */
     protected string $api;
 
+    /*
+    * Set the API to call.
+    */
     public function api(string $api): self
     {
         $this->api = $api;
@@ -60,7 +68,9 @@ class SxApiService
     }
 
     /**
-     * Log and output.
+     * Get the URL and Method to use.
+     * 
+     * @return string[]
      */
     private function getUrlAndMethod(string $endpoint, array $values): array
     {

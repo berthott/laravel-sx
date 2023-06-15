@@ -5,6 +5,9 @@ namespace berthott\SX\Services;
 use berthott\SX\Facades\SxHttpService;
 use berthott\SX\Models\Respondent;
 
+/*
+ * Service to manage SX Respondents.
+ */
 class SxRespondentService
 {
     /**
@@ -21,7 +24,7 @@ class SxRespondentService
     }
 
     /**
-     * Get a respondent.
+     * Get an existing respondent.
      */
     public function getRespondent(): Respondent
     {
@@ -39,7 +42,7 @@ class SxRespondentService
     }
 
     /**
-     * Create a new respondent.
+     * Update a respondent.
      */
     public function updateRespondentAnswers(array $args): Respondent
     {

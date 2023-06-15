@@ -5,7 +5,7 @@ namespace berthott\SX\Services;
 class SxReportPdfService
 {
     /**
-     * Build a report for the given class.
+     * Estimate the pages count of the final report.
      */
     public function estimatePages(array $pages): int
     {

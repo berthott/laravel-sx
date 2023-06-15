@@ -6,6 +6,9 @@ use berthott\SX\Facades\Sxable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * Simple FormRequest Implementation for validation.
+ */
 class LabeledRequest extends FormRequest
 {
     private string $target;

@@ -6,6 +6,9 @@ use berthott\SX\Facades\Sxable;
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Middleware.
+ */
 class ConvertLabelsToValues extends TransformsRequest
 {
     private string $target;
@@ -15,6 +18,16 @@ class ConvertLabelsToValues extends TransformsRequest
         $this->target = Sxable::getTarget();
     }
 
+    /**
+     * Transform the given value.
+     * 
+     * If the value is a string, and it's key is of type `Single` or `Multiple`
+     * the string value will be converted into it's numeric value representation.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
     protected function transform($key, $value)
     {
         $splittedKey = explode('.', $key);

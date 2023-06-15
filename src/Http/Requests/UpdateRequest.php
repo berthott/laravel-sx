@@ -16,6 +16,9 @@ class UpdateRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     * 
+     * Unique fields will be validated unique.
+     * All other fields will be validated nullable.
      */
     public function rules(): array
     {

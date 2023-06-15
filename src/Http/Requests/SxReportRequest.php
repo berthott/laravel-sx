@@ -2,16 +2,19 @@
 
 namespace berthott\SX\Http\Requests;
 
-use berthott\SX\Facades\Sxable;
 use Illuminate\Support\Collection;
-use Illuminate\Validation\Rule;
 use Spatie\QueryBuilder\QueryBuilderRequest;
 
+/**
+ * QueryBuilderRequest extension to add custom aggregated query parameter.
+ */
 class SxReportRequest extends QueryBuilderRequest
 {
     /**
-    * Get the validation rules that apply to the request.
-    */
+     * The fields to be aggregated.
+     * 
+     * The aggregated query parameter is an array of fileds to be aggregated.
+     */
     public function aggregate(): Collection
     { 
         $aggregate = collect($this->getRequestData('aggregate'));
@@ -24,6 +27,12 @@ class SxReportRequest extends QueryBuilderRequest
         return $aggregate->filter();
     }
 
+    /**
+     * The fields to be included.
+     * 
+     * Overrides {@see \Spatie\QueryBuilder\QueryBuilderRequest::fields()} to
+     * include fields that are included via the aggregated query parameter.
+     */
     public function fields(): Collection
     {
         $allFields = parent::fields();

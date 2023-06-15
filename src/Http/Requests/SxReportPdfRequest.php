@@ -4,6 +4,9 @@ namespace berthott\SX\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Simple FormRequest Implementation for validation.
+ */
 class SxReportPdfRequest extends FormRequest
 {
     /**

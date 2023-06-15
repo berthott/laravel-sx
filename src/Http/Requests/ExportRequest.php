@@ -5,6 +5,9 @@ namespace berthott\SX\Http\Requests;
 use berthott\SX\Facades\Sxable;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Simple FormRequest Implementation for validation.
+ */
 class ExportRequest extends FormRequest
 {
     private string $target;

@@ -32,7 +32,7 @@ class SxApiService
     public function __call(string $name, array $arguments): mixed
     {
         $arguments = Arr::collapse($arguments);
-        [$url , $method] = $this->getApi($name, $arguments);
+        [$url , $method] = $this->getUrlAndMethod($name, $arguments);
         SxLog::log("Requesting $method $url...");
         return $this->http()->request($method, $url, $arguments);
     }
@@ -62,7 +62,7 @@ class SxApiService
     /**
      * Log and output.
      */
-    public function getApi(string $endpoint, array $values)
+    private function getUrlAndMethod(string $endpoint, array $values): array
     {
         $api = config("sx.api.{$this->api}");
         $url = $api[$endpoint]['api'];

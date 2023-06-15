@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Console;
 
-use berthott\SX\Facades\Sxable;
+use Facades\berthott\SX\Services\SxableService;
 use Facades\berthott\SX\Helpers\SxLog;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +33,7 @@ class Init extends Command
             DB::disableQueryLog();
         }
 
-        foreach (Sxable::getTargetableClasses() as $class) {
+        foreach (SxableService::getTargetableClasses() as $class) {
             if ($this->argument('classes') && !in_array($class::entityTableName(), $this->argument('classes'))) {
                 continue;
             }

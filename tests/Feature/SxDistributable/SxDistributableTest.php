@@ -2,14 +2,14 @@
 
 namespace berthott\SX\Tests\Feature\SxDistributable;
 
-use berthott\SX\Facades\SxDistributable;
+use Facades\berthott\SX\Services\SxDistributableService;
 use Illuminate\Support\Facades\Route;
 
 class SxDistributableTest extends SxDistributableTestCase
 {
     public function test_distributable_found(): void
     {
-        $distributable = SxDistributable::getTargetableClasses();
+        $distributable = SxDistributableService::getTargetableClasses();
         $this->assertNotEmpty($distributable);
     }
 

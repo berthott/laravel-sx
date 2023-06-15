@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Tests\Feature\Sxable;
 
-use berthott\SX\Facades\Sxable;
+use Facades\berthott\SX\Services\SxableService;
 use berthott\SX\Services\SxSurveyService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
@@ -11,7 +11,7 @@ class SxableTest extends SxableTestCase
 {
     public function test_sxable_found(): void
     {
-        $sxables = Sxable::getTargetableClasses();
+        $sxables = SxableService::getTargetableClasses();
         $this->assertNotEmpty($sxables);
     }
 

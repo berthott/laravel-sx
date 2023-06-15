@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Http\Requests;
 
-use berthott\SX\Facades\Sxable;
+use Facades\berthott\SX\Services\SxableService;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -14,7 +14,7 @@ class StoreRequest extends FormRequest
 
     public function __construct()
     {
-        $this->target = Sxable::getTarget();
+        $this->target = SxableService::getTarget();
     }
 
     /**

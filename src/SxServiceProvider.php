@@ -6,14 +6,12 @@ use berthott\SX\Console\Import;
 use berthott\SX\Console\Init;
 use berthott\SX\Console\Drop;
 use berthott\SX\Exceptions\Handler;
-use berthott\SX\Facades\Sxable;
-use berthott\SX\Facades\SxDistributable;
 use berthott\SX\Http\Controllers\SxableController;
 use berthott\SX\Http\Controllers\SxDistributableController;
 use berthott\SX\Http\Middleware\ConvertLabelsToValues;
 use berthott\SX\Http\Middleware\ConvertStringBooleans;
-use berthott\SX\Services\SxableService;
-use berthott\SX\Services\SxDistributableService;
+use Facades\berthott\SX\Services\SxableService;
+use Facades\berthott\SX\Services\SxDistributableService;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Routing\Router;
@@ -27,14 +25,6 @@ class SxServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // bind singletons
-        $this->app->singleton('Sxable', function () {
-            return new SxableService();
-        });
-        $this->app->singleton('SxDistributable', function () {
-            return new SxDistributableService();
-        });
-
         // bind exception singleton
         $this->app->singleton(ExceptionHandler::class, Handler::class);
 
@@ -80,7 +70,7 @@ class SxServiceProvider extends ServiceProvider
             'sx.string_booleans',
             'sx.labels_to_values'
         ]), function () {
-            foreach (Sxable::getTargetableClasses() as $sxable) {
+            foreach (SxableService::getTargetableClasses() as $sxable) {
                 $crudRoutes = $this->getCrudRoutes($sxable::routeOptions());
                 if (in_array('sync', $crudRoutes)) Route::post($sxable::entityTableName().'/sync', [SxableController::class, 'sync'])->name($sxable::entityTableName().'.sync');
                 if (in_array('export', $crudRoutes)) Route::match(['get', 'post'], $sxable::entityTableName().'/export', [SxableController::class, 'export'])->name($sxable::entityTableName().'.export');
@@ -102,7 +92,7 @@ class SxServiceProvider extends ServiceProvider
         });
 
         Route::group($this->routeConfiguration('sx-distribution'), function () {
-            foreach (SxDistributable::getTargetableClasses('sx-distribution') as $distributable) {
+            foreach (SxDistributableService::getTargetableClasses('sx-distribution') as $distributable) {
                 Route::get("{$distributable::entityTableName()}/{{$distributable::singleName()}}", [SxDistributableController::class, 'sxcollect'])->name($distributable::entityTableName().'.sxcollect');
                 Route::get("{$distributable::entityTableName()}/{{$distributable::singleName()}}/qrcode", [SxDistributableController::class, 'qrcode'])->name($distributable::entityTableName().'.qrcode');
                 Route::get("{$distributable::entityTableName()}/{{$distributable::singleName()}}/pdf", [SxDistributableController::class, 'pdf'])->name($distributable::entityTableName().'.pdf');

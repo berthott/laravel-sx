@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Http\Middleware;
 
-use berthott\SX\Facades\Sxable;
+use Facades\berthott\SX\Services\SxableService;
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
 use Illuminate\Support\Facades\DB;
 
@@ -15,7 +15,7 @@ class ConvertLabelsToValues extends TransformsRequest
 
     public function __construct()
     {
-        $this->target = Sxable::getTarget();
+        $this->target = SxableService::getTarget();
     }
 
     /**

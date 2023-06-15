@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Http\Controllers;
 
-use berthott\SX\Facades\SxDistributable;
+use Facades\berthott\SX\Services\SxDistributableService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -13,7 +13,7 @@ class SxDistributableController
 
     public function __construct()
     {
-        $this->target = SxDistributable::getTarget();
+        $this->target = SxDistributableService::getTarget();
     }
 
     /**

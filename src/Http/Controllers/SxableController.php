@@ -5,7 +5,7 @@ namespace berthott\SX\Http\Controllers;
 use berthott\SX\Exports\SxTableExport;
 use berthott\SX\Exports\SxLabeledExport;
 use berthott\SX\Exports\SxExportAll;
-use berthott\SX\Facades\Sxable;
+use Facades\berthott\SX\Services\SxableService;
 use Facades\berthott\SX\Services\SxReportService;
 use berthott\SX\Http\Requests\DestroyManyRequest;
 use berthott\SX\Http\Requests\ExportRequest;
@@ -34,7 +34,7 @@ class SxableController
 
     public function __construct()
     {
-        $this->target = Sxable::getTarget();
+        $this->target = SxableService::getTarget();
     }
 
     /**

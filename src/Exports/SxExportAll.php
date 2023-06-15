@@ -6,19 +6,23 @@ use berthott\SX\Exports\SxTableExport;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
+/**
+ * Multiple Sheets Export.
+ * 
+ * @link https://docs.laravel-excel.com/3.1/exports/multiple-sheets.html
+ */
 class SxExportAll implements WithMultipleSheets
 {
     use Exportable;
 
-    private string $target;
-    private array $ids;
-
-    public function __construct(string $target, array $ids = [])
-    {
-        $this->target = $target;
-        $this->ids = $ids;
-    }
+    public function __construct(
+        private string $target, 
+        private array $ids = []
+    ) {}
     
+    /**
+     * Gather different sheets.
+     */
     public function sheets(): array
     {
         return [

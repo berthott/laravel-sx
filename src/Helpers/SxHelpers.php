@@ -30,6 +30,8 @@ class SxHelpers
      * Will substitute numeric value for their labels for `Single` and `Multiple`
      * data types. In addition for `Multiple` data types the column header is
      * extended by the choice text. 
+     * 
+     * @see \berthott\SX\Exports\SxLabeledExport::headings()
      */
     public function getLabeledResource(Model $resource, bool $excludeFromExport = false): array
     {

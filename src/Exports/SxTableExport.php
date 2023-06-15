@@ -12,22 +12,36 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
+/**
+ * Variable Sheet Export for any table.
+ * 
+ * @link https://docs.laravel-excel.com/3.1/exports/collection.html
+ * @link https://docs.laravel-excel.com/3.1/exports/mapping.html#adding-a-heading-row
+ * @link https://docs.laravel-excel.com/3.1/exports/collection.html#strict-null-comparisons
+ */
 class SxTableExport implements FromCollection, WithHeadings, WithTitle, WithStrictNullComparison
 {
-    private string $tableName;
-    private array $ids;
-
-    public function __construct(string $tableName, array $ids = [])
-    {
-        $this->tableName = $tableName;
-        $this->ids = $ids;
-    }
+    public function __construct(
+        private string $tableName, 
+        private array $ids = []
+    ) {}
     
+    /**
+     * Show requested table name.
+     */
     public function title(): string
     {
         return $this->tableName;
     }
 
+    /**
+     * Get a resource collection for all requested IDs and exclude
+     * excluded columns.
+     * 
+     * @see \berthott\SX\Helpers\SxHelpers::getLabeledResource()
+     * @see \berthott\SX\Exports\SxLabeledExport::collection()
+     * @see \berthott\SX\Exports\SxTableExport::headings()
+     */
     public function collection(): Collection
     {
         $query = DB::table($this->tableName)->select(...$this->headings());
@@ -39,6 +53,13 @@ class SxTableExport implements FromCollection, WithHeadings, WithTitle, WithStri
             });
     }
 
+    /**
+     * Filter columns if they are excluded from export.
+     * 
+     * @see \berthott\SX\Helpers\SxHelpers::getLabeledResource()
+     * @see \berthott\SX\Exports\SxTableExport::collection()
+     * @see \berthott\SX\Exports\SxLabeledExport::headings()
+     */
     public function headings(): array
     {
         return array_filter(SxHelpers::getSortedColumns($this->tableName), function ($column) {
@@ -46,7 +67,12 @@ class SxTableExport implements FromCollection, WithHeadings, WithTitle, WithStri
         });
     }
 
-    // intentionally disabled because of missing WithColumnFormatting Concern
+    /**
+     * Format the columns.
+     * 
+     * This is intentionally disabled right now by not applying the WithColumnFormatting Concern.
+     * @link https://docs.laravel-excel.com/3.1/exports/column-formatting.html#formatting-columns
+     */
     public function columnFormats(): array
     {
         $i = 1;

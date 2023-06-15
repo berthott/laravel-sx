@@ -7,6 +7,15 @@ use Facades\berthott\SX\Helpers\SxLog;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * An artisan command to drop all SX tables.
+ * 
+ * * Takes a list of `classes` to be applied to. If non is provided,
+ * all SX tables are dropped.
+ * * Takes a `memory` option to set the memory limit.
+ * 
+ * @api
+ */
 class Drop extends Command
 {
     protected $signature = 'sx:drop {classes?*} {--memory=}';

@@ -8,22 +8,18 @@ use Illuminate\Http\JsonResponse;
 class PdfReportException extends Exception
 {
     /**
-     * The error.
-     */
-    private array $error;
-
-    /**
      * Create a new exception instance.
      */
-    public function __construct(array $error)
+    public function __construct(private array $error)
     {
         parent::__construct('Building the PDF Report failed');
-
-        $this->error = $error;
     }
 
     /**
      * Render the exception into an HTTP response.
+     * 
+     * The `custom_error` will be interpreted by the frontend and shown 
+     * to the user.
      */
     public function render(/* Request $request */): JsonResponse
     {

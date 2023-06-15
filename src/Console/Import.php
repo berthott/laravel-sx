@@ -8,6 +8,18 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * An artisan command to import SX data.
+ * 
+ * * Takes a list of `classes` to be applied to. If non is provided,
+ * all SX classes are imported.
+ * * Takes a `fresh` option to drop all previous imported data.
+ * * Takes a `since` option to define a timestamp from which onward 
+ * data should be imported.
+ * * Takes a `memory` option to set the memory limit.
+ * 
+ * @api
+ */
 class Import extends Command
 {
     protected $signature = 'sx:import {classes?*} {--fresh} {--since=} {--memory=}';

@@ -10,6 +10,11 @@ class Handler extends ExceptionHandler
 {
     /**
      * Render an exception into an HTTP response.
+     * 
+     * Wrap `ValidationException`s into errors array and return a 422 Http Response.
+     * This 422 response will be interpreted by the frontend and shown to the user.
+     * 
+     * @link \TODO
      *
      * @param \Illuminate\Http\Request $request
      * @param \Throwable               $e

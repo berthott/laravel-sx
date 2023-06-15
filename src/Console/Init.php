@@ -8,6 +8,18 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * An artisan command to init SX tables and import data.
+ * 
+ * * Takes a list of `classes` to be applied to. If non is provided,
+ * all possible SX tables are created and imported.
+ * * Takes a `fresh` option to drop all previous created tables.
+ * * Takes a `max` option to define a maximum of data entries to be
+ * imported per table.
+ * * Takes a `memory` option to set the memory limit.
+ * 
+ * @api
+ */
 class Init extends Command
 {
     protected $signature = 'sx:init {classes?*} {--fresh} {--max=} {--memory=}';

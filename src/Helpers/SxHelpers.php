@@ -9,10 +9,13 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Some helper functions.
+ */
 class SxHelpers
 {
     /**
-     * Get the values for the values table.
+     * Pluck a set of keys from a collection.
      */
     public function pluckFromCollection(Collection $collection, string ...$args): Collection
     {
@@ -23,6 +26,10 @@ class SxHelpers
 
     /**
      * Get a labeled resource.
+     * 
+     * Will substitute numeric value for their labels for `Single` and `Multiple`
+     * data types. In addition for `Multiple` data types the column header is
+     * extended by the choice text. 
      */
     public function getLabeledResource(Model $resource, bool $excludeFromExport = false): array
     {
@@ -56,7 +63,7 @@ class SxHelpers
     }
 
     /**
-     * Get a sorted columns for table.
+     * Get a sorted list of columns for table.
      */
     public function getSortedColumns(string $tableName): array
     {

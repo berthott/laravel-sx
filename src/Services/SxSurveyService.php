@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Services;
 
-use berthott\SX\Facades\SxHelpers;
+use Facades\berthott\SX\Helpers\SxHelpers;
 use berthott\SX\Facades\SxHttpService;
 use GuzzleHttp\Psr7\Response;
 use League\Csv\Reader;

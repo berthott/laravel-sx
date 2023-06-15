@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Models\Resources;
 
-use berthott\SX\Facades\SxHelpers;
+use Facades\berthott\SX\Helpers\SxHelpers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;

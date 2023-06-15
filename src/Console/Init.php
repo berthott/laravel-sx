@@ -3,7 +3,7 @@
 namespace berthott\SX\Console;
 
 use berthott\SX\Facades\Sxable;
-use berthott\SX\Facades\SxLog;
+use Facades\berthott\SX\Helpers\SxLog;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

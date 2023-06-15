@@ -2,10 +2,9 @@
 
 namespace berthott\SX\Exports;
 
-use berthott\SX\Facades\SxHelpers;
+use Facades\berthott\SX\Helpers\SxHelpers;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStrictNullComparison;

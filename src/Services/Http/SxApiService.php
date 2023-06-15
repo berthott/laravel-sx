@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Services\Http;
 
-use berthott\SX\Facades\SxLog;
+use Facades\berthott\SX\Helpers\SxLog;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\TransferStats;

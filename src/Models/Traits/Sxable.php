@@ -3,10 +3,9 @@
 namespace berthott\SX\Models\Traits;
 
 use berthott\SX\Events\RespondentsImported;
-use berthott\SX\Facades\SxHelpers;
-use berthott\SX\Facades\SxLog;
+use Facades\berthott\SX\Helpers\SxHelpers;
+use Facades\berthott\SX\Helpers\SxLog;
 use berthott\SX\Models\Resources\SxableLabeledResource;
-use berthott\SX\Models\SxMode;
 use berthott\SX\Observers\SxableObserver;
 use berthott\SX\Services\SxSurveyService;
 use Closure;

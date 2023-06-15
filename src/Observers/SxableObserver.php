@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Observers;
 
-use berthott\SX\Facades\SxLog;
+use Facades\berthott\SX\Helpers\SxLog;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;

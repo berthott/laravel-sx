@@ -8,8 +8,6 @@ use berthott\SX\Console\Drop;
 use berthott\SX\Exceptions\Handler;
 use berthott\SX\Facades\Sxable;
 use berthott\SX\Facades\SxDistributable;
-use berthott\SX\Helpers\SxHelpers;
-use berthott\SX\Helpers\SxLog as HelpersSxLog;
 use berthott\SX\Http\Controllers\SxableController;
 use berthott\SX\Http\Controllers\SxDistributableController;
 use berthott\SX\Http\Middleware\ConvertLabelsToValues;
@@ -34,16 +32,10 @@ class SxServiceProvider extends ServiceProvider
     public function register(): void
     {
         // bind singletons
-        $this->app->singleton('SxHelpers', function () {
-            return new SxHelpers();
-        });
-        $this->app->singleton('SxLog', function () {
-            return new HelpersSxLog();
-        });
         $this->app->singleton('SxHttpService', function () {
             return new SxHttpService();
         });
-        $this->app->bind('SxApiService', function () {
+        $this->app->singleton('SxApiService', function () {
             return new SxApiService();
         });
         $this->app->singleton('Sxable', function () {

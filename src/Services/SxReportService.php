@@ -14,7 +14,7 @@ const REPORT_DECIMALS = 1;
  * 
  * @link https://docs.syspons-dev.com/ngs-core/modules/_syspons_ngs_sx_report.html @syspons/ngs-sx-report
  */
-class SxReportLongService
+class SxReportService
 {
     private array $columns;
     private Collection $questions;

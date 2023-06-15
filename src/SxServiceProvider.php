@@ -14,8 +14,6 @@ use berthott\SX\Http\Middleware\ConvertLabelsToValues;
 use berthott\SX\Http\Middleware\ConvertStringBooleans;
 use berthott\SX\Services\SxableService;
 use berthott\SX\Services\SxDistributableService;
-use berthott\SX\Services\SxReportLongService;
-use berthott\SX\Services\SxReportPdfService;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Routing\Router;
@@ -35,12 +33,6 @@ class SxServiceProvider extends ServiceProvider
         });
         $this->app->singleton('SxDistributable', function () {
             return new SxDistributableService();
-        });
-        $this->app->singleton('SxReport', function () {
-            return new SxReportLongService();
-        });
-        $this->app->singleton('SxReportPdf', function () {
-            return new SxReportPdfService();
         });
 
         // bind exception singleton

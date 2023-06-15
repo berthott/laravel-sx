@@ -6,7 +6,7 @@ use berthott\SX\Exports\SxTableExport;
 use berthott\SX\Exports\SxLabeledExport;
 use berthott\SX\Exports\SxExportAll;
 use berthott\SX\Facades\Sxable;
-use berthott\SX\Facades\SxReport;
+use Facades\berthott\SX\Services\SxReportService;
 use berthott\SX\Http\Requests\DestroyManyRequest;
 use berthott\SX\Http\Requests\ExportRequest;
 use berthott\SX\Http\Requests\ImportRequest;
@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use berthott\SX\Exceptions\PdfReportException;
-use berthott\SX\Facades\SxReportPdf;
+use \Facades\berthott\SX\Services\SxReportPdfService;
 use berthott\SX\Http\Requests\SxReportPdfRequest;
 
 class SxableController
@@ -208,7 +208,7 @@ class SxableController
      */
     public function report(LabeledRequest $request): array
     {
-        return SxReport::get($this->target);
+        return SxReportService::get($this->target);
     }
 
     /**
@@ -235,7 +235,7 @@ class SxableController
     {
         $pages = $request->input('pages');
         $pageLimit = $request->input('pageLimit');
-        if ($pageLimit && SxReportPdf::estimatePages($pages) > $pageLimit) {
+        if ($pageLimit && SxReportPdfService::estimatePages($pages) > $pageLimit) {
             throw new PdfReportException(['pageLimit' => $pageLimit]);
         } 
 

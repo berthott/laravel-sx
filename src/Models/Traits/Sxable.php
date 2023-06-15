@@ -87,14 +87,6 @@ trait Sxable
     }
 
     /**
-     * The format in which the data should be stored
-     */
-    public static function format(): string
-    {
-        return SxMode::Entity;
-    }
-
-    /**
      * The fields that should be excluded from being processed.
      * Will be ignored when include is set
      */

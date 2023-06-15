@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Exports;
 
-use berthott\SX\Models\Resources\SxableLabeledExportResource;
+use berthott\SX\Models\Resources\SxableLabeledResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -29,7 +29,7 @@ class SxLabeledExport implements FromCollection, WithHeadings, WithTitle, WithSt
     public function collection(): Collection | ResourceCollection
     {
         $entries = !empty($this->ids) ? $this->target::whereIn(config('sx.primary'), $this->ids)->get() : $this->target::all();
-        return SxableLabeledExportResource::collection($entries);
+        return SxableLabeledResource::collection($entries);
     }
 
     public function headings(): array

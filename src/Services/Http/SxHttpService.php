@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Services\Http;
 
-use berthott\SX\Facades\SxApiService;
+use Facades\berthott\SX\Services\Http\SxApiService;
 
 /*
  * Service to distinguish between different SX APIs.

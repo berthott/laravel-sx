@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Tests\Unit\Api;
 
-use berthott\SX\Facades\SxHttpService;
+use Facades\berthott\SX\Services\Http\SxHttpService;
 
 class ApiTest extends ApiTestCase
 {

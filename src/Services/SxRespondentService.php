@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Services;
 
-use berthott\SX\Facades\SxHttpService;
+use Facades\berthott\SX\Services\Http\SxHttpService;
 use berthott\SX\Models\Respondent;
 
 /*

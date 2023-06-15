@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Tests\Feature\Userstamps;
 
-use berthott\SX\Facades\SxApiService;
+use Facades\berthott\SX\Services\Http\SxApiService;
 use berthott\SX\SxServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Artisan;

@@ -2,7 +2,7 @@
 
 namespace berthott\SX\Tests\Feature\Commands;
 
-use berthott\SX\Facades\SxApiService;
+use Facades\berthott\SX\Services\Http\SxApiService;
 use berthott\SX\SxServiceProvider;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Artisan;

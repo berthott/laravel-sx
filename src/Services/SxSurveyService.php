@@ -3,7 +3,7 @@
 namespace berthott\SX\Services;
 
 use Facades\berthott\SX\Helpers\SxHelpers;
-use berthott\SX\Facades\SxHttpService;
+use Facades\berthott\SX\Services\Http\SxHttpService;
 use GuzzleHttp\Psr7\Response;
 use League\Csv\Reader;
 use GuzzleHttp\Psr7\StreamWrapper;

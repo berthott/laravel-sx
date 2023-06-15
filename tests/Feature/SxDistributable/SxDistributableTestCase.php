@@ -3,7 +3,7 @@
 namespace berthott\SX\Tests\Feature\SxDistributable;
 
 use berthott\InternalRequest\InternalRequestServiceProvider;
-use berthott\SX\Facades\SxApiService;
+use Facades\berthott\SX\Services\Http\SxApiService;
 use berthott\SX\SxServiceProvider;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Schema\Blueprint;

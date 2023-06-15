@@ -208,7 +208,9 @@ class SxSurveyService
     private function mapToFullVariableName(Collection $collection): Collection
     {
         return $collection->map(function ($entry) {
-            $entry['variableName'] = $this->guessFullVariableName($entry['variableName']);
+            if (array_key_exists('variableName', $entry)) {
+                $entry['variableName'] = $this->guessFullVariableName($entry['variableName']);
+            }
             return $entry;
         });
     }

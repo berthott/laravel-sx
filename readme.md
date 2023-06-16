@@ -49,9 +49,9 @@ $ composer require berthott/laravel-sx
 * Implement the `sxable()` method to provide the connection with a Sxable.
 * The package will register the following routes:
   * SX collect, *get*     **yourmodels/{yourmodel}** => create a new respondent and redirect to its collect URL
-  * SX collect, *get*     **yourmodels/{yourmodel}/qrcode** => get a QR code for the collect endpoint
-  * SX collect, *get*     **yourmodels/{yourmodel}/pdf** => download a PDF with the QR code
-  * SX collect, *get*     **yourmodels/{yourmodel}/sxdata** => get some data that can be used inside SX surveys
+  * SX QR code, *get*     **yourmodels/{yourmodel}/qrcode** => get a QR code for the collect endpoint
+  * SX QR code PDF, *get*     **yourmodels/{yourmodel}/pdf** => download a PDF with the QR code
+  * SX data, *get*     **yourmodels/{yourmodel}/sxdata** => get some data that can be used inside SX surveys
 * For more information on how to setup certain features see `\berthott\SX\Models\Traits\SxDistributable`.
 
 ## Options

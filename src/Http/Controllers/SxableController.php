@@ -29,7 +29,7 @@ use \Facades\berthott\SX\Services\SxReportPdfService;
 use berthott\SX\Http\Requests\SxReportPdfRequest;
 
 /**
- * API endpoint implementation
+ * Sxable API endpoint implementation.
  */
 class SxableController
 {

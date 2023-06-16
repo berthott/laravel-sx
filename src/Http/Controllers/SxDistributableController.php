@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Barryvdh\DomPDF\Facade\Pdf;
 
+/**
+ * AxDistributable API endpoint implementation.
+ */
 class SxDistributableController
 {
     private string $target;
@@ -18,6 +21,11 @@ class SxDistributableController
 
     /**
      * Collect the target.
+     * 
+     * Creates a new SX respondent and redirects to its collect URL.
+     * 
+     * @see \berthott\SX\Models\Traits\SxDistributable::collect()
+     * @api
      */
     public function sxcollect(mixed $id)
     {
@@ -26,6 +34,8 @@ class SxDistributableController
 
     /**
      * Get the QR Code for the collect url.
+     * 
+     * @api
      */
     public function qrcode(mixed $id)
     {
@@ -33,7 +43,9 @@ class SxDistributableController
     }
 
     /**
-     * Get the QR Code for the collect url.
+     * Get the QR Code PDF for the collect url.
+     * 
+     * @api
      */
     public function pdf(mixed $id)
     {
@@ -49,6 +61,8 @@ class SxDistributableController
 
     /**
      * Get the data for the sx survey from the target.
+     * 
+     * @api
      */
     public function sxdata(mixed $id, Request $request)
     {

@@ -116,10 +116,10 @@ class SxServiceProvider extends ServiceProvider
 
         Route::group($this->routeConfiguration('sx-distribution'), function () {
             foreach (SxDistributableService::getTargetableClasses('sx-distribution') as $distributable) {
-                Route::get("{$distributable::entityTableName()}/{{$distributable::singleName()}}", [SxDistributableController::class, 'sxcollect'])->name($distributable::entityTableName().'.sxcollect');
-                Route::get("{$distributable::entityTableName()}/{{$distributable::singleName()}}/qrcode", [SxDistributableController::class, 'qrcode'])->name($distributable::entityTableName().'.qrcode');
-                Route::get("{$distributable::entityTableName()}/{{$distributable::singleName()}}/pdf", [SxDistributableController::class, 'pdf'])->name($distributable::entityTableName().'.pdf');
-                Route::get("{$distributable::entityTableName()}/{{$distributable::singleName()}}/sxdata", [SxDistributableController::class, 'sxdata'])->name($distributable::entityTableName().'.sxdata');
+                Route::get("{$distributable::distributableEntityTableName()}/{{$distributable::distributableSingleName()}}", [SxDistributableController::class, 'sxcollect'])->name($distributable::entityTableName().'.sxcollect');
+                Route::get("{$distributable::distributableEntityTableName()}/{{$distributable::distributableSingleName()}}/qrcode", [SxDistributableController::class, 'qrcode'])->name($distributable::entityTableName().'.qrcode');
+                Route::get("{$distributable::distributableEntityTableName()}/{{$distributable::distributableSingleName()}}/pdf", [SxDistributableController::class, 'pdf'])->name($distributable::entityTableName().'.pdf');
+                Route::get("{$distributable::distributableEntityTableName()}/{{$distributable::distributableSingleName()}}/sxdata", [SxDistributableController::class, 'sxdata'])->name($distributable::entityTableName().'.sxdata');
             }
         });
 

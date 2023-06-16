@@ -27,8 +27,8 @@ class Init extends Command
      * 
      * @api
      */
-    protected string $signature = 'sx:init {classes?*} {--fresh} {--max=} {--memory=}';
-    protected string $description = 'Initialize SX tables';
+    protected $signature = 'sx:init {classes?*} {--fresh} {--max=} {--memory=}';
+    protected $description = 'Initialize SX tables';
 
     public function handle()
     {

@@ -43,10 +43,12 @@ class SxableController
     /**
      * Display a listing of all entries of the resource.
      * 
+     * Possible query parameters are:
+     * *boolean*   **labeled**     should values be substituted by labels
+     * *string*    **lang**        the language of the labels
+     * 
      * @api
      * @see \berthott\SX\Http\Requests\LabeledRequest
-     * @param boolean   labeled     should values be substituted by labels
-     * @param string    lang        the language of the labels
      */
     public function index(LabeledRequest $request): Collection | ResourceCollection
     {

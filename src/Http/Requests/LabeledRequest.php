@@ -20,6 +20,8 @@ class LabeledRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     * 
+     * @source
      */
     public function rules(): array
     {

@@ -18,6 +18,12 @@ use Illuminate\Support\Facades\Log;
  */
 class Drop extends Command
 {
+    /**
+     * The Signature.
+     * 
+     * @api
+     * @source
+     */
     protected $signature = 'sx:drop {classes?*} {--memory=}';
     protected $description = 'Drop SX tables';
 

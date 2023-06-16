@@ -28,6 +28,9 @@ use berthott\SX\Exceptions\PdfReportException;
 use \Facades\berthott\SX\Services\SxReportPdfService;
 use berthott\SX\Http\Requests\SxReportPdfRequest;
 
+/**
+ * API endpoint implementation
+ */
 class SxableController
 {
     private string $target;
@@ -38,7 +41,11 @@ class SxableController
     }
 
     /**
-     * Display a listing of the resource.
+     * Display a listing of all entries of the resource.
+     * 
+     * @see \berthott\SX\Http\Requests\LabeledRequest
+     * @param boolean   labeled     should values be substituted by labels
+     * @param string    lang        the language of the labels
      */
     public function index(LabeledRequest $request): Collection | ResourceCollection
     {

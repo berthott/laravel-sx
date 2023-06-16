@@ -22,8 +22,13 @@ use Illuminate\Support\Facades\Log;
  */
 class Init extends Command
 {
-    protected $signature = 'sx:init {classes?*} {--fresh} {--max=} {--memory=}';
-    protected $description = 'Initialize SX tables';
+    /**
+     * The Signature.
+     * 
+     * @api
+     */
+    protected string $signature = 'sx:init {classes?*} {--fresh} {--max=} {--memory=}';
+    protected string $description = 'Initialize SX tables';
 
     public function handle()
     {

@@ -22,8 +22,13 @@ use Illuminate\Support\Facades\Log;
  */
 class Import extends Command
 {
-    protected $signature = 'sx:import {classes?*} {--fresh} {--since=} {--memory=}';
-    protected $description = 'Import SX data';
+    /**
+     * The Signature.
+     * 
+     * @api
+     */
+    protected string $signature = 'sx:import {classes?*} {--fresh} {--since=} {--memory=}';
+    protected string $description = 'Import SX data';
 
     public function handle()
     {

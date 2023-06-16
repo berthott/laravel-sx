@@ -19,6 +19,8 @@ class UpdateRequest extends FormRequest
      * 
      * Unique fields will be validated unique.
      * All other fields will be validated nullable.
+     * 
+     * @api
      */
     public function rules(): array
     {

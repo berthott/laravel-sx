@@ -21,6 +21,29 @@ use Illuminate\Support\ServiceProvider;
 class SxServiceProvider extends ServiceProvider
 {
     /**
+     * Possible routes.
+     * 
+     * @var string[]
+     * @api
+     */
+    private $routes = [
+        'index', 
+        'show', 
+        'show_respondent',
+        'create_respondent', 
+        'update_respondent', 
+        'destroy', 
+        'destroy_many', 
+        'structure', 
+        'sync', 
+        'export', 
+        'labels', 
+        'report', 
+        'report_pdf', 
+        'languages',
+    ];
+
+    /**
      * Register services.
      */
     public function register(): void
@@ -126,22 +149,7 @@ class SxServiceProvider extends ServiceProvider
      */
     protected function getCrudRoutes(array $options): array
     {
-        $methods = [
-            'index', 
-            'show', 
-            'show_respondent',
-            'create_respondent', 
-            'update_respondent', 
-            'destroy', 
-            'destroy_many', 
-            'structure', 
-            'sync', 
-            'export', 
-            'labels', 
-            'report', 
-            'report_pdf', 
-            'languages',
-        ];
+        $methods = $this->routes;
 
         if (isset($options['only'])) {
             $methods = array_intersect($methods, (array) $options['only']);

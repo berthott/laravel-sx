@@ -27,6 +27,7 @@ use Illuminate\Contracts\Support\Arrayable;
  * * send reminder mail: Is the endpoint to send a reminder mail to the respondent.
  * 
  * @link https://documenter.getpostman.com/view/1760772/S1a33ni6#abe7266c-677f-463d-8e01-3347caa97521 SX Respondent
+ * @api
  */
 class Respondent implements Arrayable
 {

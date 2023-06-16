@@ -48,7 +48,6 @@ class SxableController
      * * *string*    **lang**:       the language of the labels
      * 
      * @api
-     * @see \berthott\SX\Http\Requests\LabeledRequest
      */
     public function index(LabeledRequest $request): Collection | ResourceCollection
     {
@@ -59,6 +58,8 @@ class SxableController
 
     /**
      * Display a single resource.
+     * 
+     * @api
      */
     public function show(int $id): Model
     {
@@ -66,10 +67,23 @@ class SxableController
     }
 
     /**
-     * Store a resource.
+     * Create a resource.
+     * 
+     * A new respondent is created in SX and the database simultaneously.
+     * For SX API options and validation see {@see \berthott\SX\Http\Requests\StoreRequest}.
+     * Additionally to the passed form_params `created_by` and `updated_by`, as well
+     * as generated unique fields are added.
+     * 
+     * The SX values `createts` and `modifyts` won't be stored in our database
+     * at this point to be able to identify whether a respondent was already synced
+     * from SX. For a tracking up creating and updating through out library
+     * see `created_at` and `updated_at`.
+     * 
+     * @api
      */
     public function create_respondent(StoreRequest $request): Respondent
     {
+        // SX expects short names
         $a = $this->formParamsWithShortNames(array_merge_recursive(
             $request->all(),
             Auth::user() ? [
@@ -96,11 +110,24 @@ class SxableController
     }
 
     /**
-     * update a resource.
+     * Update a resource by the given ID.
+     * 
+     * The respondent is updated in SX and the database simultaneously.
+     * For validation see {@see \berthott\SX\Http\Requests\UpdateRequest}.
+     * Additionally to the passed form_params `updated_by` is updated.
+     * 
+     * The SX values `createts` and `modifyts` won't be stored in our database
+     * at this point to be able to identify whether a respondent was already synced
+     * from SX. For a tracking up creating and updating through out library
+     * see `created_at` and `updated_at`.
+     * 
+     * @api
      */
     public function update_respondent(UpdateRequest $request, int $id): Respondent
     {
+        // SX expects a key instead of an id
         $key = $this->show_respondent($id)->externalkey();
+        // SX expects short names
         $respondent = (new SxRespondentService($key))->updateRespondentAnswers($this->formParamsWithShortNames(array_merge_recursive(
             $request->all(),
             Auth::user() ? [
@@ -123,7 +150,9 @@ class SxableController
     }
 
     /**
-     * Destroy a resource.
+     * Destroy a resource by the given ID.
+     * 
+     * @api
      */
     public function destroy(int $id): Response
     {
@@ -134,7 +163,11 @@ class SxableController
     }
 
     /**
-     * Destroy a resource.
+     * Destroy resources by a given array of IDs.
+     * 
+     * For validation see {@see \berthott\SX\Http\Requests\DestroyManyRequest}.
+     * 
+     * @api
      */
     public function destroy_many(DestroyManyRequest $request): Response
     {
@@ -146,7 +179,10 @@ class SxableController
     }
 
     /**
-     * Display the sx show_respondent data.
+     * Display the SX show_respondent data.
+     * 
+     * @see \berthott\SX\Models\Respondent
+     * @api
      */
     public function show_respondent(int $id): Respondent
     {
@@ -154,7 +190,13 @@ class SxableController
     }
 
     /**
-     * Display the structure.
+     * Display the structure table contents.
+     * 
+     * Possible query parameters are:
+     * * *boolean*   **labeled**:    should values be substituted by labels
+     * * *string*    **lang**:       the language of the labels
+     * 
+     * @api
      */
     public function structure(LabeledRequest $request): Collection | ResourceCollection
     {
@@ -167,7 +209,13 @@ class SxableController
     }
 
     /**
-     * Display the sx labels.
+     * Display the labels table contents.
+     * 
+     * Possible query parameters are:
+     * * *boolean*   **labeled**:    should values be substituted by labels
+     * * *string*    **lang**:       the language of the labels
+     * 
+     * @api
      */
     public function labels(LabeledRequest $request): Collection
     {
@@ -178,7 +226,14 @@ class SxableController
 
 
     /**
-     * Trigger sx import.
+     * Trigger an import.
+     * 
+     * Possible query parameters are:
+     * * *fresh*    **boolean**:    if true all entries will be imported, if false just the latest will be imported
+     * * *since*    **string**:     a time stamp or relative time to define the time from which onwards new respondents should be imported from SX
+     * * *boolean*  **labeled**:    should values be substituted by labels
+     * 
+     * @api
      */
     public function sync(ImportRequest $request): Collection | ResourceCollection
     {
@@ -186,7 +241,15 @@ class SxableController
     }
 
     /**
-     * Trigger export.
+     * Download an export.
+     * 
+     * Exports a xlsx table.
+     * 
+     * Possible query parameters are:
+     * * *table*    **string**:    the following tables can be exported: **questions**, **labels**, **long**, **wide**, **wide_labeled**. If non is specified all will be exported into one file.
+     * * *ids*      **array**:     an array of IDs to be included in the export
+     * 
+     * @api
      */
     public function export(ExportRequest $request): BinaryFileResponse
     {
@@ -214,7 +277,14 @@ class SxableController
     }
 
     /**
-     * Get report data.
+     * Get report data.     
+     * 
+     * Possible query parameters are:
+     * * *boolean*   **labeled**:    should values be substituted by labels
+     * * *string*    **lang**:       the language of the labels
+     * 
+     * @see \berthott\SX\Services\SxReportService
+     * @api
      */
     public function report(LabeledRequest $request): array
     {
@@ -223,6 +293,8 @@ class SxableController
 
     /**
      * Get survey languages.
+     * 
+     * @api
      */
     public function languages(): array
     {
@@ -241,6 +313,15 @@ class SxableController
         return $all;
     }
 
+    /**
+     * Download a report PDF.
+     * 
+     * Takes an array of pages with base64 image data and renders it into a PDF.
+     * 
+     * @see \berthott\SX\Http\Requests\SxReportPdfRequest
+     * @see resources/reportPDF.blade.php
+     * @api
+     */
     public function report_pdf(SxReportPdfRequest $request)
     {
         $pages = $request->input('pages');

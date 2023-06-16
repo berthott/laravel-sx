@@ -22,7 +22,6 @@ class LabeledRequest extends FormRequest
      * Get the validation rules that apply to the request.
      * 
      * @api
-     * @source
      */
     public function rules(): array
     {

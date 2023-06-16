@@ -7,13 +7,26 @@ use Spatie\QueryBuilder\QueryBuilderRequest;
 
 /**
  * QueryBuilderRequest extension to add custom aggregated query parameter.
+ * 
+ * @link https://spatie.be/docs/laravel-query-builder/v5/introduction
+ * @api
  */
 class SxReportRequest extends QueryBuilderRequest
 {
     /**
      * The fields to be aggregated.
      * 
-     * The aggregated query parameter is an array of fileds to be aggregated.
+     * The aggregated query parameter is an array of fields to be aggregated.
+     * e.g.
+     * ```
+     * 'trainer' => [
+     *   'trainer_1',
+     *   'trainer_2',
+     *   'trainer_3',
+     * ];
+     * ```
+     * 
+     * @api
      */
     public function aggregate(): Collection
     { 

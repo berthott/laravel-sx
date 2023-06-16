@@ -12,6 +12,7 @@ const REPORT_DECIMALS = 1;
 /**
  * Service for generating report data.
  * 
+ * @see \berthott\SX\Http\Requests\SxReportRequest
  * @link https://docs.syspons-dev.com/ngs-core/modules/_syspons_ngs_sx_report.html @syspons/ngs-sx-report
  */
 class SxReportService

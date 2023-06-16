@@ -25,6 +25,8 @@ class StoreRequest extends FormRequest
      * `email`is required.
      * Unique fields will be validated unique.
      * All other fields will be validated nullable.
+     * 
+     * @api
      */
     public function rules(): array
     {

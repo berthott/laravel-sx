@@ -22,10 +22,9 @@ class Drop extends Command
      * The Signature.
      * 
      * @api
-     * @source
      */
-    protected $signature = 'sx:drop {classes?*} {--memory=}';
-    protected $description = 'Drop SX tables';
+    protected string $signature = 'sx:drop {classes?*} {--memory=}';
+    protected string $description = 'Drop SX tables';
 
     public function handle()
     {

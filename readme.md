@@ -21,25 +21,25 @@ $ composer require berthott/laravel-sx
 * Add the `Sxable` trait to your newly generated model.
 * Implement the `surveyId()` method to provide the SX connection.
 * The package will create and fill the following tables on the fly:
-  * **yourmodels** => the entities in wide format
-  * **yourmodels_long** => the entities in long format
-  * **yourmodel_questions**
-  * **yourmodel_labels**
+  * `yourmodels` => the entities in wide format
+  * `yourmodels_long` => the entities in long format
+  * `yourmodel_questions`
+  * `yourmodel_labels`
 * The package will register the following routes:
-  * Index, *get*     **yourmodels/** => get all entities
-  * Show, *get*     **yourmodels/{yourmodel}** => get respondent information from our DB
-  * Show respondent, *get*     **yourmodels/{yourmodel}/show_respondent** => get respondent information from inside SX
-  * Create respondent, *post*    **yourmodels/** => create a new respondent inside SX and our DB
-  * Update respondent, *put*    **yourmodels/{yourmodel}** => update a respondent inside SX and our DB
-  * Destroy, *delete*  **yourmodels/{yourmodel}** => delete a respondent inside SX and in our DB
-  * Destroy many, *delete*  **yourmodels/destroy_many** => delete a respondent inside SX and in our DB
-  * Sync, *post*    **yourmodels/sync** => sync all respondent answers from SX to our DB
-  * Export, *get* *post*    **yourmodels/export** => download a XLSX export
-  * Structure, *get*  **yourmodel/structure** => get all columns inside SX and their meta information
-  * Labels, *get*  **yourmodel/labels** => get all labels for the survey questions
-  * Report, *get*  **yourmodel/report** => get report data for the survey
-  * Report PDF, *get*  **yourmodel/report_pdf** => get report a PDF report from some frontend charts
-  * Languages, *get*  **yourmodel/report_pdf** => get the SX survey languages
+  * Index, *get*     `yourmodels/` => get all entities
+  * Show, *get*     `yourmodels/{yourmodel}` => get respondent information from our DB
+  * Show respondent, *get*     `yourmodels/{yourmodel}/show_respondent` => get respondent information from inside SX
+  * Create respondent, *post*    `yourmodels/` => create a new respondent inside SX and our DB
+  * Update respondent, *put*    `yourmodels/{yourmodel}` => update a respondent inside SX and our DB
+  * Destroy, *delete*  `yourmodels/{yourmodel}` => delete a respondent inside SX and in our DB
+  * Destroy many, *delete*  `yourmodels/destroy_many` => delete a respondent inside SX and in our DB
+  * Sync, *post*    `yourmodels/sync` => sync all respondent answers from SX to our DB
+  * Export, *get* *post*    `yourmodels/export` => download a XLSX export
+  * Structure, *get*  `yourmodel/structure` => get all columns inside SX and their meta information
+  * Labels, *get*  `yourmodel/labels` => get all labels for the survey questions
+  * Report, *get*  `yourmodel/report` => get report data for the survey
+  * Report PDF, *get*  `yourmodel/report_pdf` => get report a PDF report from some frontend charts
+  * Languages, *get*  `yourmodel/report_pdf` => get the SX survey languages
 * For more information on how to setup certain features see `\berthott\SX\Models\Traits\Sxable`.
 
 ### SXDistributable
@@ -48,10 +48,10 @@ $ composer require berthott/laravel-sx
 * Add the `SxDistributable` trait to your newly generated model.
 * Implement the `sxable()` method to provide the connection with a Sxable.
 * The package will register the following routes:
-  * SX collect, *get*     **yourmodels/{yourmodel}** => create a new respondent and redirect to its collect URL
-  * SX QR code, *get*     **yourmodels/{yourmodel}/qrcode** => get a QR code for the collect endpoint
-  * SX QR code PDF, *get*     **yourmodels/{yourmodel}/pdf** => download a PDF with the QR code
-  * SX data, *get*     **yourmodels/{yourmodel}/sxdata** => get some data that can be used inside SX surveys
+  * SX collect, *get*     `yourmodels/{yourmodel}` => create a new respondent and redirect to its collect URL
+  * SX QR code, *get*     `yourmodels/{yourmodel}/qrcode` => get a QR code for the collect endpoint
+  * SX QR code PDF, *get*     `yourmodels/{yourmodel}/pdf` => download a PDF with the QR code
+  * SX data, *get*     `yourmodels/{yourmodel}/sxdata` => get some data that can be used inside SX surveys
 * For more information on how to setup certain features see `\berthott\SX\Models\Traits\SxDistributable`.
 
 ## Options

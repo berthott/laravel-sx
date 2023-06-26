@@ -9,7 +9,7 @@ For a connection between Laravel, it is necessary, to own a SX License. The conn
 
 ## Installation
 
-```
+```sh
 $ composer require berthott/laravel-sx
 ```
 
@@ -68,7 +68,7 @@ $ php artisan vendor:publish --provider="berthott\SX\SxServiceProvider" --tag="c
   * `middleware`: An array of all middlewares to be applied to all of the generated routes. Defaults to `[]`.
 * SX interconnectivity options
   * `auth`: Defines the SX Basic Auth. Defaults to env variables `SX_USERNAME` and `SX_PASSWORD`.
-  * `defaultUnique`: An array of unique columns inside the SX database. Can be extended per entity with {@see \berthott\SX\Models\Traits\Sxable::uniqueFields()}. Defaults to `['respondentid']`.
+  * `defaultUnique`: An array of unique columns inside the SX database. Can be extended per entity with `\berthott\SX\Models\Traits\Sxable::uniqueFields()`. Defaults to `['respondentid']`.
   * `primary`: Defines the primary column inside the SX database. Defaults to SXs internal ID `respondentid`.
   * `filters`: Defines an array of prefixes that will be filtered during SX import automatically. Defaults to `['x_']`.
   * `api`: Defines the a JSON representation of the SX API. See the [SX API Documentation](https://documenter.getpostman.com/view/1760772/S1a33ni6).

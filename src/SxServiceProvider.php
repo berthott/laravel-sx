@@ -18,6 +18,9 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * Register the libraries features with the laravel application.
+ */
 class SxServiceProvider extends ServiceProvider
 {
     /**

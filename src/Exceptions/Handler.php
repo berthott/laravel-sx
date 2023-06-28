@@ -17,7 +17,7 @@ class Handler extends ExceptionHandler
      * @link \TODO
      *
      * @param \Illuminate\Http\Request $request
-     * @param \Throwable               $e
+     * @param \Throwable               $exception
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *

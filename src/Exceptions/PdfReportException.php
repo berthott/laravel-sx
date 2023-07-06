@@ -20,6 +20,8 @@ class PdfReportException extends Exception
      * 
      * The `custom_error` will be interpreted by the frontend and shown 
      * to the user.
+     * 
+     * @api
      */
     public function render(/* Request $request */): JsonResponse
     {

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Redirect;
 use Barryvdh\DomPDF\Facade\Pdf;
 use berthott\SX\Exceptions\QueryCollectException;
 use berthott\SX\Http\Requests\QueryCollectRequest;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * AxDistributable API endpoint implementation.
@@ -46,14 +47,14 @@ class SxDistributableController
     public function sxquerycollect(QueryCollectRequest $request)
     {
         $validated = $request->validated();
-        if (empty($validated)) {
-            throw new QueryCollectException;
-        }
         $model = $this->target::where(function ($query) use ($validated) {
             foreach($validated as $param => $value) {
                 $query = $query->where($param, $value);
             }
         })->first();
+        if (empty($model) || empty($validated)) {
+            throw new HttpException(404);
+        }
         return Redirect::to($model->collect()->collecturl());
     }
 

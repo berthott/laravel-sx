@@ -44,7 +44,9 @@ class SxDistributableTest extends SxDistributableTestCase
         $entity = Entity::factory()->create();
         $this->assertDatabaseMissing('entity_sxes', ['respondentid' => '841931211']);
         $this->get(route('entities.sxquerycollect'))
-            ->assertBadRequest();
+            ->assertNotFound();
+        $this->get(route('entities.sxquerycollect', ['name' => 'wrong']))
+            ->assertNotFound();
         $this->get(route('entities.sxquerycollect', ['year' => $entity->name]))
             ->assertJsonValidationErrorFor('year');
         $this->get(route('entities.sxquerycollect', ['name' => $entity->name]))

@@ -33,7 +33,7 @@ abstract class UserstampsTestCase extends BaseTestCase
         Config::set('sx.namespace', __NAMESPACE__);
         Config::set('sx.auth', [
             'Syspons_API',
-            'SySpons$$'
+            'dL1lty$KWj61'
         ]);
     }
 

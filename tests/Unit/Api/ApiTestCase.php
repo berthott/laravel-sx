@@ -24,7 +24,7 @@ abstract class ApiTestCase extends BaseTestCase
     {
         Config::set('sx.auth', [
             'Syspons_API',
-            'SySpons$$'
+            'dL1lty$KWj61'
         ]);
     }
 }

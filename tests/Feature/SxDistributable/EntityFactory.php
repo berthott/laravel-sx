@@ -12,6 +12,7 @@ class EntityFactory extends Factory
     {
         return [
             'name' => $this->faker->name,
+            'year' => $this->faker->year,
         ];
     }
 }

@@ -87,6 +87,28 @@ trait SxDistributable
     }
 
     /**
+     * Possible params for collecting a distributable.
+     * 
+     * The array can contain strings, in which case it's validation will be
+     * nullable, or associative query => validation_rule values.
+     * 
+     * ```php
+     * [
+     *   'id',
+     *   'special_id' => 'required_string',
+     * ]
+     * ```
+     * 
+     * **optional**
+     * 
+     * Defaults to `[]`.
+     */
+    public static function distributableQueryCollectParams(): array
+    {
+        return [];
+    }
+
+    /**
      * Create a new SX respondent on a connected Sxable.
      * 
      * @throws \Exception

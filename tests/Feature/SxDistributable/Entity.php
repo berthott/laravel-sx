@@ -56,6 +56,14 @@ class Entity extends Model
         ];
     }
 
+    public static function distributableQueryCollectParams(): array
+    {
+        return [
+            'name',
+            'year' => 'numeric',
+        ];
+    }
+
     protected static function newFactory()
     {
         return EntityFactory::new();

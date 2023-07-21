@@ -6,6 +6,8 @@ use Facades\berthott\SX\Services\SxDistributableService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Barryvdh\DomPDF\Facade\Pdf;
+use berthott\SX\Exceptions\QueryCollectException;
+use berthott\SX\Http\Requests\QueryCollectRequest;
 
 /**
  * AxDistributable API endpoint implementation.
@@ -20,7 +22,7 @@ class SxDistributableController
     }
 
     /**
-     * Collect the target.
+     * Collect the target via the id.
      * 
      * Creates a new SX respondent and redirects to its collect URL.
      * 
@@ -30,6 +32,29 @@ class SxDistributableController
     public function sxcollect(mixed $id)
     {
         return Redirect::to($this->target::findOrFail($id)->collect()->collecturl());
+    }
+
+    /**
+     * Collect the target via a query parameter.
+     * 
+     * Creates a new SX respondent and redirects to its collect URL.
+     * 
+     * @see \berthott\SX\Models\Traits\SxDistributable::distributableQueryCollectParams()
+     * @throws QueryCollectException
+     * @api
+     */
+    public function sxquerycollect(QueryCollectRequest $request)
+    {
+        $validated = $request->validated();
+        if (empty($validated)) {
+            throw new QueryCollectException;
+        }
+        $model = $this->target::where(function ($query) use ($validated) {
+            foreach($validated as $param => $value) {
+                $query = $query->where($param, $value);
+            }
+        })->first();
+        return Redirect::to($model->collect()->collecturl());
     }
 
     /**

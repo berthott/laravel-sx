@@ -39,6 +39,22 @@ class SxDistributableTest extends SxDistributableTestCase
         ]);
     }
 
+    public function test_query_collect_route(): void
+    {
+        $entity = Entity::factory()->create();
+        $this->assertDatabaseMissing('entity_sxes', ['respondentid' => '841931211']);
+        $this->get(route('entities.sxquerycollect'))
+            ->assertBadRequest();
+        $this->get(route('entities.sxquerycollect', ['year' => $entity->name]))
+            ->assertJsonValidationErrorFor('year');
+        $this->get(route('entities.sxquerycollect', ['name' => $entity->name]))
+            ->assertRedirect();
+        $this->assertDatabaseHas('entity_sxes', [
+            'respondentid' => '841931211',
+            's_2' => 1999,
+        ]);
+    }
+
     public function test_data_route(): void
     {
         $entity = Entity::factory()->create();

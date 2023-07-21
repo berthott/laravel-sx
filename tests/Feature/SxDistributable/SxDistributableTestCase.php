@@ -76,6 +76,7 @@ abstract class SxDistributableTestCase extends BaseTestCase
         Schema::create('entities', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
+            $table->integer('year');
             $table->timestamps();
         });
     }

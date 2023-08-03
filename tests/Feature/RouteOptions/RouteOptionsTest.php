@@ -34,6 +34,7 @@ class RouteOptionsTest extends RouteOptionsTestCase
             $this->assertNotContains($route, $registeredRoutes);
         }
     }
+    
     public function test_except_routes(): void
     {
         $expectedRoutes = [

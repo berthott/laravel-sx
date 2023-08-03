@@ -19,7 +19,9 @@ class SxReportService
 {
     private array $columns;
     private Collection $questions;
+    private Collection $aggregatedQuestions;
     private Collection $labels;
+    private Collection $requestedRespondets;
     private SxReportRequest $request;
 
     /**
@@ -29,19 +31,20 @@ class SxReportService
     {
         $this->request = SxReportRequest::fromRequest(app(Request::class));
         $this->columns = $this->fromOptions($class, 'filter') ?: $class::questionNames();
-        $this->questions = $class::questions($this->request->lang);
+        $this->questions = $this->aggregatedQuestions = $class::questions($this->request->lang);
         $this->labels = $class::labels($this->request->lang);
-        return $this->report($class, $this->getData($class));
+        $this->requestedRespondets = $this->filterRespondents($class, $this->request);
+        $this->setupForAggregatedFields($this->request);
+        return $this->report($class);
     }
 
     /**
-     * Gather report data.
+     * Gather report data for the given questions.
      */
-    private function getData(string $class): Collection
+    private function getData(string $class, Collection $questions): Collection
     {    
-        $respondents = $this->filterRespondents($class, $this->request);
-        $data = $this->filterFields($class, $this->request, $respondents);
-        return $this->aggregateFields($this->request, $data);
+        $data = $this->filterFields($class, $this->request, $questions);
+        return $this->applyAggregateFields($this->request, $data);
     }
 
     /**
@@ -100,38 +103,39 @@ class SxReportService
 
     /**
      * Build a query to filter for the fields requested.
+     * 
+     * Also filters for the respondents and the requested questions.
      */
-    private function filterFields(string $class, SxReportRequest $request, Collection $respondents): Collection
+    private function filterFields(string $class, SxReportRequest $request, Collection $questions): Collection
     {    
-        return DB::table($class::longTableName())->where(function ($query) use ($respondents, $request, $class) {
+        $respondents = $this->requestedRespondets;
+        return DB::table($class::longTableName())->where(function ($query) use ($respondents, $request, $class, $questions) {
             $fields = $request->fields();
             if ($fields->count()) {
                 $query = $query->whereIn('variableName', $fields[$class::entityTableName()]);
             }
-            return $query->whereIn('respondent_id', $respondents);
+            $query->whereIn('respondent_id', $respondents);
+            $query->whereIn('variableName', $questions);
+
+            return $query;
         })->get();
     }
 
     /**
-     * Aggregate the requested fields.
+     * Build aggregated columns, questions and labels.
      */
-    private function aggregateFields(SxReportRequest $request, Collection $data): Collection
-    {    
-        $aggregate = $request->aggregate();
-        if (!$aggregate->count()) {
-            return $data;
-        }
-        
-        foreach($aggregate as $replace => $search) {
-            // collumns 
+    private function setupForAggregatedFields(SxReportRequest $request)
+    {        
+        foreach($request->aggregate() as $replace => $search) {
+            // columns 
             array_push($this->columns, $replace);
             $this->columns = array_diff($this->columns, $search);
             // questions
             $newQuestion = $this->questions->filter(fn($question) => in_array($question['variableName'], $search))->first();
             $newQuestion['variableName'] = $replace;
             $newQuestion['questionName'] = $replace;
-            $this->questions = $this->questions->filter(fn($question) => !in_array($question['variableName'], $search));
-            $this->questions->push($newQuestion);
+            $this->aggregatedQuestions = $this->questions->filter(fn($question) => !in_array($question['variableName'], $search));
+            $this->aggregatedQuestions->push($newQuestion);
             // labels
             $this->labels = $this->labels->map(function($label) use ($replace, $search) {
                 if (in_array($label['variableName'], $search)) {
@@ -140,6 +144,18 @@ class SxReportService
                 return $label;
             });
         }
+    }
+
+    /**
+     * Aggregate the requested fields.
+     */
+    private function applyAggregateFields(SxReportRequest $request, Collection $data): Collection
+    {    
+        $aggregate = $request->aggregate();
+        if (!$aggregate->count()) {
+            return $data;
+        }
+
         return $data->map(function($entry) use ($aggregate) {
             foreach($aggregate as $replace => $search) {
                 if (in_array($entry->variableName, $search)) {
@@ -155,26 +171,22 @@ class SxReportService
      * 
      * This is done for each data type individually.
      */
-    private function report(string $class, Collection $data): array
+    private function report(string $class): array
     {
         $ret = [];
-        if ($data->count()) {
-            foreach($this->columns as $column) {
-                $filteredQuestions = $this->questions->where('questionName', $column);
-                $filteredData = $data->filter(function($entry) use ($filteredQuestions) {
-                    return $filteredQuestions->contains(function($question) use ($entry) {
-                        return $question['variableName'] === $entry->variableName;
-                    });
-                });
-                if ($filteredData->isEmpty()) {
-                    continue;
-                }
-                $question = $filteredQuestions->first();
-                $method = 'report'.$question['subType'];
-                $d = $this->$method($class, $filteredData, $question);
-                if ($d['numValid']) {
-                    $ret[$column] = $d;
-                }
+        foreach($this->columns as $column) {
+            $aggregated = $this->request->aggregate()->get($column);
+            $filteredQuestions = $aggregated ? $this->questions->whereIn('questionName', $aggregated) : $this->questions->where('questionName', $column);
+
+            $filteredData = $this->getData($class, $filteredQuestions->pluck('variableName'));
+            if ($filteredData->isEmpty()) {
+                continue;
+            }
+            $question = $this->aggregatedQuestions->where('questionName', $column)->first();
+            $method = 'report'.$question['subType'];
+            $d = $this->$method($class, $filteredData, $question);
+            if ($d['numValid']) {
+                $ret[$column] = $d;
             }
         }
         return $ret;

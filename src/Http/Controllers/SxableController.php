@@ -96,7 +96,7 @@ class SxableController
             ['survey' => $this->target::surveyId()]
         ));
         $respondent = (new SxRespondentService())->createNewRespondent($a);
-        $this->target::create(array_merge(
+        $this->target::unguarded(fn () => $this->target::create(array_merge(
             [
                 config('sx.primary') => $respondent->id(),
                 'survey' => $this->target::surveyId(),
@@ -105,7 +105,7 @@ class SxableController
                 'modified' => $respondent->modifyts(), */
             ],
             $this->target::filterFormParams($request->form_params)
-        ));
+        )));
         return $respondent;
     }
 
@@ -137,14 +137,14 @@ class SxableController
             ] : [],
         )));
         if ($model = $this->target::where([config('sx.primary') => $id])->first()) {
-            $model->update(array_merge(
+            $this->target::unguarded(fn () => $model->update(array_merge(
                 // only fill with sync
                 /* [
                     'created' => $respondent->createts(),
                     'modified' => $respondent->modifyts(),
                 ], */
                 $this->target::filterFormParams($request->form_params)
-            ));
+            )));
         }
         return $respondent;
     }

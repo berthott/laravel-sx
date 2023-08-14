@@ -35,11 +35,6 @@ trait Sxable
      */
     protected static function bootSxable(): void
     {
-        /**
-         * Indicates if all mass assignment is enabled.
-         */
-        static::$unguarded = true;
-
         // observe Sxable
         static::observe(SxableObserver::class);
     }

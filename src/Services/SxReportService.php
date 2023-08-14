@@ -134,7 +134,7 @@ class SxReportService
             $newQuestion = $this->questions->filter(fn($question) => in_array($question['variableName'], $search))->first();
             $newQuestion['variableName'] = $replace;
             $newQuestion['questionName'] = $replace;
-            $this->aggregatedQuestions = $this->questions->filter(fn($question) => !in_array($question['variableName'], $search));
+            $this->aggregatedQuestions = $this->aggregatedQuestions->filter(fn($question) => !in_array($question['variableName'], $search));
             $this->aggregatedQuestions->push($newQuestion);
             // labels
             $this->labels = $this->labels->map(function($label) use ($replace, $search) {

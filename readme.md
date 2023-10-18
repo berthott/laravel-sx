@@ -40,6 +40,7 @@ $ composer require berthott/laravel-sx
   * Report, *get*  `yourmodel/report` => get report data for the survey
   * Report PDF, *get*  `yourmodel/report_pdf` => get report a PDF report from some frontend charts
   * Languages, *get*  `yourmodel/report_pdf` => get the SX survey languages
+  * Preview, *get*  `yourmodel/preview` => get a collect url for a preview survey
 * For more information on how to setup certain features see `\berthott\SX\Models\Traits\Sxable`.
 
 ### SXDistributable
@@ -52,6 +53,7 @@ $ composer require berthott/laravel-sx
   * SX QR code, *get*     `yourmodels/{yourmodel}/qrcode` => get a QR code for the collect endpoint
   * SX QR code PDF, *get*     `yourmodels/{yourmodel}/pdf` => download a PDF with the QR code
   * SX data, *get*     `yourmodels/{yourmodel}/sxdata` => get some data that can be used inside SX surveys
+  * SX preview, *get*     `yourmodels/{yourmodel}/preview` => get a collect url for a preview survey
 * For more information on how to setup certain features see `\berthott\SX\Models\Traits\SxDistributable`.
 
 ## Options

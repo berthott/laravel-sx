@@ -123,6 +123,18 @@ trait Sxable
     }
 
     /**
+     * The Survey ID that holds a preview survey.
+     * 
+     * **optional**
+     * 
+     * @api
+     */
+    public static function previewId(): string | null
+    {
+        return null;
+    }
+
+    /**
      * The fields that should be excluded from being processed.
      * 
      * This is in addition to the {@link guide/readme/index.html sx.filters option}.

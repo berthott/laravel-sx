@@ -29,6 +29,14 @@ trait SxDistributable
     }
 
     /**
+     * Can the distributable be previewed.
+     */
+    public static function canPreview(): bool
+    {
+        return is_string(static::sxable()::previewId());
+    }
+
+    /**
      * An array of background variables to push to SX.
      * 
      * **optional**
@@ -115,7 +123,27 @@ trait SxDistributable
      */
     public function collect(): Respondent
     {
-        $response = InternalRequest::skipMiddleware()->post(route(static::sxable()::entityTableName().'.create_respondent'), [
+        return $this->internalCollect('create_respondent');
+    }
+
+    /**
+     * Create a new SX preview respondent on a connected Sxable.
+     * 
+     * @throws \Exception
+     */
+    public function preview(): Respondent
+    {
+        return $this->internalCollect('preview');
+    }
+
+    /**
+     * Create a new SX respondent on a connected Sxable for the given route action.
+     * 
+     * @throws \Exception
+     */
+    private function internalCollect(string $action = 'create_respondent'): Respondent
+    {
+        $response = InternalRequest::skipMiddleware()->post(route(static::sxable()::entityTableName().'.'.$action), [
             'form_params' => array_merge(
                 ['email' => 'monitoring@syspons.com'],
                 static::sxBackgroundVariables($this),

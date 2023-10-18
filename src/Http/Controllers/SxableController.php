@@ -110,6 +110,34 @@ class SxableController
     }
 
     /**
+     * Create a respondent on the preview survey.
+     * 
+     * A new respondent is created in SX. Nothing is stored in the database. 
+     * For SX API options and validation see {@see \berthott\SX\Http\Requests\StoreRequest}.
+     * Additionally to the passed form_params `created_by` and `updated_by`, as well
+     * as generated unique fields are added.
+     * 
+     * @api
+     */
+    public function preview(StoreRequest $request): Respondent
+    {
+        // SX expects short names
+        $a = $this->formParamsWithShortNames(array_merge_recursive(
+            $request->all(),
+            Auth::user() ? [
+                'form_params' => [
+                    'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id,
+                ]
+            ] : [],
+            $this->target::generatedUniqueFieldsParams(),
+            ['survey' => $this->target::previewId()]
+        ));
+        $respondent = (new SxRespondentService())->createNewRespondent($a);
+        return $respondent;
+    }
+
+    /**
      * Update a resource by the given ID.
      * 
      * The respondent is updated in SX and the database simultaneously.

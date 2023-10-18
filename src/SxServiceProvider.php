@@ -44,6 +44,7 @@ class SxServiceProvider extends ServiceProvider
         'report', 
         'report_pdf', 
         'languages',
+        'preview',
     ];
 
     /**
@@ -107,6 +108,7 @@ class SxServiceProvider extends ServiceProvider
                 if (in_array('report', $crudRoutes)) Route::get("{$sxable::entityTableName()}/report", [SxableController::class, 'report'])->name($sxable::entityTableName().'.report');
                 if (in_array('languages', $crudRoutes)) Route::get("{$sxable::entityTableName()}/languages", [SxableController::class, 'languages'])->name($sxable::entityTableName().'.languages');
                 if (in_array('report_pdf', $crudRoutes)) Route::post("{$sxable::entityTableName()}/report_pdf", [SxableController::class, 'report_pdf'])->name($sxable::entityTableName().'.report_pdf');
+                if (in_array('preview', $crudRoutes) && is_string($sxable::previewId())) Route::post("{$sxable::entityTableName()}/preview", [SxableController::class, 'preview'])->name($sxable::entityTableName().'.preview');
                 //Route::apiResource($sxable::entityTableName(), SxableController::class, $sxable::routeOptions());
 
                 if (in_array('index', $crudRoutes)) Route::get($sxable::entityTableName(), [SxableController::class, 'index'])->name($sxable::entityTableName().'.index');
@@ -124,6 +126,9 @@ class SxServiceProvider extends ServiceProvider
                 Route::get("{$distributable::distributableEntityTableName()}/{{$distributable::distributableSingleName()}}/qrcode", [SxDistributableController::class, 'qrcode'])->name($distributable::entityTableName().'.qrcode');
                 Route::get("{$distributable::distributableEntityTableName()}/{{$distributable::distributableSingleName()}}/pdf", [SxDistributableController::class, 'pdf'])->name($distributable::entityTableName().'.pdf');
                 Route::get("{$distributable::distributableEntityTableName()}/{{$distributable::distributableSingleName()}}/sxdata", [SxDistributableController::class, 'sxdata'])->name($distributable::entityTableName().'.sxdata');
+                if ($distributable::canPreview()) {
+                    Route::get("{$distributable::distributableEntityTableName()}/{{$distributable::distributableSingleName()}}/preview", [SxDistributableController::class, 'preview'])->name($distributable::entityTableName().'.preview');
+                }
             }
         });
 

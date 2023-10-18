@@ -1,0 +1,27 @@
+<?php
+
+namespace berthott\SX\Tests\Feature\Preview;
+
+use berthott\SX\Models\Traits\Sxable;
+use Illuminate\Database\Eloquent\Model;
+
+class Entity extends Model
+{
+    use Sxable;
+
+    /**
+     * The Survey Id that should be connected to this Model.
+     */
+    public static function surveyId(): string
+    {
+        return '1325978';
+    }
+
+    /**
+     * The Survey ID that holds a preview survey.
+     */
+    public static function previewId(): string | null
+    {
+        return '1325978';
+    }
+}

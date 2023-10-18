@@ -36,6 +36,18 @@ class SxDistributableController
     }
 
     /**
+     * Preview the target via the id.
+     * 
+     * Creates a new SX preview respondent and redirects to its collect URL.
+     * 
+     * @api
+     */
+    public function preview(mixed $id)
+    {
+        return $this->target::findOrFail($id)->preview();
+    }
+
+    /**
      * Collect the target via a query parameter.
      * 
      * Creates a new SX respondent and redirects to its collect URL.

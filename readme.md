@@ -13,6 +13,30 @@ For a connection between Laravel, it is necessary, to own a SX License. The conn
 $ composer require berthott/laravel-sx
 ```
 
+## Concept
+
+### Sxable
+
+SX is a surveying tool that offers a `questionnaire` to the end user who will respond which will fill out one row in a database with values corresponding to their answers. This row is referred to as `respondent`, so the whole dataset will be the `respondents`. The structure of this respondents table including information question type, as well as the `questionnaire` which is the labels for the structure, and the `labels` for all possible answers can be downloaded by SX's API.
+
+In addition, respondents can be created and prefilled with background variables via the API.
+
+For more information see the [SX API Documentation](https://documenter.getpostman.com/view/1760772/S1a33ni6).
+
+This package will provide all the API implementation for you. Once you connect a survey, the respondent's data from SX will be synced with your own database. Interacting (creating, editing and deleting respondents) with this package will ensure to always maintain the latest data in both table, SX and our own.
+If changes are done to the SX Database by end users a sync can be triggered via the `sync route` or by the `sx:import Artisan command`.
+
+### Distributable
+
+A distributable is an entity within your database that can provide background variable to pre-fill respondents data. It corresponds to a sxable and provides some useful routes for collecting respondents.
+
+### Use cases
+
+There's different possible use cases, that are implemented by the `ngs-core/sx-entity` package.
+* Simply connecting a survey, without creating respondents on your own: Just show the data in your application.
+* Create / Edit respondents from within the package: Use SX as a sophisticated input form for your application.
+* Collect data for specific entities (distributable): Create respondents connected to specific entities within you application.
+
 ## Usage
 
 ### Sxable
@@ -39,7 +63,7 @@ $ composer require berthott/laravel-sx
   * Labels, *get*  `yourmodel/labels` => get all labels for the survey questions
   * Report, *get*  `yourmodel/report` => get report data for the survey
   * Report PDF, *get*  `yourmodel/report_pdf` => get report a PDF report from some frontend charts
-  * Languages, *get*  `yourmodel/report_pdf` => get the SX survey languages
+  * Languages, *get*  `yourmodel/languages` => get the SX survey languages
   * Preview, *get*  `yourmodel/preview` => get a collect url for a preview survey
 * For more information on how to setup certain features see `\berthott\SX\Models\Traits\Sxable`.
 
@@ -83,6 +107,40 @@ $ php artisan vendor:publish --provider="berthott\SX\SxServiceProvider" --tag="c
 ### SX short variable names vs. long variable names
 
 SX uses short variable names for export by default. While the SX API gives us the option to export also long names, when interacting with respondents, it requires short names. Therefore we export the short names and use the returned structure to guess the short and full names however we need them. See `\berthott\SX\Services\SxSurveyService`.
+
+## Architecture
+
+* The package relies on [laravel-targetable](https://docs.syspons-dev.com/laravel-targetable) to connect specific functionality to Laravel model entities via traits. (`Sxable`, `Distributable`).
+* API
+  * The SX API interaction happens inside `SxApiService` and is separated into different endpoint with `SxHttpService`. As API definition might change in the future it is configurable inside the `api config`.
+  * `SxSurveyService` is an interface into the SX survey data. It caches some data. `SxRespondentService` is an interface for interacting with respondents. Both utilize `SxHttpService` for this.
+* `Sxable`
+  * Maintains the connection between SX and our database utilizing `SxSurveyService`
+  * `SxableController`
+    * provide the routes for interacting with the Sxable and the SX API
+    * utilizes `SxRespondentService` for creating respondents in SX
+    * Some routes will affect our own database, some won't and only transmit data from the SX API
+  * Wide vs. Long Data
+    * SX stores data in a wide table format, but aggregation is best solved with long data
+    * An exact copy of the original wide data is maintained as a long table by the `SxableObserver`
+    * During initialization and import the observer is bypassed for performance reasons (see `Sxable::doUpsert`)
+  * More Tables
+    * After initializing an Sxable questions + labels will be stored in an extra table. These won't change after initialization, so whenever the surveys structure changes inside SX these table need to be reinitialized
+* `Distributable`
+  * Maintains the connection between an arbitrary model and an Sxable.
+  * `DistributableController`
+    * provide the routes for interacting with the Distributable
+* Requests
+  * mostly used to encapsulate validation
+  * `SxReportRequest` adds some functionality around filtering and aggregation
+* Export
+  * An export will return a labeled wide table, as well as the unlabeled wide table, the questions and the labels table
+  * The wide table can be filtered by IDs
+* `RespondentsImported` will be fired whenever new entities were imported. Useful for flushing the cache
+* Artisan commands for initializing, importing and dropping tables and data.
+
+  
+
 
 ## Compatibility
 

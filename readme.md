@@ -62,7 +62,7 @@ There's different possible use cases, that are implemented by the `ngs-core/sx-e
   * Structure, *get*  `yourmodel/structure` => get all columns inside SX and their meta information
   * Labels, *get*  `yourmodel/labels` => get all labels for the survey questions
   * Report, *get*  `yourmodel/report` => get report data for the survey
-  * Report PDF, *get*  `yourmodel/report_pdf` => get report a PDF report from some frontend charts
+  * Report PDF, *get*  `yourmodel/report_pdf` => get a PDF report from some frontend charts
   * Languages, *get*  `yourmodel/languages` => get the SX survey languages
   * Preview, *get*  `yourmodel/preview` => get a collect url for a preview survey
 * For more information on how to setup certain features see `\berthott\SX\Models\Traits\Sxable`.

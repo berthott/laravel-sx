@@ -44,7 +44,7 @@ class SxDistributableController
      */
     public function preview(mixed $id)
     {
-        return $this->target::findOrFail($id)->preview();
+        return Redirect::to($this->target::findOrFail($id)->preview()->collecturl());
     }
 
     /**

@@ -13,9 +13,9 @@ use Illuminate\Support\Str;
 
 /**
  * Service to interact with a SX Surveys data.
- * 
+ *
  * A survey has various data that is mapped in this service as follows:
- * 
+ *
  * | SxSurveyService    | SX            |
  * | ---                | ---           |
  * | structure          | structure     |
@@ -24,14 +24,14 @@ use Illuminate\Support\Str;
  * | labels             | labels        |
  * | /                  | questionnaire |
  * | /                  | variables     |
- * 
+ *
  * Data is requested as CSV, and parsed.
- * 
+ *
  * SX uses short variable names for export by default. While the SX API
  * gives us the option to export also long names, when interacting with
  * respondents, it requires short names. Therefore we export the short
  * names and use the returned structure to guess the short and full names
- * however we need them ({@see \berthott\SX\Services\SxSurveyService::guessShortVariableName()}, 
+ * however we need them ({@see \berthott\SX\Services\SxSurveyService::guessShortVariableName()},
  * {@see \berthott\SX\Services\SxSurveyService::guessFullVariableName()}).
  */
 class SxSurveyService
@@ -100,7 +100,7 @@ class SxSurveyService
     public function getQuestions(string $language = null): Collection
     {
         $this->initStructure();
-        $questions = $this->structure->map(fn($structure) => $this->mapToFullVariableName(SxHelpers::pluckFromCollection($structure, 'questionName', 'variableName', 'questionText', 'subType', 'choiceValue', 'choiceText')));
+        $questions = $this->structure->map(fn ($structure) => $this->mapToFullVariableName(SxHelpers::pluckFromCollection($structure, 'questionName', 'variableName', 'questionText', 'subType', 'choiceValue', 'choiceText')));
         return $questions[$language ?: $this->defaultLanguage];
     }
 
@@ -119,7 +119,7 @@ class SxSurveyService
     private function initStructure()
     {
         if (!isset($this->structure)) {
-            $this->structure = $this->languages->mapWithKeys(fn($lang) => [
+            $this->structure = $this->languages->mapWithKeys(fn ($lang) => [
                 $lang => $this->extractCsv(SxHttpService::surveys()->exportStructure([
                 'survey' => $this->survey_id,
                 'query' => [
@@ -136,7 +136,7 @@ class SxSurveyService
     private function initLabels()
     {
         if (!isset($this->labels)) {
-            $this->labels = $this->languages->mapWithKeys(fn($lang) => [
+            $this->labels = $this->languages->mapWithKeys(fn ($lang) => [
                 $lang => $this->mapToFullVariableName($this->extractCsv(SxHttpService::surveys()->exportLabels([
                     'survey' => $this->survey_id,
                     'query' => [
@@ -169,6 +169,11 @@ class SxSurveyService
             $csv = Statement::create()->process($csv, $header);
         }
         foreach ($csv as $row) {
+            foreach ($row as $k => $v) {
+                unset($row[$k]);
+                $new_key = preg_replace('/[^A-Za-z0-9\-]/', '', $k);
+                $row[$new_key] = $v;
+            }
             $row = array_map(function ($entry) {
                 return !is_numeric($entry) && empty($entry) ? null : $entry;
             }, $row);
@@ -179,7 +184,7 @@ class SxSurveyService
 
     /**
      * Guess the full SX variable name from it's short name.
-     * 
+     *
      * This is done by looking up the SX structure.
      */
     public function guessFullVariableName(string $shortName): string
@@ -203,8 +208,8 @@ class SxSurveyService
 
     /**
      * Guess the short SX variable name from its full name.
-     * 
-     * Guessing the short name is no simple mapping, because the short 
+     *
+     * Guessing the short name is no simple mapping, because the short
      * names are numbered by short name and not by the long name. This
      * means if two long names begin in the same way, they'll get the
      * same short name, and the short name will be counted accordingly.
@@ -237,8 +242,8 @@ class SxSurveyService
 
     /**
      * Guess the full variable name for each element of a collection.
-     * 
-     * If a variableName exists on an item of the given collection, guess 
+     *
+     * If a variableName exists on an item of the given collection, guess
      * its full name.
      */
     private function mapToFullVariableName(Collection $collection): Collection

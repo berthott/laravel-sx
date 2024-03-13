@@ -171,7 +171,7 @@ class SxSurveyService
         foreach ($csv as $row) {
             foreach ($row as $k => $v) {
                 unset($row[$k]);
-                $new_key = preg_replace('/[^A-Za-z0-9\-]/', '', $k);
+                $new_key = preg_replace('/[^a-zA-Z0-9_.]/', '', $k);
                 $row[$new_key] = $v;
             }
             $row = array_map(function ($entry) {

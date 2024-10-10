@@ -2,7 +2,9 @@
 
 namespace berthott\SX\Helpers;
 
+use Closure;
 use Exception;
+use Facades\berthott\SX\Helpers\SxLog;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Support\Collection;
@@ -79,5 +81,40 @@ class SxHelpers
         } catch (Exception $e) {
             return Schema::getColumnListing($tableName);
         }
+    }
+
+    /**
+     * Log the execution time and return the result.
+     */
+    public function logExecutionTimeAndGetResult(string $label, Closure $cb): mixed
+    {
+        [$ret, $executionTime] = $this->getExecutionTimeAndResult($label, $cb);
+        return $ret;
+    }
+
+    /**
+     * Log the execution time and return the execution time.
+     */
+    public function logAndGetExecutionTime(string $label, Closure $cb): mixed
+    {
+        [$ret, $executionTime] = $this->getExecutionTimeAndResult($label, $cb);
+        return $executionTime;
+    }
+
+
+    /**
+     * Get the execution time and the result.
+     */
+    public function getExecutionTimeAndResult(string $label, Closure $cb): array
+    {
+        $startTime = microtime(true);
+        $ret = $cb();
+        $endTime = microtime(true);
+        $executionTime = $endTime - $startTime;
+        if (app()->runningInConsole()) {
+            fwrite(STDERR, print_r("$label => $executionTime\r\n", TRUE));
+        }
+        SxLog::log("$label => $executionTime");
+        return [$ret, $executionTime];
     }
 }

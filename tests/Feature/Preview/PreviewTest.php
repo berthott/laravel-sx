@@ -63,9 +63,6 @@ class PreviewTest extends PreviewTestCase
             'year' => fake()->year,
         ]);
         $this->get(route('distribution_entities.preview', ['distribution_entity' => $distributionEntity->id]))
-            ->assertSuccessful()
-            ->assertJson([
-                'collecturl' => 'http://www.survey-xact.dk/answer?key=TYCAN7PPW33U',
-            ]);
+            ->assertRedirect();
     }
 }

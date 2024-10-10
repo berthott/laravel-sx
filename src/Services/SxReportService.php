@@ -52,7 +52,7 @@ class SxReportService
      */
     private function filterRespondents(string $class, SxReportRequest $request): Collection
     {    
-        return DB::table($class::longTableName())->where(function ($query) use ($class, $request) {            
+        return DB::table($class::reportTableName())->where(function ($query) use ($class, $request) {            
             foreach($request->filters() as $property => $value) {
                 $questions = $this->questions->where('questionName', $property);
                 $type = $questions->first()['subType'];
@@ -109,7 +109,7 @@ class SxReportService
     private function filterFields(string $class, SxReportRequest $request, Collection $questions): Collection
     {    
         $respondents = $this->requestedRespondets;
-        return DB::table($class::longTableName())->where(function ($query) use ($respondents, $request, $class, $questions) {
+        return DB::table($class::reportTableName())->where(function ($query) use ($respondents, $request, $class, $questions) {
             $fields = $request->fields();
             if ($fields->count()) {
                 $query = $query->whereIn('variableName', $fields[$class::entityTableName()]);

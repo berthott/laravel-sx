@@ -406,6 +406,33 @@ trait Sxable
     }
 
     /**
+     * The views specified for the model.
+     * 
+     * Currently the only supported view is the report table.
+     * To specify a view, use the following format:
+     * ```php
+     * [
+     *    'report' => "
+     *         SELECT * FROM entities_long
+     *         WHERE variableName = 'fake'
+     *    "
+     * ]
+     * ```
+     */
+    public static function views(): array
+    {
+        return [];
+    }
+
+    /**
+     * The table to use for the report.
+     */
+    public static function reportTableName(): string
+    {
+        return array_key_exists('report', static::views()) ? static::entityTableName().'_report' : static::longTableName();
+    }
+
+    /**
      * Initialize the sxable tables.
      * 
      * The order of this initialization matters.
@@ -416,6 +443,7 @@ trait Sxable
         static::initEntityTable($force, $max);
         static::initLabelsTable($force);
         static::initQuestionsTable($force);
+        static::initViews($force);
         return $labeled
             ? SxableLabeledResource::collection(static::all())
             : static::all();
@@ -451,6 +479,25 @@ trait Sxable
     {
         SxLog::log("$table: Table dropped.");
         Schema::dropIfExists($table);
+    }
+
+    /**
+     * Initialize the views.
+     */
+    private static function initViews(bool $force = false): void
+    {
+        foreach (static::views() as $view => $statement) {
+            $viewTableName = static::entityTableName().'_'.$view;
+            if ($force) {
+                SxLog::log("$viewTableName: View dropped.");
+                DB::statement("DROP VIEW $viewTableName");
+            }
+            if(!Schema::hasTable(static::entityTableName().'_'.$view)) {
+                SxLog::log("$viewTableName: Creating view.");
+                DB::statement("CREATE VIEW $viewTableName AS $statement");
+                SxLog::log("$viewTableName: View created.");
+            }
+        }
     }
 
     /**

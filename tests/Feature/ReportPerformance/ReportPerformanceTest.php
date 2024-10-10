@@ -2,19 +2,56 @@
 
 namespace berthott\SX\Tests\Feature\ReportPerformance;
 
+use Facades\berthott\SX\Helpers\SxHelpers;
+use Illuminate\Support\Facades\DB;
+
 class ReportPerformanceTest extends ReportPerformanceTestCase
 {
-    public function test_report_performance(): void
+    public function test_report_performance_5000(): void
     {
-        $startTime = microtime(true);
+        $respondents = DB::table('entities')->get()->take(5000)->pluck('fake')->toArray();
 
-        $this->get(route('entities.report'))
-            ->assertStatus(200);
+        $executionTime = SxHelpers::logAndGetExecutionTime('Querying 5000 respondents.', function () use ($respondents) {
+            $this->get(route('entities.report', [
+                'filter' => [
+                    'fake' => join(',', $respondents),
+                ]
+            ]))
+                ->assertStatus(200);
+        });
 
-        $endTime = microtime(true);  
-        $executionTime = $endTime - $startTime;
-        fwrite(STDERR, print_r("Query took $executionTime seconds to execute.", TRUE));
+        $this->assertLessThan(2, $executionTime, 'The report execution time exceeds 2 seconds for 5000 respondents.');
+    }
 
-        $this->assertLessThan(10, $executionTime, 'The report execution time exceeds 10 seconds for 5000 respondents.');
+    public function test_report_performance_10000(): void
+    {
+        $respondents = DB::table('entities')->get()->take(10000)->pluck('fake')->toArray();
+
+        $executionTime = SxHelpers::logAndGetExecutionTime('Querying 10000 respondents.', function () use ($respondents) {
+            $this->get(route('entities.report', [
+                'filter' => [
+                    'fake' => join(',', $respondents),
+                ]
+            ]))
+                ->assertStatus(200);
+        });
+
+        $this->assertLessThan(4, $executionTime, 'The report execution time exceeds 4 seconds for 10000 respondents.');
+    }
+
+    public function test_report_performance_50000(): void
+    {
+        $respondents = DB::table('entities')->get()->take(50000)->pluck('fake')->toArray();
+
+        $executionTime = SxHelpers::logAndGetExecutionTime('Querying 50000 respondents.', function () use ($respondents) {
+            $this->get(route('entities.report', [
+                'filter' => [
+                    'fake' => join(',', $respondents),
+                ]
+            ]))
+                ->assertStatus(200);
+        });
+
+        $this->assertLessThan(12, $executionTime, 'The report execution time exceeds 12 seconds for 50000 respondents.');
     }
 }

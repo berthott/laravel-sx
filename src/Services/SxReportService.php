@@ -21,7 +21,7 @@ class SxReportService
     private Collection $questions;
     private Collection $aggregatedQuestions;
     private Collection $labels;
-    private Collection $requestedRespondets;
+    private Collection $requestedRespondents;
     private SxReportRequest $request;
 
     /**
@@ -30,21 +30,25 @@ class SxReportService
     public function get(string $class): array
     {
         $this->request = SxReportRequest::fromRequest(app(Request::class));
-        $this->columns = $this->fromOptions($class, 'filter') ?: $class::questionNames();
         $this->questions = $this->aggregatedQuestions = $class::questions($this->request->lang);
+        $this->columns = $this->fromOptions($class, 'filter') ?: $this->getColumns($class);
         $this->labels = $class::labels($this->request->lang);
-        $this->requestedRespondets = $this->filterRespondents($class, $this->request);
+        $this->requestedRespondents = $this->filterRespondents($class, $this->request);
         $this->setupForAggregatedFields($this->request);
         return $this->report($class);
     }
 
     /**
-     * Gather report data for the given questions.
+     * Get the columns for the report.
      */
-    private function getData(string $class, Collection $questions): Collection
-    {    
-        $data = $this->filterFields($class, $this->request, $questions);
-        return $this->applyAggregateFields($this->request, $data);
+    private function getColumns(string $class): array
+    {
+        $questions = $this->questions;
+        $fields = $this->request->fields();
+            if ($fields->count()) {
+                $questions = $questions->whereIn('variableName', $fields[$class::entityTableName()]);
+            }
+        return $questions->pluck('questionName')->unique()->values()->toArray();
     }
 
     /**
@@ -52,72 +56,32 @@ class SxReportService
      */
     private function filterRespondents(string $class, SxReportRequest $request): Collection
     {    
-        return DB::table($class::reportTableName())->where(function ($query) use ($class, $request) {            
+        return DB::table($class::entityTableName())->where(function ($query) use ($request) {            
             foreach($request->filters() as $property => $value) {
                 $questions = $this->questions->where('questionName', $property);
                 $type = $questions->first()['subType'];
-                $column = '';
-                switch($type) {
-                    case 'Single':
-                    case 'Multiple':
-                        $column = 'value_single_multiple';
-                        break;
-                    case 'Double':
-                        $column = 'value_double';
-                        break;
-                    case 'String':
-                        $column = 'value_string';
-                        break;
-                    case 'Date':
-                        $column = 'value_datetime';
-                        break;
-                }
-                $query = $query->orwhere(function($query) use ($column, $property, $value, $type, $questions) {
-                    
+                $query = $query->orwhere(function($query) use ($property, $value, $type, $questions) {
                     if ($type === 'Multiple') {
                         if (!is_array($value)) {
                             $value = [$value];
                         }
-                        $query = $query->whereIn('variableName', $questions->where('questionName', $property)->pluck('variableName'));
-                        $query = $query->where(function($query) use ($value, $questions, $column) {
+                        $query = $query->where(function($query) use ($value, $questions) {
                             foreach ($value as $v) {
-                                foreach ($questions as $question) {
-                                    if ($question['choiceValue'] === (int) $v) {
-                                        $query = $query->orwhere(function($query) use ($question, $column) {
-                                            return $query->where('variableName', $question['variableName'])->where($column, 1);
-                                        });
-                                    }
+                                $question = $questions->first(fn($q) => $q['choiceValue'] === (int) $v);
+                                if ($question) {
+                                    $query = $query->orwhere(function($query) use ($question) {
+                                        return $query->where($question['variableName'], 1);
+                                    });
                                 }
                             }
                         });
                         return $query;
                     }
-                    $query = $query->where('variableName', $property);
                     return is_array($value) 
-                            ? $query->whereIn($column, $value) 
-                            : $query->where($column, $value);
+                            ? $query->whereIn($property, $value) 
+                            : $query->where($property, $value);
                 });
             }
-        })->get()->unique('respondent_id')->pluck('respondent_id');
-    }
-
-    /**
-     * Build a query to filter for the fields requested.
-     * 
-     * Also filters for the respondents and the requested questions.
-     */
-    private function filterFields(string $class, SxReportRequest $request, Collection $questions): Collection
-    {    
-        $respondents = $this->requestedRespondets;
-        return DB::table($class::reportTableName())->where(function ($query) use ($respondents, $request, $class, $questions) {
-            $fields = $request->fields();
-            if ($fields->count()) {
-                $query = $query->whereIn('variableName', $fields[$class::entityTableName()]);
-            }
-            $query->whereIn('respondent_id', $respondents);
-            $query->whereIn('variableName', $questions);
-
-            return $query;
         })->get();
     }
 
@@ -147,26 +111,6 @@ class SxReportService
     }
 
     /**
-     * Aggregate the requested fields.
-     */
-    private function applyAggregateFields(SxReportRequest $request, Collection $data): Collection
-    {    
-        $aggregate = $request->aggregate();
-        if (!$aggregate->count()) {
-            return $data;
-        }
-
-        return $data->map(function($entry) use ($aggregate) {
-            foreach($aggregate as $replace => $search) {
-                if (in_array($entry->variableName, $search)) {
-                    $entry->variableName = $replace;
-                }
-            }
-            return $entry;
-        });
-    }
-
-    /**
      * Build the report from the gathered data.
      * 
      * This is done for each data type individually.
@@ -178,13 +122,9 @@ class SxReportService
             $aggregated = $this->request->aggregate()->get($column);
             $filteredQuestions = $aggregated ? $this->questions->whereIn('questionName', $aggregated) : $this->questions->where('questionName', $column);
 
-            $filteredData = $this->getData($class, $filteredQuestions->pluck('variableName'));
-            if ($filteredData->isEmpty()) {
-                continue;
-            }
             $question = $this->aggregatedQuestions->where('questionName', $column)->first();
             $method = 'report'.$question['subType'];
-            $d = $this->$method($class, $filteredData, $question);
+            $d = $this->$method($class, $question);
             if ($d['numValid']) {
                 $ret[$column] = $d;
             }
@@ -192,10 +132,34 @@ class SxReportService
         return $ret;
     }
 
-    private function reportSingle(string $class, Collection $data, array $question): array
+    /**
+     * Get the data for a single question.
+     * Handling of aggregated fields.
+     */
+    private function getSingleData(string $question): Collection
+    {
+        $aggregate = $this->request->aggregate();
+        if (!$aggregate->count() || !$aggregate->has($question)) {
+            return $this->requestedRespondents->pluck($question)->values();
+        }
+
+        $aggregated = collect();
+        if ($aggregate->has($question)) {
+            $this->requestedRespondents->each(function($respondent) use ($question, $aggregate, &$aggregated) {
+                foreach($aggregate[$question] as $search) {
+                    $aggregated->push($respondent->$search);
+                }
+            });
+            
+        }
+
+        return $aggregated;
+    }
+
+    private function reportSingle(string $class, array $question): array
     {
         $possibleAnswers = $this->labels->where('variableName', $question['variableName'])->unique()->filter(fn($a) => $a['value'] > 0);
-        $answers = $data->where('variableName', $question['variableName'])->pluck('value_single_multiple')->values();
+        $answers = $this->getSingleData($question['variableName']);
         $validAnswers = $answers->filter(fn($answer) => $answer > 0);
         $validAnswersCount = $possibleAnswers->pluck('value')->mapWithKeys(function($value) use ($validAnswers) {
             $count = $validAnswers->filter(fn($v) => $v == $value)->count();
@@ -212,15 +176,18 @@ class SxReportService
         ]);
     }
 
-    private function reportMultiple(string $class, Collection $data, array $question): array
+    private function reportMultiple(string $class, array $question): array
     {
         $possibleAnswers = $this->questions->where('questionName', $question['questionName']);
         $possibleValues = $possibleAnswers->mapWithKeys(fn($a) => [$a['choiceValue'] => $a['choiceText']]);
-        $answers = $data->groupBy('respondent_id')->map(function($group) use ($possibleAnswers) {
-            return $group
-                ->filter(fn($entry) => $entry->value_single_multiple === 1)
-                ->map(fn($entry) => $possibleAnswers->firstWhere('variableName', $entry->variableName)['choiceValue'])
-                ->sort()->values()->toArray();
+        $answers = $this->requestedRespondents->map(function($respondent) use ($possibleAnswers) {
+            return $possibleAnswers->reduce(function($r, $possibleAnswer) use ($respondent) {
+                $variableName = $possibleAnswer['variableName'];
+                if ($respondent->$variableName === 1) {
+                    $r[] = $possibleAnswer['choiceValue'];
+                }
+                return $r;
+            }, []);
         });
         $num = $answers->count();
         $validAnswers = $answers->filter(fn($answer) => count($answer) > 0);
@@ -239,25 +206,25 @@ class SxReportService
         ]);
     }
 
-    private function reportDouble(string $class, Collection $data, array $question): array
+    private function reportDouble(string $class, array $question): array
     {
-        $answers = $data->where('variableName', $question['variableName'])->pluck('value_double')->values();
+        $answers = $this->requestedRespondents->pluck($question['variableName'])->values();
         $validAnswers = $answers->filter(fn($answer) => $answer != null);
         return $this->buildReport($answers, $validAnswers, $question, [
             'average' => $validAnswers->average(),
         ]);
     }
 
-    private function reportString(string $class, Collection $data, array $question): array
+    private function reportString(string $class, array $question): array
     {
-        $answers = $data->where('variableName', $question['variableName'])->pluck('value_string')->values();
+        $answers = $this->requestedRespondents->pluck($question['variableName'])->values();
         $validAnswers = $answers->filter(fn($answer) => $answer != null);
         return $this->buildReport($answers, $validAnswers, $question);
     }
 
-    private function reportDate(string $class, Collection $data, array $question): array
+    private function reportDate(string $class, array $question): array
     {
-        $answers = $data->where('variableName', $question['variableName'])->pluck('value_datetime')->values();
+        $answers = $this->requestedRespondents->pluck($question['variableName'])->values();
         $validAnswers = $answers->filter(fn($answer) => $answer != null);
         return $this->buildReport($answers, $validAnswers, $question);
     }

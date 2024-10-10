@@ -49,7 +49,7 @@ abstract class ReportPerformanceTestCase extends BaseTestCase
             ->andReturn(new Response(
                 $status = 200,
                 $headers = [],
-                File::get(__DIR__.'/../dataset_5000.csv'),
+                File::get(__DIR__.'/../dataset_50000.csv'),
             ));
         SxApiService::makePartial();
     }

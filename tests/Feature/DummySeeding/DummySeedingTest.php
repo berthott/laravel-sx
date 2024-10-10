@@ -17,7 +17,7 @@ class DummySeedingTest extends DummySeedingTestCase
     {
         Entity::seedDummyData(11);
         $this->assertDatabaseCount('entities', 11);
-        $this->assertDatabaseCount('entities_long', 11 * 107);
+        $this->assertDatabaseCount('entities_long', 11 * 108);
     }
 
     public function test_dummy_seeding_with_override(): void

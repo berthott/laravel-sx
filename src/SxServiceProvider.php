@@ -105,7 +105,7 @@ class SxServiceProvider extends ServiceProvider
                 if (in_array('labels', $crudRoutes)) Route::get("{$sxable::entityTableName()}/labels", [SxableController::class, 'labels'])->name($sxable::entityTableName().'.labels');
                 if (in_array('destroy_many', $crudRoutes)) Route::delete("{$sxable::entityTableName()}/destroy_many", [SxableController::class, 'destroy_many'])->name($sxable::entityTableName().'.destroy_many');
                 if (in_array('show_respondent', $crudRoutes)) Route::get("{$sxable::entityTableName()}/{{$sxable::singleName()}}/show_respondent", [SxableController::class, 'show_respondent'])->name($sxable::entityTableName().'.show_respondent');
-                if (in_array('report', $crudRoutes)) Route::get("{$sxable::entityTableName()}/report", [SxableController::class, 'report'])->name($sxable::entityTableName().'.report');
+                if (in_array('report', $crudRoutes)) Route::match(['GET', 'POST'], "{$sxable::entityTableName()}/report", [SxableController::class, 'report'])->name($sxable::entityTableName().'.report');
                 if (in_array('languages', $crudRoutes)) Route::get("{$sxable::entityTableName()}/languages", [SxableController::class, 'languages'])->name($sxable::entityTableName().'.languages');
                 if (in_array('report_pdf', $crudRoutes)) Route::post("{$sxable::entityTableName()}/report_pdf", [SxableController::class, 'report_pdf'])->name($sxable::entityTableName().'.report_pdf');
                 if (in_array('preview', $crudRoutes) && is_string($sxable::previewId())) Route::post("{$sxable::entityTableName()}/preview", [SxableController::class, 'preview'])->name($sxable::entityTableName().'.preview');

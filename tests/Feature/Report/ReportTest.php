@@ -324,6 +324,131 @@ class ReportTest extends ReportTestCase
             ['respondentid' => 834262051],
         ]); */
     }
+    
+    public function test_report_filtered_one_single_post(): void
+    {
+        $this->post(route('entities.report'), [
+            'filter' => [
+                's_5' => 2,
+            ]
+        ])
+        ->assertStatus(200)
+        ->assertJson([
+            'startTime' => [
+                'type' => 'Date',
+                'question' => 'Beginn',
+                'answers' => [
+                    '2021-09-02 18:50:24',
+                ],
+                'num' => 1,
+                'numValid' => 1,
+                'numInvalid' => 0,
+            ],
+            's_2' => [
+                'type' => 'Double',
+                'question' => 'Jahr',
+                'answers' => [2021],
+                'average' => 2021,
+                'num' => 1,
+                'numValid' => 1,
+                'numInvalid' => 0,
+            ],
+            'trainer_1' => [
+                'type' => 'Single',
+                'question' => 'Trainer 1',
+                'labels' => [
+                    1 => 'gar nicht zufrieden',
+                    2 => 'kaum zufrieden',
+                    3 => 'teilweise zufrieden',
+                    4 => 'eher zufrieden',
+                    5 => 'sehr zufrieden',
+                ],
+                'answers' => [1],
+                'answersCount' => [
+                    1 => 1,
+                    2 => 0,
+                    3 => 0,
+                    4 => 0,
+                ],
+                'answersPercent' => [
+                    1 => 100,
+                    2 => 0,
+                    3 => 0,
+                    4 => 0,
+                ],
+                'average' => 1,
+                'num' => 1,
+                'numValid' => 1,
+                'numInvalid' => 0,
+            ],
+            's_10' => [
+                'type' => 'String',
+                'question' => 'business_idea_description',
+                'answers' => [
+                    'Frauenhaus in Georgien im ländlichen Gebiet',
+                ],
+                'num' => 1,
+                'numValid' => 1,
+                'numInvalid' => 0,
+            ],
+            's_11' => [
+                'type' => 'Multiple',
+                'question' => 'SDG',
+                'answers' => [
+                    [3, 5],
+                ],
+                'answersPercent' => [
+                    1 => 0,
+                    2 => 0,
+                    3 => 1,
+                    4 => 0,
+                    5 => 1,
+                    6 => 0,
+                    7 => 0,
+                    8 => 0,
+                    9 => 0,
+                    10 => 0,
+                    11 => 0,
+                    12 => 0,
+                    13 => 0,
+                    14 => 0,
+                    15 => 0,
+                    16 => 0,
+                    17 => 0,
+                ],
+                'answersPercent' => [
+                    1 => 0,
+                    2 => 0,
+                    3 => 100,
+                    4 => 0,
+                    5 => 100,
+                    6 => 0,
+                    7 => 0,
+                    8 => 0,
+                    9 => 0,
+                    10 => 0,
+                    11 => 0,
+                    12 => 0,
+                    13 => 0,
+                    14 => 0,
+                    15 => 0,
+                    16 => 0,
+                    17 => 0,
+                ],
+                'num' => 1,
+                'numValid' => 1,
+                'numInvalid' => 0,
+            ],
+        ]);
+        /* ->assertJson([
+            ['respondentid' => 825478429],
+        ])
+            ->assertJsonMissing([
+            ['respondentid' => 825479792],
+            ['respondentid' => 825478569],
+            ['respondentid' => 834262051],
+        ]); */
+    }
 
     public function test_report_filtered_multiple_single(): void
     {
@@ -818,6 +943,46 @@ class ReportTest extends ReportTestCase
                 ],
             ]
         ]))
+        ->assertStatus(200)
+        ->assertJson([
+            'trainer' => [
+                'answers' => [1, 4, 5, 2, 5, 5, 3, 5, 4],
+                'answersCount' => [
+                    1 => 1,
+                    2 => 1,
+                    3 => 1,
+                    4 => 2,
+                    5 => 4,
+                ],
+                'answersPercent' => [
+                    1 => 11.1,
+                    2 => 11.1,
+                    3 => 11.1,
+                    4 => 22.2,
+                    5 => 44.4,
+                ],
+                'average' => 3.8,
+                'num' => 12,
+                'numValid' => 9,
+                'numInvalid' => 3,
+            ],
+        ]);
+    }
+
+    public function test_aggregate_field_combination_post(): void
+    {
+        $this->post(route('entities.report'), [
+            'fields' => [
+                'entities' => 'trainer'
+            ],
+            'aggregate' => [
+                'trainer' => [
+                    'trainer_1',
+                    'trainer_2',
+                    'trainer_3',
+                ],
+            ]
+        ])
         ->assertStatus(200)
         ->assertJson([
             'trainer' => [

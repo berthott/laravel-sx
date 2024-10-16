@@ -29,6 +29,11 @@ const LONG_TABLE_COLUMN_COUNT = 8;
 trait Sxable
 {
     /**
+     * @var Collection|null $longStructure cache the long structure
+     */
+    private static Collection|null $longStructure = null;
+
+    /**
      * Bootstrap the trait.
      * 
      * @see \Illuminate\Database\Eloquent\Concerns\GuardsAttributes
@@ -866,21 +871,23 @@ trait Sxable
     {
         $count = $entries->count();
         SxLog::log(static::entityTableName().": Importing $count respondents...");
-        // wide table
         $wideChunkSize = floor(MAX_SQL_PLACEHOLDERS / static::structure()->count());
-        $entries->chunk($wideChunkSize)->each(function (Collection $chunk) use ($count) {
+        $longChunkSize = floor(MAX_SQL_PLACEHOLDERS / LONG_TABLE_COLUMN_COUNT);
+        $entries->chunk($wideChunkSize)->each(function (Collection $chunk, int $index) use ($count, $longChunkSize) {
+            // wide table
             static::upsert($chunk->all(), [config('sx.primary')]);
-        });
 
-        // long table
-        $entries->chunk(MAX_MEMORY_CHUNK_SIZE)->each(function (Collection $memoryChunk) use ($count) {
-            $longEntries = $memoryChunk->reduce(function (Collection $reduced, $entry) {
+            // long table
+            $longEntries = $chunk->reduce(function (Collection $reduced, $entry) {
                 return $reduced->push(...static::makeLongEntries($entry));
             }, collect());
-            $longChunkSize = floor(MAX_SQL_PLACEHOLDERS / LONG_TABLE_COLUMN_COUNT);
-            $longEntries->chunk($longChunkSize)->each(function (Collection $chunk) use ($count) {
+            $longEntries->chunk($longChunkSize)->each(function (Collection $chunk) {
                 DB::table(static::longTableName())->upsert($chunk->toArray(), ['respondent_id', 'variableName']);
             });
+
+            // log
+            $chunkCount = ($index + 1) * $chunk->count();
+            SxLog::log(static::entityTableName().": $chunkCount/$count entries imported.");
         });
 
         SxLog::log(static::entityTableName().": $count respondents imported (".$entries->pluck(config('sx.primary'))->join(', ').')');
@@ -894,9 +901,12 @@ trait Sxable
     public static function makeLongEntries(array $attributes): array
     {
         $entries = [];
-        $structure = DB::table(static::structureTableName())->get()->mapWithKeys(function ($entry) {
-            return [$entry->variableName => $entry->subType];
-        });
+        if (static::$longStructure === null) {
+            static::$longStructure = DB::table(static::structureTableName())->get()->mapWithKeys(function ($entry) {
+                return [$entry->variableName => $entry->subType];
+            });
+        }
+        $now = now();
         foreach ($attributes as $variableName => $value) {
             if (in_array($variableName, ['id', config('sx.primary'), 'created_at', 'updated_at'])) {
                 continue;
@@ -908,10 +918,10 @@ trait Sxable
                 'value_double' => null,
                 'value_string' => null,
                 'value_datetime' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'created_at' => $now,
+                'updated_at' => $now,
             ];
-            switch ($structure[$variableName]) {
+            switch (static::$longStructure[$variableName]) {
                 case 'Single':
                 case 'Multiple':
                     $entry['value_single_multiple'] = $value;

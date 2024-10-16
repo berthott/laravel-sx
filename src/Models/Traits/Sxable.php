@@ -20,7 +20,6 @@ use Faker\Factory as FakerFactory;
 use Faker\Generator as Faker;
 
 const MAX_SQL_PLACEHOLDERS = 60000;
-const MAX_MEMORY_CHUNK_SIZE = 100;
 const LONG_TABLE_COLUMN_COUNT = 8;
 
 /**
@@ -239,6 +238,46 @@ trait Sxable
      * @api
      */
     public static function reportQueryOptions(): array
+    {
+        return [];
+    }
+
+    /**
+     * The indexes to add to the database.
+     * 
+     * **optional**
+     * 
+     * Defaults to `[]`.
+     */
+    public static function indexes(): array
+    {
+        return [];
+    }
+
+    /**
+     * The columns that should have a different type than used in sx.
+     * 
+     * Array should be of the structure $column => $type.
+     * 
+     * **optional**
+     * 
+     * Defaults to `[]`.
+     */
+    public static function databaseCasts(): array
+    {
+        return [];
+    }
+
+    /**
+     * Foreign keys to be added to the database.
+     * 
+     * Array should be of the structure $column => [$table, $foreign].
+     * 
+     * **optional**
+     * 
+     * Defaults to `[]`.
+     */
+    public static function foreignKeys(): array
     {
         return [];
     }
@@ -562,22 +601,27 @@ trait Sxable
                 if (!in_array($column->variableName, static::fields())) {
                     continue;
                 }
-                switch ($column->subType) {
-                    case 'Single':
-                    case 'Multiple':
-                        $t = $table->integer($column->variableName);
-                        break;
-                    case 'Double':
-                        $t = $table->double($column->variableName);
-                        break;
-                    case 'String':
-                        $t = in_array($column->variableName, static::uniqueFields())
-                            ? $table->string($column->variableName)
-                            : $table->text($column->variableName);
-                        break;
-                    case 'Date':
-                        $t = $table->dateTime($column->variableName);
-                        break;
+                if (array_key_exists($column->variableName, static::databaseCasts())) {
+                    $t = $table->{static::databaseCasts()[$column->variableName]}($column->variableName);
+                } else {
+                    switch ($column->subType) {
+                        case 'Single':
+                        case 'Multiple':
+                            $t = $table->integer($column->variableName);
+                            break;
+                        case 'Double':
+                            $t = $table->double($column->variableName);
+                            break;
+                        case 'String':
+                            $t = in_array($column->variableName, static::uniqueFields()) ||
+                                static::isInIndex($column->variableName)
+                                    ? $table->string($column->variableName)
+                                    : $table->text($column->variableName);
+                            break;
+                        case 'Date':
+                            $t = $table->dateTime($column->variableName);
+                            break;
+                    }
                 }
                 if ($column->variableName === config('sx.primary')) {
                     $t->primary();
@@ -590,6 +634,12 @@ trait Sxable
                     $t->nullable();
                 }
             }
+            foreach (static::indexes() as $index) {
+                $table->index($index);
+            }
+            foreach (static::foreignKeys() as $column => [$tableName, $foreign]) {
+                $table->foreign($column, $tableName.'_'.$foreign)->references($foreign)->on($tableName);
+            }
             $table->timestamps();
         }, $force);
 
@@ -601,6 +651,20 @@ trait Sxable
             static::doUpsert($entries);
             SxLog::log("$tableName: Table filled.");
         }
+    }
+
+    /**
+     * Check whether a column is in the index fields.
+     */
+    private static function isInIndex($columnName): bool
+    {
+        $found = false;
+        foreach (static::indexes() as $index) {
+            if ($index === $columnName || (is_array($index) && in_array($columnName, $index))) {
+                $found = true;
+            }
+        }
+        return $found;
     }
 
     /**

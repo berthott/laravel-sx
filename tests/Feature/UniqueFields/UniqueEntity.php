@@ -18,6 +18,51 @@ class UniqueEntity extends Model
     }
 
     /**
+     * The indexes to add to the database.
+     * 
+     * **optional**
+     * 
+     * Defaults to `[]`.
+     */
+    public static function indexes(): array
+    {
+        return [
+            'statinternal_2',
+            ['statinternal_3', 'statinternal_4']
+        ];
+    }
+
+    /**
+     * The columns that should have a different type than used in sx.
+     * 
+     * Array should be of the structure $column => $type.
+     * 
+     * **optional**
+     * 
+     * Defaults to `[]`.
+     */
+    public static function databaseCasts(): array
+    {
+        return ['fake' => 'string'];
+    }
+
+    /**
+     * Foreign keys to be added to the database.
+     * 
+     * Array should be of the structure $column => [$table, $foreign].
+     * 
+     * **optional**
+     * 
+     * Defaults to `[]`.
+     */
+    public static function foreignKeys(): array
+    {
+        return [
+            'statinternal_1' => ['entities', 'id']
+        ];
+    }
+
+    /**
      * The fields that should be unique.
      */
     public static function uniqueFields(): array

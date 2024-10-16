@@ -65,4 +65,32 @@ class UniqueFieldsTest extends UniqueFieldsTestCase
         
         $this->assertDatabaseHas('unique_entities', ['unique_id' => 'UNIQUE005']);
     }
+
+    public function test_database_has_unique_column(): void
+    {
+        $sm = Schema::getConnection()->getDoctrineSchemaManager();
+        $indexes = $sm->listTableIndexes('unique_entities');
+        $this->assertArrayHasKey('unique_entities_unique_id_unique', $indexes);
+    }
+
+    public function test_database_has_indexes(): void
+    {
+        $sm = Schema::getConnection()->getDoctrineSchemaManager();
+        $indexes = $sm->listTableIndexes('unique_entities');
+        $this->assertArrayHasKey('unique_entities_statinternal_3_statinternal_4_index', $indexes);
+        $this->assertArrayHasKey('unique_entities_statinternal_2_index', $indexes);
+    }
+
+    public function test_database_has_foreign_keys(): void
+    {
+        $sm = Schema::getConnection()->getDoctrineSchemaManager();
+        $foreign_keys = $sm->listTableForeignKeys('unique_entities');
+        $this->assertCount(1, $foreign_keys);
+    }
+
+    public function test_database_casts(): void
+    {
+        $type = Schema::getColumnType('unique_entities', 'fake');
+        $this->assertSame('string', $type);
+    }
 }

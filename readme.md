@@ -1,3 +1,5 @@
+![test workflow](https://github.com/berthott/laravel-sx/actions/workflows/test.yml/badge.svg)
+
 # Laravel-SX
 
 A SurveyXAct (SX) API Integration for Laravel. 

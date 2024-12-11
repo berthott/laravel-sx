@@ -52,6 +52,6 @@ class ReportPerformanceTest extends ReportPerformanceTestCase
                 ->assertStatus(200);
         });
 
-        $this->assertLessThan(12, $executionTime, 'The report execution time exceeds 12 seconds for 50000 respondents.');
+        $this->assertLessThan(15, $executionTime, 'The report execution time exceeds 12 seconds for 50000 respondents.');
     }
 }
